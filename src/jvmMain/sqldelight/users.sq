@@ -1,0 +1,12 @@
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY,
+      business TEXT,
+      name TEXT,
+      description TEXT,
+      street TEXT,
+      city TEXT,
+      state TEXT,
+      zip TEXT,
+      email TEXT,
+      phone TEXT
+);

@@ -1,5 +1,8 @@
 package storage
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class User(
     var businessName:String,
     var name: String,

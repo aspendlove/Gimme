@@ -1,5 +1,8 @@
 package storage
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Item(
     val startDate: String,
     val endDate: String,

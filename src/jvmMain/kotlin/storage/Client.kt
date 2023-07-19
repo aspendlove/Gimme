@@ -1,5 +1,8 @@
 package storage
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Client(
     var name: String,
     var street: String,

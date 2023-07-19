@@ -5,11 +5,13 @@ plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
     kotlin("plugin.serialization") version "1.5.0"
+    id("app.cash.sqldelight") version "2.0.0-alpha05"
 }
 
 group = "com.aspendlove"
-version = "1.0-SNAPSHOT"
+version = "1.0"
 dependencies {
+
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 
     val voyagerVersion = "1.0.0-rc05"
@@ -60,6 +62,14 @@ compose.desktop {
             targetFormats(TargetFormat.Exe, TargetFormat.AppImage)
             packageName = "Gimme"
             packageVersion = "1.0.0"
+        }
+    }
+}
+
+sqldelight {
+    databases {
+        create("Database") {
+            packageName.set("com.gimme")
         }
     }
 }
