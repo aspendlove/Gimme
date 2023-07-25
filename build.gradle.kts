@@ -16,7 +16,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposedVersion")
-    implementation("org.xerial:sqlite-jdbc:3.30.1")
+    implementation("org.xerial:sqlite-jdbc:3.42.0.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 
