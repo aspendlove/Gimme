@@ -1,9 +1,9 @@
-import storage.Client
-import storage.Item
-import storage.User
+import storage.TempClient
+import storage.TempItem
+import storage.TempUser
 
 data class SelectionState(
-    val user: User = User(
+    val tempUser: TempUser = TempUser(
         "default",
         "default",
         "default",
@@ -14,7 +14,7 @@ data class SelectionState(
         "default",
         "default"
     ),
-    val client: Client = Client(
+    val tempClient: TempClient = TempClient(
         "default",
         "default",
         "default",
@@ -23,5 +23,5 @@ data class SelectionState(
         "default",
         "default",
     ),
-    val items: MutableCollection<Item> = mutableListOf()
+    val tempItems: MutableCollection<TempItem> = mutableListOf()
 )

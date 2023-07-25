@@ -3,7 +3,7 @@ package storage
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class User(
+data class TempUser(
     var businessName:String,
     var name: String,
     var description: String,

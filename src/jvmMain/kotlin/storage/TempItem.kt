@@ -3,7 +3,7 @@ package storage
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Item(
+data class TempItem(
     val startDate: String,
     val endDate: String,
     val item: String,

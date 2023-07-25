@@ -3,7 +3,7 @@ package storage
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Client(
+data class TempClient(
     var name: String,
     var street: String,
     var city: String,

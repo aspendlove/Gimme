@@ -1,16 +1,22 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.plugin.extraProperties
 
 plugins {
     java
     kotlin("multiplatform")
     id("org.jetbrains.compose")
     kotlin("plugin.serialization") version "1.5.0"
-    id("app.cash.sqldelight") version "2.0.0-alpha05"
 }
 
+val exposedVersion: String by project
 group = "com.aspendlove"
 version = "1.0"
 dependencies {
+    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposedVersion")
+    implementation("org.xerial:sqlite-jdbc:3.30.1")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 
@@ -62,14 +68,6 @@ compose.desktop {
             targetFormats(TargetFormat.Exe, TargetFormat.AppImage)
             packageName = "Gimme"
             packageVersion = "1.0.0"
-        }
-    }
-}
-
-sqldelight {
-    databases {
-        create("Database") {
-            packageName.set("com.gimme")
         }
     }
 }
