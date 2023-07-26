@@ -9,6 +9,9 @@ plugins {
 }
 
 val exposedVersion: String by project
+val jdbcVersion: String by project
+val serializationVersion: String by project
+val voyagerVersion: String by project
 group = "com.aspendlove"
 version = "1.0"
 dependencies {
@@ -16,11 +19,9 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposedVersion")
-    implementation("org.xerial:sqlite-jdbc:3.42.0.0")
+    implementation("org.xerial:sqlite-jdbc:$jdbcVersion")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
-
-    val voyagerVersion = "1.0.0-rc05"
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
 
     // Multiplatform
 
@@ -61,13 +62,15 @@ kotlin {
     }
 }
 
+val gimmeVersion: String by project
+
 compose.desktop {
     application {
         mainClass = "MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Exe, TargetFormat.AppImage)
             packageName = "Gimme"
-            packageVersion = "1.0.0"
+            packageVersion = "$gimmeVersion"
         }
     }
 }
