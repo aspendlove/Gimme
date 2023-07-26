@@ -22,6 +22,8 @@ internal class DatabaseTest {
     private val databaseFilename = "testData.db"
     private val exampleStartDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
     private val exampleEndDate = exampleStartDate
+    private val exampleSendDate = exampleStartDate
+    private val exampleStatus = "Status"
     private val exampleItemName = "Item Name"
     private val exampleDescription = "Description"
     private val exampleQuantity = 1.0
@@ -121,5 +123,50 @@ internal class DatabaseTest {
             exampleQuantity,
             examplePrice
         )
+
+        assertEquals(exampleStartDate, item.startDate)
+        assertEquals(exampleEndDate, item.endDate)
+        assertEquals(exampleItemName, item.name)
+        assertEquals(exampleDescription, item.description)
+        assertEquals(exampleQuantity, item.quantity)
+        assertEquals(examplePrice, item.price)
+
+        val selectedItem = selectItemById(databaseFilename, item.id.value)
+
+        assertEquals(exampleStartDate, selectedItem.startDate)
+        assertEquals(exampleEndDate, selectedItem.endDate)
+        assertEquals(exampleItemName, selectedItem.name)
+        assertEquals(exampleDescription, selectedItem.description)
+        assertEquals(exampleQuantity, selectedItem.quantity)
+        assertEquals(examplePrice, selectedItem.price)
+    }
+
+    @Test
+    fun testAndInsertInvoice() {
+        val invoice = insertInvoice(
+            databaseFilename,
+            exampleStartDate,
+            exampleStatus,
+            exampleBusinessName,
+            exampleBusinessName,
+            exampleEmail,
+            examplePhone
+        )
+
+        assertEquals(exampleStartDate, invoice.sendDate)
+        assertEquals(exampleStatus, invoice.status)
+        assertEquals(exampleBusinessName, invoice.sender)
+        assertEquals(exampleBusinessName, invoice.clientBusinessName)
+        assertEquals(exampleEmail, invoice.clientEmail)
+        assertEquals(examplePhone, invoice.clientPhone)
+
+        val selectedInvoice = selectInvoiceById(databaseFilename, invoice.id.value)
+
+        assertEquals(exampleStartDate, selectedInvoice.sendDate)
+        assertEquals(exampleStatus, selectedInvoice.status)
+        assertEquals(exampleBusinessName, selectedInvoice.sender)
+        assertEquals(exampleBusinessName, selectedInvoice.clientBusinessName)
+        assertEquals(exampleEmail, selectedInvoice.clientEmail)
+        assertEquals(examplePhone, selectedInvoice.clientPhone)
     }
 }
