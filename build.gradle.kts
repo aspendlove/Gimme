@@ -1,5 +1,4 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.plugin.extraProperties
 
 plugins {
     java
@@ -15,6 +14,7 @@ val voyagerVersion: String by project
 group = "com.aspendlove"
 version = "1.0"
 dependencies {
+    testImplementation(kotlin("test"))
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
@@ -36,6 +36,7 @@ dependencies {
 
     // Transitions
     implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
+//    testImplementation("org.testng:testng:7.7.0")
 }
 
 repositories {
@@ -43,6 +44,10 @@ repositories {
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
+
+//tasks.test {
+//    useJUnitPlatform()
+//}
 
 
 kotlin {
@@ -58,7 +63,11 @@ kotlin {
                 implementation("com.darkrockstudios:mpfilepicker:1.2.0")
             }
         }
-        val jvmTest by getting
+        val jvmTest by getting {
+            dependencies {
+                implementation(kotlin("test-junit"))
+            }
+        }
     }
 }
 
