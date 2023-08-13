@@ -1,9 +1,12 @@
 package storage
 
-import java.sql.Connection
-import java.sql.ResultSet
-import java.sql.SQLException
-import java.sql.Statement
+import java.sql.*
+
+fun connect(databaseFilePath: String) : Connection {
+    val connection = DriverManager.getConnection("jdbc:sqlite:$databaseFilePath")
+    createTables(connection)
+    return connection
+}
 
 /**
  * Checks that a table with the passed name exists
@@ -162,7 +165,7 @@ fun insertUser(connection: Connection, user: User): Int {
 }
 
 /**
- * Inserts an client into the correct table and returns the ID of the newly inserted row
+ * Inserts a client into the correct table and returns the ID of the newly inserted row
  *
  * @param connection active jdbc connection
  * @param client client object that will be inserted
@@ -337,7 +340,7 @@ fun selectUser(connection: Connection, id: Int): User {
         "SELECT * FROM ${TableNames.userTableName} WHERE id = $id"
     ).use { preparedStatement ->
         val result = preparedStatement.executeQuery()
-        if (!result.first()) throw NoResultException("no row with given id")
+        if (!result.next()) throw NoResultException("no row with given id")
         return userFromResult(result)
     }
 }
@@ -354,7 +357,7 @@ fun selectClient(connection: Connection, id: Int): Client {
         "SELECT * FROM ${TableNames.clientTableName} WHERE id = $id"
     ).use { preparedStatement ->
         val result = preparedStatement.executeQuery()
-        if (!result.first()) throw NoResultException("no row with given id")
+        if (!result.next()) throw NoResultException("no row with given id")
         return clientFromResult(result)
     }
 }
@@ -371,7 +374,7 @@ fun selectItem(connection: Connection, id: Int): Item {
         "SELECT * FROM ${TableNames.itemTableName} WHERE id = $id"
     ).use { preparedStatement ->
         val result = preparedStatement.executeQuery()
-        if (!result.first()) throw NoResultException("no row with given id")
+        if (!result.next()) throw NoResultException("no row with given id")
         return itemFromResult(result)
     }
 }
@@ -382,7 +385,7 @@ fun selectItem(connection: Connection, id: Int): Item {
  * @param connection active jdbc connection
  * @param tableName the name of the table to delete a row in
  * @param id id of the row to delete
- * @return
+ * @return whether any rows were deleted
  */
 private fun deleteRowById(connection: Connection, tableName: String, id: Int): Boolean {
     connection.prepareStatement("DELETE FROM $tableName WHERE id = ?").use { preparedStatement ->
@@ -397,7 +400,7 @@ private fun deleteRowById(connection: Connection, tableName: String, id: Int): B
  *
  * @param connection active jdbc connection
  * @param id
- * @return
+ * @return whether any rows were deleted
  */
 fun deleteInvoice(connection: Connection, id: Int): Boolean {
     return deleteRowById(connection, TableNames.invoiceTableName, id)
@@ -408,7 +411,7 @@ fun deleteInvoice(connection: Connection, id: Int): Boolean {
  *
  * @param connection active jdbc connection
  * @param id
- * @return
+ * @return whether any rows were deleted
  */
 fun deleteUser(connection: Connection, id: Int): Boolean {
     return deleteRowById(connection, TableNames.userTableName, id)
@@ -419,7 +422,7 @@ fun deleteUser(connection: Connection, id: Int): Boolean {
  *
  * @param connection active jdbc connection
  * @param id
- * @return
+ * @return whether any rows were deleted
  */
 fun deleteClient(connection: Connection, id: Int): Boolean {
     return deleteRowById(connection, TableNames.clientTableName, id)
