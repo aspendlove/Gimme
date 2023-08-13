@@ -5,6 +5,13 @@ import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Statement
 
+/**
+ * Checks that a table with the passed name exists
+ *
+ * @param connection active jdbc connection
+ * @param tableName
+ * @return
+ */
 fun doesTableExist(connection: Connection, tableName: String): Boolean {
     val query = "SELECT name FROM sqlite_master WHERE type='table' AND name=?;"
     connection.prepareStatement(query).use { preparedStatement ->
@@ -13,9 +20,12 @@ fun doesTableExist(connection: Connection, tableName: String): Boolean {
     }
 }
 
+/**
+ * Creates all needed tables if they do not already exist in the database
+ *
+ * @param connection active jdbc connection
+ */
 fun createTables(connection: Connection) {
-
-
     if (!doesTableExist(connection, TableNames.clientTableName)) {
         connection.prepareStatement(
             """
@@ -86,6 +96,14 @@ fun createTables(connection: Connection) {
     }
 }
 
+/**
+ * Inserts an invoice into the correct table and returns the ID of the newly inserted row
+ *
+ * @param connection active jdbc connection
+ * @param invoice invoice object that will be inserted
+ * @return ID of newly inserted row
+ * @throws SQLInsertException Could not get the ID after insertion
+ */
 fun insertInvoice(connection: Connection, invoice: Invoice): Int {
     val insertQuery =
         "INSERT INTO ${TableNames.invoiceTableName} (sendDate, status, sender, clientBusinessName, clientEmail, clientPhone) VALUES (?, ?, ?, ?, ?, ?)"
@@ -109,6 +127,14 @@ fun insertInvoice(connection: Connection, invoice: Invoice): Int {
     }
 }
 
+/**
+ * Inserts a user into the correct table and returns the ID of the newly inserted row
+ *
+ * @param connection active jdbc connection
+ * @param user user object that will be inserted
+ * @return ID of newly inserted row
+ * @throws SQLInsertException Could not get the ID after insertion
+ */
 fun insertUser(connection: Connection, user: User): Int {
     val insertQuery =
         "INSERT INTO ${TableNames.userTableName} (businessName, contactName, subtitle, street, city, state, zip, email, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
@@ -135,6 +161,14 @@ fun insertUser(connection: Connection, user: User): Int {
     }
 }
 
+/**
+ * Inserts an client into the correct table and returns the ID of the newly inserted row
+ *
+ * @param connection active jdbc connection
+ * @param client client object that will be inserted
+ * @return ID of newly inserted row
+ * @throws SQLInsertException Could not get the ID after insertion
+ */
 fun insertClient(connection: Connection, client: Client): Int {
     val insertQuery =
         "INSERT INTO ${TableNames.clientTableName} (businessName, contactName, street, city, state, zip, email, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
@@ -160,6 +194,14 @@ fun insertClient(connection: Connection, client: Client): Int {
     }
 }
 
+/**
+ * Inserts an item into the correct table and returns the ID of the newly inserted row
+ *
+ * @param connection active jdbc connection
+ * @param item item object that will be inserted
+ * @return ID of newly inserted row
+ * @throws SQLInsertException Could not get the ID after insertion
+ */
 fun insertItem(connection: Connection, item: Item): Int {
     val insertQuery =
         "INSERT INTO ${TableNames.itemTableName} (name, startDate, endDate, quantity, price, description) VALUES (?, ?, ?, ?, ?, ?)"
@@ -182,6 +224,13 @@ fun insertItem(connection: Connection, item: Item): Int {
     }
 }
 
+/**
+ * Returns all invoices ordered by the given column name
+ *
+ * @param connection active jdbc connection
+ * @param columnToSortBy the name of the column that will be used to sort the results
+ * @return a list of invoice objects
+ */
 fun selectAllInvoices(connection: Connection, columnToSortBy: String): List<Invoice> {
     connection.prepareStatement("SELECT * FROM ${TableNames.invoiceTableName} ORDER BY $columnToSortBy ASC")
         .use { preparedStatement ->
@@ -196,6 +245,13 @@ fun selectAllInvoices(connection: Connection, columnToSortBy: String): List<Invo
         }
 }
 
+/**
+ * Returns all users ordered by the given column name
+ *
+ * @param connection active jdbc connection
+ * @param columnToSortBy the name of the column that will be used to sort the results
+ * @return a users of invoice objects
+ */
 fun selectAllUsers(connection: Connection, columnToSortBy: String): List<User> {
     connection.prepareStatement("SELECT * FROM ${TableNames.userTableName} ORDER BY $columnToSortBy ASC")
         .use { preparedStatement ->
@@ -210,6 +266,13 @@ fun selectAllUsers(connection: Connection, columnToSortBy: String): List<User> {
         }
 }
 
+/**
+ * Returns all clients ordered by the given column name
+ *
+ * @param connection active jdbc connection
+ * @param columnToSortBy the name of the column that will be used to sort the results
+ * @return a list of client objects
+ */
 fun selectAllClients(connection: Connection, columnToSortBy: String): List<Client> {
     connection.prepareStatement("SELECT * FROM ${TableNames.clientTableName} ORDER BY $columnToSortBy ASC")
         .use { preparedStatement ->
@@ -224,6 +287,13 @@ fun selectAllClients(connection: Connection, columnToSortBy: String): List<Clien
         }
 }
 
+/**
+ * Returns all items ordered by the given column name
+ *
+ * @param connection active jdbc connection
+ * @param columnToSortBy the name of the column that will be used to sort the results
+ * @return a list of item objects
+ */
 fun selectAllItems(connection: Connection, columnToSortBy: String): List<Item> {
     connection.prepareStatement("SELECT * FROM ${TableNames.itemTableName} ORDER BY $columnToSortBy ASC")
         .use { preparedStatement ->
@@ -238,6 +308,13 @@ fun selectAllItems(connection: Connection, columnToSortBy: String): List<Item> {
         }
 }
 
+/**
+ * Select a single invoice with a given id
+ *
+ * @param connection active jdbc connection
+ * @param id
+ * @return
+ */
 fun selectInvoice(connection: Connection, id: Int): Invoice {
     connection.prepareStatement(
         "SELECT * FROM ${TableNames.invoiceTableName} WHERE id = $id"
@@ -248,6 +325,13 @@ fun selectInvoice(connection: Connection, id: Int): Invoice {
     }
 }
 
+/**
+ * Select a single user with a given id
+ *
+ * @param connection active jdbc connection
+ * @param id
+ * @return
+ */
 fun selectUser(connection: Connection, id: Int): User {
     connection.prepareStatement(
         "SELECT * FROM ${TableNames.userTableName} WHERE id = $id"
@@ -258,6 +342,13 @@ fun selectUser(connection: Connection, id: Int): User {
     }
 }
 
+/**
+ * Select a single client with a given id
+ *
+ * @param connection active jdbc connection
+ * @param id
+ * @return
+ */
 fun selectClient(connection: Connection, id: Int): Client {
     connection.prepareStatement(
         "SELECT * FROM ${TableNames.clientTableName} WHERE id = $id"
@@ -268,6 +359,13 @@ fun selectClient(connection: Connection, id: Int): Client {
     }
 }
 
+/**
+ * Select a single item with a given id
+ *
+ * @param connection active jdbc connection
+ * @param id
+ * @return
+ */
 fun selectItem(connection: Connection, id: Int): Item {
     connection.prepareStatement(
         "SELECT * FROM ${TableNames.itemTableName} WHERE id = $id"
@@ -278,6 +376,14 @@ fun selectItem(connection: Connection, id: Int): Item {
     }
 }
 
+/**
+ * Delete a single row by id
+ *
+ * @param connection active jdbc connection
+ * @param tableName the name of the table to delete a row in
+ * @param id id of the row to delete
+ * @return
+ */
 private fun deleteRowById(connection: Connection, tableName: String, id: Int): Boolean {
     connection.prepareStatement("DELETE FROM $tableName WHERE id = ?").use { preparedStatement ->
         preparedStatement.setInt(1, id)
@@ -286,23 +392,60 @@ private fun deleteRowById(connection: Connection, tableName: String, id: Int): B
     }
 }
 
+/**
+ * Delete a single invoice by id
+ *
+ * @param connection active jdbc connection
+ * @param id
+ * @return
+ */
 fun deleteInvoice(connection: Connection, id: Int): Boolean {
     return deleteRowById(connection, TableNames.invoiceTableName, id)
 }
 
+/**
+ * Delete a single user by id
+ *
+ * @param connection active jdbc connection
+ * @param id
+ * @return
+ */
 fun deleteUser(connection: Connection, id: Int): Boolean {
     return deleteRowById(connection, TableNames.userTableName, id)
 }
 
+/**
+ * Delete a single client by id
+ *
+ * @param connection active jdbc connection
+ * @param id
+ * @return
+ */
 fun deleteClient(connection: Connection, id: Int): Boolean {
     return deleteRowById(connection, TableNames.clientTableName, id)
 }
 
+/**
+ * Delete a single client by id
+ *
+ * @param connection active jdbc connection
+ * @param id
+ * @return
+ */
 fun deleteItem(connection: Connection, id: Int): Boolean {
     return deleteRowById(connection, TableNames.itemTableName, id)
 }
 
-// TODO test generic
+/**
+ * Search the clients table for a given value in a given column. The specified query must be a part or a whole of a
+ * value in the table. If the value contains a difference from one of the values, it is not a valid match.
+ *
+ * @param T the data type of the given column name
+ * @param connection active jdbc connection
+ * @param columnName the column name to search
+ * @param query the query to be searched against the clients table. It is of the generic type given.
+ * @return
+ */
 fun <T> searchClients(connection: Connection, columnName: String, query: T): List<Client> {
     val returnList = mutableListOf<Client>()
 
@@ -320,6 +463,16 @@ fun <T> searchClients(connection: Connection, columnName: String, query: T): Lis
     return returnList
 }
 
+/**
+ * Search the users table for a given value in a given column. The specified query must be a part or a whole of a
+ * value in the table. If the value contains a difference from one of the values, it is not a valid match.
+ *
+ * @param T the data type of the given column name
+ * @param connection active jdbc connection
+ * @param columnName the column name to search
+ * @param query the query to be searched against the users table. It is of the generic type given.
+ * @return
+ */
 fun <T> searchUsers(connection: Connection, columnName: String, query: T): List<User> {
     val returnList = mutableListOf<User>()
 
@@ -337,6 +490,16 @@ fun <T> searchUsers(connection: Connection, columnName: String, query: T): List<
     return returnList
 }
 
+/**
+ * Search the invoices table for a given value in a given column. The specified query must be a part or a whole of a
+ * value in the table. If the value contains a difference from one of the values, it is not a valid match.
+ *
+ * @param T the data type of the given column name
+ * @param connection active jdbc connection
+ * @param columnName the column name to search
+ * @param query the query to be searched against the invoices table. It is of the generic type given.
+ * @return
+ */
 fun <T> searchInvoices(connection: Connection, columnName: String, query: T): List<Invoice> {
     val returnList = mutableListOf<Invoice>()
 
@@ -354,6 +517,16 @@ fun <T> searchInvoices(connection: Connection, columnName: String, query: T): Li
     return returnList
 }
 
+/**
+ * Search the items table for a given value in a given column. The specified query must be a part or a whole of a
+ * value in the table. If the value contains a difference from one of the values, it is not a valid match.
+ *
+ * @param T the data type of the given column name
+ * @param connection active jdbc connection
+ * @param columnName the column name to search
+ * @param query the query to be searched against the items table. It is of the generic type given.
+ * @return
+ */
 fun <T> searchItems(connection: Connection, columnName: String, query: T): List<Item> {
     val returnList = mutableListOf<Item>()
 
@@ -371,7 +544,13 @@ fun <T> searchItems(connection: Connection, columnName: String, query: T): List<
     return returnList
 }
 
-fun invoiceFromResult(result: ResultSet): Invoice {
+/**
+ * Produces a single invoice object from a ResultSet's current position
+ *
+ * @param result a JDBC result set
+ * @return
+ */
+private fun invoiceFromResult(result: ResultSet): Invoice {
     try {
         return Invoice(
             result.getDate(InvoiceColumns.sendDate),
@@ -387,7 +566,13 @@ fun invoiceFromResult(result: ResultSet): Invoice {
     }
 }
 
-fun userFromResult(result: ResultSet): User {
+/**
+ * Produces a single user object from a ResultSet's current position
+ *
+ * @param result a JDBC result set
+ * @return
+ */
+private fun userFromResult(result: ResultSet): User {
     try {
         return User(
             result.getString(UserColumns.businessName),
@@ -406,7 +591,13 @@ fun userFromResult(result: ResultSet): User {
     }
 }
 
-fun clientFromResult(result: ResultSet): Client {
+/**
+ * Produces a single client object from a ResultSet's current position
+ *
+ * @param result a JDBC result set
+ * @return
+ */
+private fun clientFromResult(result: ResultSet): Client {
     try {
         return Client(
             result.getString(ClientColumns.businessName),
@@ -424,7 +615,13 @@ fun clientFromResult(result: ResultSet): Client {
     }
 }
 
-fun itemFromResult(result: ResultSet): Item {
+/**
+ * Produces a single item object from a ResultSet's current position
+ *
+ * @param result a JDBC result set
+ * @return
+ */
+private fun itemFromResult(result: ResultSet): Item {
     try {
         return Item(
             result.getString(ItemColumns.name),
@@ -440,6 +637,11 @@ fun itemFromResult(result: ResultSet): Item {
     }
 }
 
+/**
+ * A consistent place for the names of the tables
+ *
+ * @constructor Create empty Table names
+ */
 object TableNames {
     const val invoiceTableName: String = "Invoices"
     const val userTableName: String = "Users"
@@ -447,6 +649,11 @@ object TableNames {
     const val itemTableName: String = "Items"
 }
 
+/**
+ * A consistent place for the names of the invoice table's column names
+ *
+ * @constructor Create empty Invoice columns
+ */
 object InvoiceColumns {
     const val sendDate: String = "sendDate"
     const val status: String = "status"
@@ -457,6 +664,11 @@ object InvoiceColumns {
     const val id: String = "id"
 }
 
+/**
+ * A consistent place for the names of the user table's column names
+ *
+ * @constructor Create empty Invoice columns
+ */
 object UserColumns {
     const val businessName: String = "businessName"
     const val contactName: String = "contactName"
@@ -470,6 +682,11 @@ object UserColumns {
     const val id: String = "id"
 }
 
+/**
+ * A consistent place for the names of the client table's column names
+ *
+ * @constructor Create empty Invoice columns
+ */
 object ClientColumns {
     const val businessName: String = "businessName"
     const val contactName: String = "contactName"
@@ -482,6 +699,11 @@ object ClientColumns {
     const val id: String = "id"
 }
 
+/**
+ * A consistent place for the names of the item table's column names
+ *
+ * @constructor Create empty Invoice columns
+ */
 object ItemColumns {
     const val name: String = "name"
     const val startDate: String = "startDate"
@@ -492,9 +714,30 @@ object ItemColumns {
     const val id: String = "id"
 }
 
+/**
+ * Thrown when a select operation returns no result
+ *
+ * @constructor
+ *
+ * @param message
+ */
 class NoResultException(message: String) : Exception(message)
 
+/**
+ * Thrown when a SQL insert operation fails
+ *
+ * @constructor
+ *
+ * @param message
+ */
 class SQLInsertException(message: String) : Exception(message)
 
+/**
+ * Thrown when an attempt is made to retrieve data from a non-existent column
+ *
+ * @constructor
+ *
+ * @param message
+ */
 class SQLDataRetrievalException(message: String) : Exception(message)
 
