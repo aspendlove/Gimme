@@ -23,8 +23,6 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
 
-    // Multiplatform
-
     // Navigator
     implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
 
@@ -36,7 +34,6 @@ dependencies {
 
     // Transitions
     implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
-//    testImplementation("org.testng:testng:7.7.0")
 }
 
 repositories {
@@ -44,11 +41,6 @@ repositories {
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
-
-//tasks.test {
-//    useJUnitPlatform()
-//}
-
 
 kotlin {
     jvm {
@@ -59,8 +51,6 @@ kotlin {
         val jvmMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
-                implementation("com.github.jhonnymertz:java-wkhtmltopdf-wrapper:1.1.15-RELEASE")
-                implementation("com.darkrockstudios:mpfilepicker:1.2.0")
             }
         }
         val jvmTest by getting {
@@ -79,7 +69,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Exe, TargetFormat.AppImage)
             packageName = "Gimme"
-            packageVersion = "$gimmeVersion"
+            packageVersion = gimmeVersion
         }
     }
 }
