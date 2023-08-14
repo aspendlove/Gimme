@@ -1,9 +1,0 @@
-CREATE TABLE invoices (
-    id INTEGER PRIMARY KEY NOT NULL,
-    sendDate TEXT NOT NULL,
-    status TEXT NOT NULL,
-    userName TEXT NOT NULL,
-    clientName TEXT NOT NULL,
-    clientEmail TEXT,
-    clientPhone TEXT
-);

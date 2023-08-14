@@ -2,7 +2,7 @@ package storage
 
 import java.sql.*
 
-fun connect(databaseFilePath: String) : Connection {
+fun connect(databaseFilePath: String): Connection {
     val connection = DriverManager.getConnection("jdbc:sqlite:$databaseFilePath")
     createTables(connection)
     return connection
@@ -228,14 +228,24 @@ fun insertItem(connection: Connection, item: Item): Int {
 }
 
 /**
- * Returns all invoices ordered by the given column name
+ * Returns all invoices ordered by the given column name either ascending or descending
  *
  * @param connection active jdbc connection
  * @param columnToSortBy the name of the column that will be used to sort the results
+ * @param ascending whether to sort by ascending or not
  * @return a list of invoice objects
  */
-fun selectAllInvoices(connection: Connection, columnToSortBy: String): List<Invoice> {
-    connection.prepareStatement("SELECT * FROM ${TableNames.invoiceTableName} ORDER BY $columnToSortBy ASC")
+fun selectAllInvoices(
+    connection: Connection,
+    columnToSortBy: String = InvoiceColumns.id,
+    ascending: Boolean = true
+): List<Invoice> {
+    var sortDirection = "DESC"
+    if (ascending) {
+        sortDirection = "ASC"
+    }
+
+    connection.prepareStatement("SELECT * FROM ${TableNames.invoiceTableName} ORDER BY $columnToSortBy $sortDirection")
         .use { preparedStatement ->
             val results = preparedStatement.executeQuery()
             val returnList = mutableListOf<Invoice>()
@@ -249,14 +259,23 @@ fun selectAllInvoices(connection: Connection, columnToSortBy: String): List<Invo
 }
 
 /**
- * Returns all users ordered by the given column name
+ * Returns all users ordered by the given column name either ascending or descending
  *
  * @param connection active jdbc connection
  * @param columnToSortBy the name of the column that will be used to sort the results
+ * @param ascending whether to sort by ascending or not
  * @return a users of invoice objects
  */
-fun selectAllUsers(connection: Connection, columnToSortBy: String): List<User> {
-    connection.prepareStatement("SELECT * FROM ${TableNames.userTableName} ORDER BY $columnToSortBy ASC")
+fun selectAllUsers(
+    connection: Connection,
+    columnToSortBy: String = UserColumns.id,
+    ascending: Boolean = true
+): List<User> {
+    var sortDirection = "DESC"
+    if (ascending) {
+        sortDirection = "ASC"
+    }
+    connection.prepareStatement("SELECT * FROM ${TableNames.userTableName} ORDER BY $columnToSortBy $sortDirection")
         .use { preparedStatement ->
             val results = preparedStatement.executeQuery()
             val returnList = mutableListOf<User>()
@@ -270,14 +289,23 @@ fun selectAllUsers(connection: Connection, columnToSortBy: String): List<User> {
 }
 
 /**
- * Returns all clients ordered by the given column name
+ * Returns all clients ordered by the given column name either ascending or descending
  *
  * @param connection active jdbc connection
  * @param columnToSortBy the name of the column that will be used to sort the results
+ * @param ascending whether to sort by ascending or not
  * @return a list of client objects
  */
-fun selectAllClients(connection: Connection, columnToSortBy: String): List<Client> {
-    connection.prepareStatement("SELECT * FROM ${TableNames.clientTableName} ORDER BY $columnToSortBy ASC")
+fun selectAllClients(
+    connection: Connection,
+    columnToSortBy: String = ClientColumns.id,
+    ascending: Boolean = true
+): List<Client> {
+    var sortDirection = "DESC"
+    if (ascending) {
+        sortDirection = "ASC"
+    }
+    connection.prepareStatement("SELECT * FROM ${TableNames.clientTableName} ORDER BY $columnToSortBy $sortDirection")
         .use { preparedStatement ->
             val results = preparedStatement.executeQuery()
             val returnList = mutableListOf<Client>()
@@ -291,14 +319,23 @@ fun selectAllClients(connection: Connection, columnToSortBy: String): List<Clien
 }
 
 /**
- * Returns all items ordered by the given column name
+ * Returns all items ordered by the given column name either ascending or descending
  *
  * @param connection active jdbc connection
  * @param columnToSortBy the name of the column that will be used to sort the results
+ * @param ascending whether to sort by ascending or not
  * @return a list of item objects
  */
-fun selectAllItems(connection: Connection, columnToSortBy: String): List<Item> {
-    connection.prepareStatement("SELECT * FROM ${TableNames.itemTableName} ORDER BY $columnToSortBy ASC")
+fun selectAllItems(
+    connection: Connection,
+    columnToSortBy: String = ItemColumns.id,
+    ascending: Boolean = true
+): List<Item> {
+    var sortDirection = "DESC"
+    if (ascending) {
+        sortDirection = "ASC"
+    }
+    connection.prepareStatement("SELECT * FROM ${TableNames.itemTableName} ORDER BY $columnToSortBy $sortDirection")
         .use { preparedStatement ->
             val results = preparedStatement.executeQuery()
             val returnList = mutableListOf<Item>()
