@@ -1,11 +1,11 @@
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
+import kotlinx.datetime.Instant
 import storage.*
 import java.io.File
+import java.sql.Connection
 import java.sql.Date
 import java.sql.DriverManager
-import kotlinx.datetime.*
-import java.sql.Connection
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
@@ -137,19 +137,13 @@ internal class DatabaseTest {
             )
             assertTrue(result)
             assertFailsWith<NoResultException> {
-                selectClient(connection, 1)
+                selectClient(connection, 2)
             }
-            assertFalse(deleteClient(connection, 1))
+            assertTrue(deleteClient(connection, 1))
             assertFalse(deleteClient(connection, 2))
         }
         deleteDatabase(databaseFilePath)
     }
-
-//    val databaseFilePath = "${::testSelectAll.name}.db"
-//    connect(databaseFilePath).use { connection ->
-//
-//    }
-//    deleteDatabase(databaseFilePath)
 
     @Test
     fun testSelectAll() {
@@ -252,7 +246,7 @@ internal class DatabaseTest {
     fun testSelectAllNoRows() {
         val databaseFilePath = "${::testSelectAll.name}.db"
         connect(databaseFilePath).use { connection ->
-            assertEquals(listOf<Client>(),selectAllClients(connection))
+            assertEquals(listOf<Client>(), selectAllClients(connection))
         }
         deleteDatabase(databaseFilePath)
     }
@@ -262,13 +256,13 @@ internal class DatabaseTest {
         val databaseFilePath = "${::testSelectAll.name}.db"
         connect(databaseFilePath).use { connection ->
             insertFakeData(connection)
-            assertEquals("businessName",selectClient(connection, 1).businessName)
+            assertEquals("businessName", selectClient(connection, 1).businessName)
             assertEquals(selectAllClients(connection)[0].businessName, selectClient(connection, 1).businessName)
-            assertEquals("businessName",selectUser(connection, 1).businessName)
+            assertEquals("businessName", selectUser(connection, 1).businessName)
             assertEquals(selectAllUsers(connection)[0].businessName, selectUser(connection, 1).businessName)
-            assertEquals("sender",selectInvoice(connection, 1).sender)
+            assertEquals("sender", selectInvoice(connection, 1).sender)
             assertEquals(selectAllInvoices(connection)[0].sender, selectInvoice(connection, 1).sender)
-            assertEquals("description",selectItem(connection, 1).description)
+            assertEquals("description", selectItem(connection, 1).description)
             assertEquals(selectAllItems(connection)[0].description, selectItem(connection, 1).description)
         }
         deleteDatabase(databaseFilePath)
@@ -289,7 +283,7 @@ internal class DatabaseTest {
     fun testDelete() {
         val databaseFilePath = "${::testSelectAll.name}.db"
         connect(databaseFilePath).use { connection ->
-            for(i in 1..3) {
+            for (i in 1..3) {
                 insertFakeData(connection)
             }
             deleteClient(connection, 2)
@@ -302,6 +296,24 @@ internal class DatabaseTest {
 
     @Test
     fun testSearch() {
+        val databaseFilePath = "${::testSelectAll.name}.db"
+        connect(databaseFilePath).use { connection ->
+            insertFakeData(connection)
+            val fullNameClient: Client =
+                searchClients<String>(connection, ClientColumns.businessName, "businessName")[0]
+            val partNameUser: User = searchUsers<String>(connection, UserColumns.businessName, "iness")[0]
+            val wrongNameItem: List<Item> = searchItems<String>(connection, ItemColumns.description, "bad query")
 
+            assertEquals("businessName", fullNameClient.businessName)
+            assertEquals("businessName", partNameUser.businessName)
+            assertTrue(wrongNameItem.isEmpty())
+        }
+        deleteDatabase(databaseFilePath)
     }
+
+    //    val databaseFilePath = "${::testSelectAll.name}.db"
+    //    connect(databaseFilePath).use { connection ->
+    //
+    //    }
+    //    deleteDatabase(databaseFilePath)
 }

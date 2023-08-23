@@ -491,8 +491,7 @@ fun <T> searchClients(connection: Connection, columnName: String, query: T): Lis
 
     connection.prepareStatement("SELECT * FROM ${TableNames.clientTableName} WHERE $columnName LIKE ?")
         .use { preparedStatement ->
-            preparedStatement.setString(1, columnName)
-            preparedStatement.setString(2, "%$query%")
+            preparedStatement.setString(1, "%$query%")
             val results = preparedStatement.executeQuery()
 
             while (results.next()) {
@@ -518,8 +517,7 @@ fun <T> searchUsers(connection: Connection, columnName: String, query: T): List<
 
     connection.prepareStatement("SELECT * FROM ${TableNames.userTableName} WHERE $columnName LIKE ?")
         .use { preparedStatement ->
-            preparedStatement.setString(1, columnName)
-            preparedStatement.setString(2, "%$query%")
+            preparedStatement.setString(1, "%$query%")
             val results = preparedStatement.executeQuery()
 
             while (results.next()) {
@@ -545,7 +543,6 @@ fun <T> searchInvoices(connection: Connection, columnName: String, query: T): Li
 
     connection.prepareStatement("SELECT * FROM ${TableNames.invoiceTableName} WHERE $columnName LIKE ?")
         .use { preparedStatement ->
-//            preparedStatement.setString(1, columnName)
             preparedStatement.setString(1, "%$query%")
             val results = preparedStatement.executeQuery()
 
@@ -572,8 +569,7 @@ fun <T> searchItems(connection: Connection, columnName: String, query: T): List<
 
     connection.prepareStatement("SELECT * FROM ${TableNames.itemTableName} WHERE $columnName LIKE ?")
         .use { preparedStatement ->
-            preparedStatement.setString(1, columnName)
-            preparedStatement.setString(2, "%$query%")
+            preparedStatement.setString(1, "%$query%")
             val results = preparedStatement.executeQuery()
 
             while (results.next()) {
