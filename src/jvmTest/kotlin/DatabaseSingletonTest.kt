@@ -205,33 +205,37 @@ internal class DatabaseSingletonTest {
     fun testSelectAllSortByDateDescending() {
         with (DatabaseManager) {
             val times = listOf<Long>(
-                Instant.parse(createIso8601String(2023, 9, 21)).toEpochMilliseconds(),
-                Instant.parse(createIso8601String(2022, 9, 21)).toEpochMilliseconds(),
-                Instant.parse(createIso8601String(2021, 9, 21)).toEpochMilliseconds(),
-                Instant.parse(createIso8601String(2020, 9, 21)).toEpochMilliseconds()
+//                Instant.parse(createIso8601String(2023, 9, 21)).toEpochMilliseconds(),
+//                Instant.parse(createIso8601String(2022, 9, 21)).toEpochMilliseconds(),
+//                Instant.parse(createIso8601String(2021, 9, 21)).toEpochMilliseconds(),
+//                Instant.parse(createIso8601String(2020, 9, 21)).toEpochMilliseconds()
+                System.currentTimeMillis(),
+                System.currentTimeMillis(),
+                System.currentTimeMillis(),
+                System.currentTimeMillis()
             )
 
             insertItem(
                 Item(
-                    "name", Date(times[1]), Date(System.currentTimeMillis()), 1.5, 1.5.toBigDecimal(), "description"
+                    "name", Date(times[1]), Date(times[1]), 1.5, 1.5.toBigDecimal(), "description"
                 )
             )
 
             insertItem(
                 Item(
-                    "name", Date(times[3]), Date(System.currentTimeMillis()), 1.5, 1.5.toBigDecimal(), "description"
+                    "name", Date(times[3]), Date(times[3]), 1.5, 1.5.toBigDecimal(), "description"
                 )
             )
 
             insertItem(
                 Item(
-                    "name", Date(times[0]), Date(System.currentTimeMillis()), 1.5, 1.5.toBigDecimal(), "description"
+                    "name", Date(times[0]), Date(times[0]), 1.5, 1.5.toBigDecimal(), "description"
                 )
             )
 
             insertItem(
                 Item(
-                    "name", Date(times[2]), Date(System.currentTimeMillis()), 1.5, 1.5.toBigDecimal(), "description"
+                    "name", Date(times[2]), Date(times[2]), 1.5, 1.5.toBigDecimal(), "description"
                 )
             )
 
