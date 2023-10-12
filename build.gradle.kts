@@ -1,8 +1,9 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
+val kotlinVersion: String by project
 plugins {
     java
-    kotlin("multiplatform")
+    kotlin("jvm") version "1.8.20"
     id("org.jetbrains.compose")
     kotlin("plugin.serialization") version "1.5.0"
 }
@@ -13,53 +14,42 @@ val serializationVersion: String by project
 val voyagerVersion: String by project
 group = "com.aspendlove"
 version = "1.0"
-dependencies {
-    testImplementation(kotlin("test"))
-    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposedVersion")
-    implementation("org.xerial:sqlite-jdbc:$jdbcVersion")
-
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
-
-    // Navigator
-    implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
-
-    // BottomSheetNavigator
-    implementation("cafe.adriel.voyager:voyager-bottom-sheet-navigator:$voyagerVersion")
-
-    // TabNavigator
-    implementation("cafe.adriel.voyager:voyager-tab-navigator:$voyagerVersion")
-
-    // Transitions
-    implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
-}
 
 repositories {
-    google()
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    google()
 }
 
-kotlin {
-    jvm {
-        jvmToolchain(17)
-        withJava()
-    }
-    sourceSets {
-        val jvmMain by getting {
-            dependencies {
-                implementation(compose.desktop.currentOs)
-            }
-        }
-        val jvmTest by getting {
-            dependencies {
-                implementation(kotlin("test-junit"))
-            }
-        }
-    }
+dependencies {
+    testImplementation(kotlin("test"))
+    implementation(compose.desktop.currentOs)
+    implementation("org.xerial:sqlite-jdbc:$jdbcVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
+    implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
+    implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
 }
+
+
+//kotlin {
+//    jvm {
+//        jvmToolchain(17)
+//        withJava()
+//    }
+//    sourceSets {
+//        val jvmMain by getting {
+//            dependencies {
+//                implementation(compose.desktop.currentOs)
+//            }
+//        }
+//        val jvmTest by getting {
+//            dependencies {
+//                implementation(kotlin("test-junit"))
+//            }
+//        }
+//    }
+//}
 
 val gimmeVersion: String by project
 
