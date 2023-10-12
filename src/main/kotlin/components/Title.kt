@@ -1,14 +1,13 @@
 package components
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.Button
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-class DefaultButton {
-    private var _modifier: Modifier = Modifier.fillMaxWidth().height(40.dp)
+class Title(private val text: String) {
+    private var _modifier: Modifier = Modifier.height(40.dp)
     var modifier: Modifier
         get() {
             return _modifier
@@ -18,13 +17,6 @@ class DefaultButton {
         }
     @Composable
     fun compose() {
-        Button(
-            onClick = {
-
-            },
-            modifier = _modifier
-        ) {
-
-        }
+        Text(text,modifier)
     }
 }

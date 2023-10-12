@@ -1,39 +1,33 @@
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.darkColors
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import cafe.adriel.voyager.navigator.Navigator
+import screens.GreetingScreen
+
+fun main() = application {
+    val windowState = rememberWindowState(size = DpSize(1200.dp, 1000.dp))
+    Window(onCloseRequest = ::exitApplication, state = windowState) {
+        App();
+    }
+}
 
 @Composable
 fun App() {
-    Navigator(
-        screen = BasicNavigationScreen(index = 0),
-        onBackPressed = {
-            true
+    MaterialTheme(colors = darkColors()) {
+        Box(Modifier.fillMaxSize().background(MaterialTheme.colors.background)) {
+            Navigator(
+                screen = GreetingScreen()
+            )
         }
-    )
-
-//    var isDialogOpen by remember { mutableStateOf(false) }
-//
-//    val userCreationDialog = UserCreationDialog {
-//        isDialogOpen = false
-//    }
-//
-//    Button(onClick = { isDialogOpen = true }) {
-//        Text(text = "Open dialog")
-//    }
-//
-//    if (isDialogOpen) {
-//        userCreationDialog.compose()
-//    }
-}
-
-fun main() = application {
-    val windowState = rememberWindowState(size = DpSize(700.dp, 600.dp))
-    Window(onCloseRequest = ::exitApplication, state=windowState) {
-        App();
     }
 }
