@@ -1,5 +1,0 @@
-package screens
-
-class ClientCreationDialog {
-
-}

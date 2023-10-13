@@ -1,4 +1,4 @@
-
+package components
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Text
@@ -10,17 +10,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
+import components.CustomComponentBase
 
-class NonRequiredTextMultiline(private var title: String) {
+class NonRequiredTextMultiline(private var title: String): CustomComponentBase(Modifier.fillMaxWidth()) {
     private var _text = ""
     val result: String
         get() = _text
 
-    var modifier:Modifier = Modifier
-
     @Composable
     @Preview
-    fun compose() {
+    override fun compose() {
         var text by rememberSaveable(stateSaver = TextFieldValue.Saver) {
             mutableStateOf(TextFieldValue(""))
         }
@@ -33,7 +32,7 @@ class NonRequiredTextMultiline(private var title: String) {
             },
             label = { Text(title) },
             singleLine = false,
-            modifier = modifier.fillMaxWidth()
+            modifier = modifier
         )
     }
 }

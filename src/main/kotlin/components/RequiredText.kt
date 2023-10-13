@@ -1,3 +1,4 @@
+package components
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,11 +13,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.input.TextFieldValue
 
-class RequiredText(private var title: String) {
+class RequiredText(private var title: String) : CustomComponentBase(Modifier.fillMaxWidth()) {
     private var _text = ""
     private var _error = true
 
-    var modifier:Modifier = Modifier
 
     val isError: Boolean
         get() = _error
@@ -24,9 +24,13 @@ class RequiredText(private var title: String) {
     val result: String
         get() = _text
 
+    fun focusChanged() {
+
+    }
+
     @Composable
     @Preview
-    fun compose() {
+    override fun compose() {
         var text by rememberSaveable(stateSaver = TextFieldValue.Saver) {
             mutableStateOf(TextFieldValue(""))
         }
@@ -49,12 +53,12 @@ class RequiredText(private var title: String) {
                 Icon(Icons.Default.Star, "Star")
             },
             modifier = modifier.fillMaxWidth().onFocusChanged {
-                if(it.isFocused) {
+                if (it.isFocused) {
                     error = false
                     _error = false
                     return@onFocusChanged
                 }
-                if(!it.isFocused && first) {
+                if (!it.isFocused && first) {
                     first = false
                     return@onFocusChanged
                 }

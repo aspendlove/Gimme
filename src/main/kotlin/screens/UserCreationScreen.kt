@@ -1,6 +1,5 @@
 package screens
 
-import RequiredText
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -8,10 +7,12 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import components.Button
+import components.CustomButton
+import components.RequiredText
+import components.Title
 import storage.User
 
-class UserCreationDialog : Screen {
+class UserCreationScreen : Screen {
     private val businessNameEntry = RequiredText("Business Name")
     private val contactNameEntry = RequiredText("Contact Name")
     private val subtitleEntry = RequiredText("Subtitle")
@@ -49,15 +50,30 @@ class UserCreationDialog : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val backButton = Button({
+        val userTitle = Title("Create or Select a User")
+        val presetButton = CustomButton({
+            // TODO load dialog
+        }, "Load User")
+        val saveButton = CustomButton({
+            // TODO save dialog
+        }, "Save User")
+        val backCustomButton = CustomButton({
             navigator.pop()
         }, "Back")
-        val forwardButton = Button({
-            navigator.pop()
+        val forwardCustomButton = CustomButton({
+            // TODO Client page
         }, "Forward")
         Column(
             modifier = Modifier.fillMaxWidth().padding(PaddingValues(20.dp))
         ) {
+            userTitle.compose()
+            Row(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                val commonModifier = Modifier.fillMaxWidth().weight(1f)
+                presetButton.addModifier(commonModifier)
+                saveButton.addModifier(commonModifier)
+                presetButton.compose()
+                saveButton.compose()
+            }
             businessNameEntry.compose()
             contactNameEntry.compose()
             subtitleEntry.compose()
@@ -67,9 +83,12 @@ class UserCreationDialog : Screen {
             zipEntry.compose()
             emailEntry.compose()
             phoneEntry.compose()
-            Row(modifier = Modifier.fillMaxWidth()) {
-                backButton.compose()
-                forwardButton.compose()
+            Row(modifier = Modifier.fillMaxWidth().weight(1f).padding(0.dp, 10.dp, 0.dp, 0.dp)) {
+                val commonModifier = Modifier.fillMaxWidth().weight(1f)
+                backCustomButton.addModifier(commonModifier)
+                forwardCustomButton.addModifier(commonModifier)
+                backCustomButton.compose()
+                forwardCustomButton.compose()
             }
         }
     }
