@@ -16,7 +16,7 @@ import screens.GreetingScreen
 
 fun main() = application {
     val windowState = rememberWindowState(size = DpSize(1000.dp, 800.dp))
-    Window(onCloseRequest = ::exitApplication, state = windowState) {
+    Window(onCloseRequest = ::exitApplication, state = windowState, title = "Gimme! Invoice Creator") {
         App();
     }
 }

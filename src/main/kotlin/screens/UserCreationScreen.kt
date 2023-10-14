@@ -61,7 +61,7 @@ class UserCreationScreen : Screen {
             navigator.pop()
         }, "Back")
         val forwardCustomButton = CustomButton({
-            // TODO Client page
+            navigator += ClientCreationScreen()
         }, "Forward")
         Column(
             modifier = Modifier.fillMaxWidth().padding(PaddingValues(20.dp))

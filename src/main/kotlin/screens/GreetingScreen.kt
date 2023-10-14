@@ -1,12 +1,12 @@
 package screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -35,6 +35,7 @@ class GreetingScreen: Screen {
                 trackCustomButton.compose()
                 continueCustomButton.compose()
             }
+            Text("© Aidan Spendlove 2023", color = Color.White, modifier = Modifier.padding(0.dp, 40.dp, 0.dp, 0.dp))
         }
     }
 }
