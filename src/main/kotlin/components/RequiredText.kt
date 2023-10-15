@@ -24,10 +24,6 @@ class RequiredText(private var title: String) : CustomComponentBase(Modifier.fil
     val result: String
         get() = _text
 
-    fun focusChanged() {
-
-    }
-
     @Composable
     @Preview
     override fun compose() {
