@@ -3,14 +3,15 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.darkColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
-import components.CustomComponentBase
 
 class NonRequiredTextMultiline(private var title: String): CustomComponentBase(Modifier.fillMaxWidth()) {
     private var _text = ""
@@ -32,7 +33,8 @@ class NonRequiredTextMultiline(private var title: String): CustomComponentBase(M
             },
             label = { Text(title) },
             singleLine = false,
-            modifier = modifier
+            modifier = modifier,
+            textStyle = TextStyle(color = darkColors().onBackground)
         )
     }
 }

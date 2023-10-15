@@ -5,12 +5,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.darkColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 
 class RequiredText(private var title: String) : CustomComponentBase(Modifier.fillMaxWidth()) {
@@ -60,7 +62,8 @@ class RequiredText(private var title: String) : CustomComponentBase(Modifier.fil
                 }
                 error = _text.isEmpty()
                 _error = error
-            }
+            },
+            textStyle = TextStyle(color = darkColors().onBackground)
         )
     }
 }

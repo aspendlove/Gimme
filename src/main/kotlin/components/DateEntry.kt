@@ -15,23 +15,32 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
+import kotlinx.datetime.LocalDate
+import java.sql.Date
 
-class DateEntry : CustomComponentBase(Modifier) {
+class DateEntry(val title: String) : CustomComponentBase(Modifier) {
     private var _text = ""
     private var _error = true
 
 
     val isError: Boolean
-        get() = _error
+        get() = _error ||
+                _text.filter {
+                    toFilter -> toFilter.isDigit()
+                }.length != 8
 
-    val result: String
-        get() = _text
+    val result: Date
+        get() {
+            val digits = _text.filter { toFilter -> toFilter.isDigit() }
+            val date = LocalDate(digits.substring(0, 2).toInt(), digits.substring(2, 4).toInt(), digits.substring(4, 8).toInt())
+            return Date(date.toEpochDays() * 31556952000L) // convert from days to milliseconds
+        }
 
     @Composable
     @Preview
     override fun compose() {
         var text by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-            mutableStateOf(TextFieldValue("  /  /    "))
+            mutableStateOf(TextFieldValue("MM/DD/YYYY"))
         }
 
         var error by remember { mutableStateOf(false) }
@@ -53,20 +62,28 @@ class DateEntry : CustomComponentBase(Modifier) {
                     digits.length
                 }
 
-                while (digits.length < 8) {
-                    digits += ' '
+                if(digits.isEmpty()) {
+                    text = TextFieldValue(
+                        "MM/DD/YYYY",
+                        TextRange(cursorPlacement)
+                    )
+                } else {
+                    while (digits.length < 8) {
+                        digits += ' '
+                    }
+
+                    text = TextFieldValue(
+                        digits.substring(0, 2) + "/" + digits.substring(2, 4) + "/" + digits.substring(4, 8),
+                        TextRange(cursorPlacement)
+                    )
                 }
 
-                text = TextFieldValue(
-                    digits.substring(0, 2) + "/" + digits.substring(2, 4) + "/" + digits.substring(4, 8),
-                    TextRange(cursorPlacement)
-                )
 
                 _text = text.text
                 error = newValue.text.isEmpty()
                 _error = error
             },
-            label = { Text("MM/DD/YYYY") },
+            label = { Text(title) },
             singleLine = true,
             isError = error,
             trailingIcon = {
