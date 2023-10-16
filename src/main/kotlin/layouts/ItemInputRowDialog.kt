@@ -4,13 +4,21 @@ package layouts
 import RequiredTextMultiline
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.material.Button
+import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import components.CustomComponentBase
 import components.DateEntry
 import components.RequiredText
+import compose.icons.FeatherIcons
+import compose.icons.feathericons.FileText
+import compose.icons.feathericons.Save
 import storage.Item
 
-class ItemInputRowDialog(val id: Int) {
+class ItemInputRowDialog(val id: Int) : CustomComponentBase(_modifier = Modifier) {
 
     private val nameInput = RequiredText("Service")
     private val startDateInput = DateEntry("Start Date")
@@ -41,8 +49,10 @@ class ItemInputRowDialog(val id: Int) {
         }
 
     @Composable
-    fun compose() {
-        Row {
+    override fun compose() {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Box(modifier = Modifier.weight(1f)) {
                 nameInput.compose()
             }
@@ -60,6 +70,22 @@ class ItemInputRowDialog(val id: Int) {
             }
             Box(modifier = Modifier.weight(2f)) {
                 descriptionInput.compose()
+            }
+            Button(
+                onClick = {
+                    TODO("Implement Loading items")
+                },
+                modifier = Modifier.fillMaxHeight()
+            ) {
+                Icon(FeatherIcons.FileText, "Load")
+            }
+            Button(
+                onClick = {
+                    TODO("Implement Saving items")
+                },
+                modifier = Modifier.fillMaxHeight()
+            ) {
+                Icon(FeatherIcons.Save, "Save")
             }
         }
     }

@@ -3,6 +3,7 @@ package storage
 import java.io.File
 import java.sql.*
 
+// TODO add notes
 object DatabaseManager {
     private var UserCache: MutableList<User?> = mutableListOf()
     private var ClientCache: MutableList<Client?> = mutableListOf()

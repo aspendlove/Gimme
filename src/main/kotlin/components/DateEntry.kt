@@ -25,14 +25,18 @@ class DateEntry(val title: String) : CustomComponentBase(Modifier) {
 
     val isError: Boolean
         get() = _error ||
-                _text.filter {
-                    toFilter -> toFilter.isDigit()
+                _text.filter { toFilter ->
+                    toFilter.isDigit()
                 }.length != 8
 
     val result: Date
         get() {
             val digits = _text.filter { toFilter -> toFilter.isDigit() }
-            val date = LocalDate(digits.substring(0, 2).toInt(), digits.substring(2, 4).toInt(), digits.substring(4, 8).toInt())
+            val date = LocalDate(
+                digits.substring(0, 2).toInt(),
+                digits.substring(2, 4).toInt(),
+                digits.substring(4, 8).toInt()
+            )
             return Date(date.toEpochDays() * 31556952000L) // convert from days to milliseconds
         }
 
@@ -62,7 +66,7 @@ class DateEntry(val title: String) : CustomComponentBase(Modifier) {
                     digits.length
                 }
 
-                if(digits.isEmpty()) {
+                if (digits.isEmpty()) {
                     text = TextFieldValue(
                         "MM/DD/YYYY",
                         TextRange(cursorPlacement)
@@ -80,8 +84,6 @@ class DateEntry(val title: String) : CustomComponentBase(Modifier) {
 
 
                 _text = text.text
-                error = newValue.text.isEmpty()
-                _error = error
             },
             label = { Text(title) },
             singleLine = true,
@@ -101,7 +103,10 @@ class DateEntry(val title: String) : CustomComponentBase(Modifier) {
                         first = false
                         return@onFocusChanged
                     }
-                    error = _text.isEmpty()
+                    error = _text.isEmpty() || _text.filter { toFilter ->
+                        toFilter.isDigit()
+                    }.length != 8
+
                     _error = error
                 }
         )

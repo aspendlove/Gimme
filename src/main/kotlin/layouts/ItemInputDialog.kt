@@ -9,13 +9,13 @@ import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import compose.icons.FeatherIcons
+import compose.icons.feathericons.XCircle
 import storage.Item
 
 class ItemInputDialog {
@@ -76,7 +76,7 @@ class ItemInputDialog {
                                 },
                                 modifier = Modifier.fillMaxHeight()
                             ) {
-                                Icon(Icons.Default.Delete, "Delete")
+                                Icon(FeatherIcons.XCircle, "Delete")
                             }
                             row.compose()
                         }

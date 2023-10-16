@@ -29,6 +29,7 @@ dependencies {
     implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
     implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
+    implementation("br.com.devsrsouza.compose.icons:feather:1.1.0")
 }
 
 
