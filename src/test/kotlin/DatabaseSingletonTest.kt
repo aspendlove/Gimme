@@ -311,10 +311,4 @@ internal class DatabaseSingletonTest {
         }
         DatabaseManager.wipeDatabase("DELETE THE DATABASE")
     }
-
-    //    val databaseFilePath = "${::testSelectAll.name}.db"
-    //    connect(databaseFilePath).use { connection ->
-    //
-    //    }
-    //    deleteDatabase(databaseFilePath)
 }

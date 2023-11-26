@@ -1,0 +1,17 @@
+package components
+
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Text
+import androidx.compose.material.darkColors
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+class Body(private val text: String): CustomComponentBase(Modifier.padding(10.dp)) {
+    @Composable
+    override fun compose() {
+        Text(text,modifier, color = darkColors().onBackground, fontSize = 20.sp, textAlign = TextAlign.Center)
+    }
+}

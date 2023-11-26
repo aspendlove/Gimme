@@ -7,21 +7,24 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import components.Alert
 import components.CustomButton
 import components.RequiredText
 import components.Title
+import storage.StateBundle
 import storage.User
+import javax.swing.JOptionPane
 
-class UserCreationScreen : Screen {
-    private val businessNameEntry = RequiredText("Business Name")
-    private val contactNameEntry = RequiredText("Contact Name")
-    private val subtitleEntry = RequiredText("Subtitle")
-    private val streetEntry = RequiredText("Street")
-    private val cityEntry = RequiredText("City")
-    private val stateEntry = RequiredText("State")
-    private val zipEntry = RequiredText("Zip Code")
-    private val emailEntry = RequiredText("Email")
-    private val phoneEntry = RequiredText("Phone")
+class UserCreationScreen: Screen {
+    private val businessNameEntry = RequiredText("Business Name", StateBundle.user.businessName)
+    private val contactNameEntry = RequiredText("Contact Name", StateBundle.user.contactName)
+    private val subtitleEntry = RequiredText("Subtitle", StateBundle.user.subtitle)
+    private val streetEntry = RequiredText("Street", StateBundle.user.street)
+    private val cityEntry = RequiredText("City", StateBundle.user.city)
+    private val stateEntry = RequiredText("State", StateBundle.user.state)
+    private val zipEntry = RequiredText("Zip Code", if (StateBundle.user.zip != -1) StateBundle.user.zip.toString() else "")
+    private val emailEntry = RequiredText("Email", StateBundle.user.email)
+    private val phoneEntry = RequiredText("Phone", StateBundle.user.phone)
 
     val isError: Boolean
         get() = businessNameEntry.isError ||
@@ -61,6 +64,11 @@ class UserCreationScreen : Screen {
             navigator.pop()
         }, "Back")
         val forwardCustomButton = CustomButton({
+            if(isError) {
+                JOptionPane.showMessageDialog(null, "Please fill out all required fields", "Error", JOptionPane.ERROR_MESSAGE)
+                return@CustomButton;
+            }
+            StateBundle.user = result
             navigator += ClientCreationScreen()
         }, "Forward")
         Column(

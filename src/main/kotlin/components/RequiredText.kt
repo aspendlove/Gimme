@@ -15,7 +15,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 
-class RequiredText(private var title: String) : CustomComponentBase(Modifier.fillMaxWidth()) {
+class RequiredText(private var title: String, private var initialText: String = "") : CustomComponentBase(Modifier.fillMaxWidth()) {
     private var _text = ""
     private var _error = true
 
@@ -30,7 +30,7 @@ class RequiredText(private var title: String) : CustomComponentBase(Modifier.fil
     @Preview
     override fun compose() {
         var text by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-            mutableStateOf(TextFieldValue(""))
+            mutableStateOf(TextFieldValue(initialText))
         }
 
         var error by remember { mutableStateOf(false) }

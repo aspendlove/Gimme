@@ -12,21 +12,29 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import components.CustomButton
 import components.NonRequiredTextMultiline
+import storage.Notes
+import storage.StateBundle
 
 class NoteScreen: Screen {
+    private val notesEntry = NonRequiredTextMultiline("Notes to be placed in the footer of the invoice")
+
+    val result:Notes = Notes(
+        notesEntry.result
+    )
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val notes = NonRequiredTextMultiline("Notes to be placed in the footer of the invoice")
+
         val backCustomButton = CustomButton({
             navigator.pop()
         }, "Back")
         val forwardCustomButton = CustomButton({
-            TODO("create summary / create pdf screen")
+            StateBundle.notes = result
+            navigator += SummaryScreen()
         }, "Forward")
         Column {
-            notes.addModifier(Modifier.fillMaxWidth().padding(100.dp).weight(7f))
-            notes.compose()
+            notesEntry.addModifier(Modifier.fillMaxWidth().padding(100.dp).weight(7f))
+            notesEntry.compose()
             Row(modifier = Modifier.fillMaxWidth().weight(1f).padding(0.dp, 10.dp, 0.dp, 0.dp)) {
                 val commonModifier = Modifier.fillMaxWidth().weight(1f)
                 backCustomButton.addModifier(commonModifier)

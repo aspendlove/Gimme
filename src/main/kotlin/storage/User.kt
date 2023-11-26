@@ -1,5 +1,6 @@
 package storage
 
+
 data class User(
     val businessName: String,
     val contactName: String,

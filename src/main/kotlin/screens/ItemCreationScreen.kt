@@ -9,6 +9,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import components.CustomButton
 import layouts.ItemInputDialog
+import storage.StateBundle
 
 class ItemCreationScreen: Screen {
     @Composable
@@ -19,7 +20,7 @@ class ItemCreationScreen: Screen {
             navigator.pop()
         }, "Back")
         val forwardCustomButton = CustomButton({
-            navigator += NoteScreen()
+            navigator += NoteScreen() // TODO add items to state bundle
         }, "Forward")
         Column(
             modifier = Modifier.fillMaxHeight()

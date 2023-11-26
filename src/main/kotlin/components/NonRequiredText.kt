@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 
-class NonRequiredText(private var title: String):
+class NonRequiredText(private var title: String, private var initialText: String = ""):
     CustomComponentBase(Modifier.fillMaxWidth()){
     private var _text = ""
     val result: String
@@ -23,7 +23,7 @@ class NonRequiredText(private var title: String):
     @Preview
     override fun compose() {
         var text by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-            mutableStateOf(TextFieldValue(""))
+            mutableStateOf(TextFieldValue(initialText))
         }
 
         TextField(

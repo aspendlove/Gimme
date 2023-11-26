@@ -11,17 +11,20 @@ import components.CustomButton
 import components.RequiredText
 import components.Title
 import storage.Client
+import storage.StateBundle
+import javax.swing.JOptionPane
 
-class ClientCreationScreen: Screen {
+class ClientCreationScreen : Screen {
 
-    private val businessNameEntry = RequiredText("Business Name")
-    private val contactNameEntry = RequiredText("Contact Name")
-    private val streetEntry = RequiredText("Street")
-    private val cityEntry = RequiredText("City")
-    private val stateEntry = RequiredText("State")
-    private val zipEntry = RequiredText("Zip Code")
-    private val emailEntry = RequiredText("Email")
-    private val phoneEntry = RequiredText("Phone")
+    private val businessNameEntry = RequiredText("Business Name", StateBundle.client.businessName)
+    private val contactNameEntry = RequiredText("Contact Name", StateBundle.client.contactName)
+    private val streetEntry = RequiredText("Street", StateBundle.client.street)
+    private val cityEntry = RequiredText("City", StateBundle.client.city)
+    private val stateEntry = RequiredText("State", StateBundle.client.state)
+    private val zipEntry =
+        RequiredText("Zip Code", if (StateBundle.client.zip != -1) StateBundle.client.zip.toString() else "")
+    private val emailEntry = RequiredText("Email", StateBundle.client.email)
+    private val phoneEntry = RequiredText("Phone", StateBundle.client.phone)
 
     val isError: Boolean
         get() = businessNameEntry.isError ||
@@ -59,6 +62,16 @@ class ClientCreationScreen: Screen {
             navigator.pop()
         }, "Back")
         val forwardCustomButton = CustomButton({
+            if (isError) {
+                JOptionPane.showMessageDialog(
+                    null,
+                    "Please fill out all required fields",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                )
+                return@CustomButton;
+            }
+            StateBundle.client = result
             navigator += ItemCreationScreen()
         }, "Forward")
         Column(
