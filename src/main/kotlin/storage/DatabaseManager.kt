@@ -8,6 +8,7 @@ object DatabaseManager {
     private var UserCache: MutableList<User?> = mutableListOf()
     private var ClientCache: MutableList<Client?> = mutableListOf()
     private var ItemCache: MutableList<Item?> = mutableListOf()
+    private var NoteCache: MutableList<String?> = mutableListOf()
     private var InvoiceCache: MutableList<Invoice?> = mutableListOf()
 
     private var _databaseFilePath: String = "GimmeDatabase.db"
@@ -21,10 +22,11 @@ object DatabaseManager {
         }
 
     init {
-        UserCache = selectAllUsers(cache = false).toMutableList()
-        ClientCache = selectAllClients(cache = false).toMutableList()
-        ItemCache = selectAllItems(cache = false).toMutableList()
-        InvoiceCache = selectAllInvoices(cache = false).toMutableList()
+        UserCache = selectAll(null, TableNames.userTableName, ::userFromResult)
+        ClientCache = selectAll(null, TableNames.clientTableName, ::clientFromResult)
+        ItemCache = selectAll(null, TableNames.itemTableName, ::itemFromResult)
+        InvoiceCache = selectAll(null, TableNames.invoiceTableName, ::invoiceFromResult)
+        NoteCache = selectAll(null, TableNames.invoiceTableName, ::noteFromResult)
     }
 
     /**
@@ -49,42 +51,40 @@ object DatabaseManager {
 
     private fun invalidateUserCache() {
         UserCache.clear()
-        UserCache = selectAllUsers(cache = false).toMutableList()
+        UserCache = selectAll(null, TableNames.userTableName, ::userFromResult)
+//        UserCache = selectAllUsers(cache = false).toMutableList()
     }
 
     private fun invalidateClientCache() {
         ClientCache.clear()
-        ClientCache = selectAllClients(cache = false).toMutableList()
+        ClientCache = selectAll(null, TableNames.clientTableName, ::clientFromResult)
+//        ClientCache = selectAllClients(cache = false).toMutableList()
+    }
+
+    private fun invalidateNoteCache() {
+        NoteCache.clear()
+        NoteCache = selectAll(null, TableNames.noteTableName, ::noteFromResult)
+//        NoteCache = selectAllNotes(cache = false).toMutableList()
     }
 
     private fun invalidateItemCache() {
         ItemCache.clear()
-        ItemCache = selectAllItems(cache = false).toMutableList()
+        ItemCache = selectAll(null, TableNames.itemTableName, ::itemFromResult)
+//        ItemCache = selectAllItems(cache = false).toMutableList()
     }
 
     private fun invalidateInvoiceCache() {
         InvoiceCache.clear()
-        InvoiceCache = selectAllInvoices(cache = false).toMutableList()
+        InvoiceCache = selectAll(null, TableNames.invoiceTableName, ::invoiceFromResult)
+//        InvoiceCache = selectAllInvoices(cache = false).toMutableList()
     }
 
-    private fun nullifyUserCacheElement(id: Int) {
-        if (id - 1 >= UserCache.size) return
-        UserCache[id - 1] = null
+    private fun <T> createCacheElementNullifier(cache: MutableList<T?>): (Int) -> Unit {
+        return fun(id: Int) {nullifyCacheElement<T>(id, cache)}
     }
-
-    private fun nullifyClientCacheElement(id: Int) {
-        if (id - 1 >= ClientCache.size) return
-        ClientCache[id - 1] = null
-    }
-
-    private fun nullifyItemCacheElement(id: Int) {
-        if (id - 1 >= ItemCache.size) return
-        ItemCache[id - 1] = null
-    }
-
-    private fun nullifyInvoiceCacheElement(id: Int) {
-        if (id - 1 >= InvoiceCache.size) return
-        InvoiceCache[id - 1] = null
+    private fun <T> nullifyCacheElement(id: Int, cache: MutableList<T?>) {
+        if (id - 1 >= cache.size) return
+        cache[id - 1] = null
     }
 
     private fun connect(): Connection {
@@ -149,6 +149,17 @@ object DatabaseManager {
             }
         }
 
+        if (!doesTableExist(connection, TableNames.noteTableName)) {
+            connection.prepareStatement(
+                """
+            CREATE TABLE ${TableNames.noteTableName} (
+            id INTEGER PRIMARY KEY,
+            note VARCHAR(1000));"""
+            ).use { query ->
+                query.execute()
+            }
+        }
+
         if (!doesTableExist(connection, TableNames.itemTableName)) {
             connection.prepareStatement(
                 """
@@ -181,6 +192,7 @@ object DatabaseManager {
             }
         }
     }
+
 
     /**
      * Inserts an invoice into the correct table and returns the ID of the newly inserted row
@@ -287,6 +299,34 @@ object DatabaseManager {
     }
 
     /**
+     * Inserts a note into the correct table and returns the ID of the newly inserted row
+     *
+     * @param noteText string that will be inserted
+     * @return ID of newly inserted row
+     * @throws SQLInsertException Could not get the ID after insertion
+     */
+    fun insertNote(noteText: String): Int {
+        connect().use { connection ->
+            val insertQuery =
+                "INSERT INTO ${TableNames.noteTableName} (note) VALUES (?)"
+
+            connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS).use { preparedStatement ->
+                with(preparedStatement) {
+                    setString(1, noteText)
+                    executeUpdate()
+                }
+                invalidateClientCache()
+                val generatedKeys: ResultSet = preparedStatement.generatedKeys
+                if (generatedKeys.next()) {
+                    return generatedKeys.getInt(1)
+                } else {
+                    throw SQLInsertException("Failed to get primary key after insertion")
+                }
+            }
+        }
+    }
+
+    /**
      * Inserts an item into the correct table and returns the ID of the newly inserted row
      *
      * @param item item object that will be inserted
@@ -355,6 +395,49 @@ object DatabaseManager {
                     }
                     return returnList
                 }
+        }
+    }
+
+    /**
+     * Returns all users ordered by the given column name either ascending or descending
+     *
+     * @param columnToSortBy the name of the column that will be used to sort the results
+     * @param ascending whether to sort by ascending or not
+     * @return a users of invoice objects
+     */
+    fun <T> selectAll(
+        cache: MutableList<T?>?,
+        tableName: String,
+        resultToT: (ResultSet) -> T,
+        columnToSortBy: String = "id",
+        ascending: Boolean = true,
+    ): MutableList<T> {
+        if (columnToSortBy == UserColumns.id && cache != null) {
+            return if (ascending) {
+                cache.filterNotNull().toMutableList()
+            } else {
+                cache.reversed().filterNotNull().toMutableList()
+            }
+        }
+
+        var sortDirection = "DESC"
+        if (ascending) {
+            sortDirection = "ASC"
+        }
+
+        connect().use { connection ->
+            connection.prepareStatement("SELECT * FROM $tableName ORDER BY $columnToSortBy $sortDirection")
+                .use { preparedStatement ->
+                    val results = preparedStatement.executeQuery()
+                    val returnList = mutableListOf<T>()
+                    while (results.next()) {
+                        returnList.add(
+                            resultToT(results)
+                        )
+                    }
+                    return returnList
+                }
+
         }
     }
 
@@ -506,6 +589,33 @@ object DatabaseManager {
     }
 
     /**
+     * Select a single invoice with a given id
+     *
+     * @param id
+     * @return
+     */
+    fun <T> select(id: Int, cache: MutableList<T?>, tableName: String, resultToT: (ResultSet) -> T): T {
+        if (cache.size >= id && id >= 1) {
+            val cacheHit = cache[id - 1]
+            if (cacheHit != null) {
+                return cacheHit
+            } else {
+                throw NoResultException("no row with given id")
+            }
+        }
+
+        connect().use { connection ->
+            connection.prepareStatement(
+                "SELECT * FROM $tableName WHERE id = $id"
+            ).use { preparedStatement ->
+                val result = preparedStatement.executeQuery()
+                if (!result.next()) throw NoResultException("no row with given id")
+                return resultToT(result)
+            }
+        }
+    }
+
+    /**
      * Select a single user with a given id
      *
      * @param id
@@ -608,6 +718,7 @@ object DatabaseManager {
         }
     }
 
+
     /**
      * Delete a single invoice by id
      *
@@ -615,7 +726,7 @@ object DatabaseManager {
      * @return whether any rows were deleted
      */
     fun deleteInvoice(id: Int): Boolean {
-        return deleteRowById(TableNames.invoiceTableName, id, ::nullifyInvoiceCacheElement)
+        return deleteRowById(TableNames.invoiceTableName, id, createCacheElementNullifier(ClientCache))
     }
 
     /**
@@ -625,8 +736,7 @@ object DatabaseManager {
      * @return whether any rows were deleted
      */
     fun deleteUser(id: Int): Boolean {
-        return deleteRowById(TableNames.userTableName, id, ::nullifyUserCacheElement)
-
+        return deleteRowById(TableNames.userTableName, id, createCacheElementNullifier(UserCache))
     }
 
     /**
@@ -636,7 +746,7 @@ object DatabaseManager {
      * @return whether any rows were deleted
      */
     fun deleteClient(id: Int): Boolean {
-        return deleteRowById(TableNames.clientTableName, id, ::nullifyClientCacheElement)
+        return deleteRowById(TableNames.clientTableName, id, createCacheElementNullifier(ClientCache))
     }
 
     /**
@@ -646,7 +756,11 @@ object DatabaseManager {
      * @return
      */
     fun deleteItem(id: Int): Boolean {
-        return deleteRowById(TableNames.itemTableName, id, ::nullifyItemCacheElement)
+        return deleteRowById(TableNames.itemTableName, id, createCacheElementNullifier(ItemCache))
+    }
+
+    fun deleteNote(id: Int): Boolean {
+        return deleteRowById(TableNames.itemTableName, id, createCacheElementNullifier(NoteCache))
     }
 
     /**
@@ -669,6 +783,33 @@ object DatabaseManager {
 
                     while (results.next()) {
                         returnList.add(clientFromResult(results))
+                    }
+                }
+        }
+
+        return returnList
+    }
+
+    /**
+     * Search the clients table for a given value in a given column. The specified query must be a part or a whole of a
+     * value in the table. If the value contains a difference from one of the values, it is not a valid match.
+     *
+     * @param T the data type of the given column name
+     * @param columnName the column name to search
+     * @param query the query to be searched against the clients table. It is of the generic type given.
+     * @return
+     */
+    fun <S, T> search(columnName: String, tableName: String, resultToT: (ResultSet) -> T, query: S): List<T> {
+        val returnList = mutableListOf<T>()
+
+        connect().use { connection ->
+            connection.prepareStatement("SELECT * FROM $tableName WHERE $columnName LIKE ?")
+                .use { preparedStatement ->
+                    preparedStatement.setString(1, "%$query%")
+                    val results = preparedStatement.executeQuery()
+
+                    while (results.next()) {
+                        returnList.add(resultToT(results))
                     }
                 }
         }
@@ -851,6 +992,14 @@ object DatabaseManager {
             throw SQLDataRetrievalException("Row Mapping is Incorrect")
         }
     }
+
+    private fun noteFromResult(result: ResultSet): String {
+        try {
+            return result.getString(NoteColumns.note)
+        } catch (e: SQLException) {
+            throw SQLDataRetrievalException("Row Mapping is Incorrect")
+        }
+    }
 }
 
 /**
@@ -863,6 +1012,7 @@ object TableNames {
     const val userTableName: String = "Users"
     const val clientTableName: String = "Clients"
     const val itemTableName: String = "Items"
+    const val noteTableName: String = "Notes"
 }
 
 /**
@@ -928,6 +1078,15 @@ object ItemColumns {
     const val price: String = "price"
     const val description: String = "description"
     const val id: String = "id"
+}
+
+/**
+ * A consistent place for the names of the note table's column names
+ *
+ * @constructor Create empty Invoice columns
+ */
+object NoteColumns {
+    const val note: String = "note"
 }
 
 /**
