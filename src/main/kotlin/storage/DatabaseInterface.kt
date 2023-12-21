@@ -1,4 +1,7 @@
 package storage
 
-class DatabaseInterface {
+object DatabaseInterface {
+    private val databaseManager: DatabaseManager = DatabaseManager()
+
+
 }

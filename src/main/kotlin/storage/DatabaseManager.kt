@@ -4,7 +4,7 @@ import java.io.File
 import java.sql.*
 
 // TODO add notes
-object DatabaseManager {
+class DatabaseManager {
     private var UserCache: MutableList<User?> = mutableListOf()
     private var ClientCache: MutableList<Client?> = mutableListOf()
     private var ItemCache: MutableList<Item?> = mutableListOf()
@@ -42,7 +42,7 @@ object DatabaseManager {
         invalidateAllCaches()
     }
 
-    private fun invalidateAllCaches() {
+    internal fun invalidateAllCaches() {
         invalidateUserCache()
         invalidateClientCache()
         invalidateItemCache()
@@ -52,31 +52,26 @@ object DatabaseManager {
     private fun invalidateUserCache() {
         UserCache.clear()
         UserCache = selectAll(null, TableNames.userTableName, ::userFromResult)
-//        UserCache = selectAllUsers(cache = false).toMutableList()
     }
 
     private fun invalidateClientCache() {
         ClientCache.clear()
         ClientCache = selectAll(null, TableNames.clientTableName, ::clientFromResult)
-//        ClientCache = selectAllClients(cache = false).toMutableList()
     }
 
     private fun invalidateNoteCache() {
         NoteCache.clear()
         NoteCache = selectAll(null, TableNames.noteTableName, ::noteFromResult)
-//        NoteCache = selectAllNotes(cache = false).toMutableList()
     }
 
     private fun invalidateItemCache() {
         ItemCache.clear()
         ItemCache = selectAll(null, TableNames.itemTableName, ::itemFromResult)
-//        ItemCache = selectAllItems(cache = false).toMutableList()
     }
 
     private fun invalidateInvoiceCache() {
         InvoiceCache.clear()
         InvoiceCache = selectAll(null, TableNames.invoiceTableName, ::invoiceFromResult)
-//        InvoiceCache = selectAllInvoices(cache = false).toMutableList()
     }
 
     private fun <T> createCacheElementNullifier(cache: MutableList<T?>): (Int) -> Unit {
@@ -112,9 +107,8 @@ object DatabaseManager {
      *
      */
     private fun createTables(connection: Connection) {
-        if (!doesTableExist(connection, TableNames.clientTableName)) {
-            connection.prepareStatement(
-                """
+        val tables = listOf<Pair<String, String>>(
+            Pair(TableNames.clientTableName, """
             CREATE TABLE ${TableNames.clientTableName} (
             id INTEGER PRIMARY KEY,
             businessName VARCHAR(64),
@@ -124,15 +118,8 @@ object DatabaseManager {
             state VARCHAR(32),
             zip INTEGER,
             email VARCHAR(64),
-            phone VARCHAR(32));"""
-            ).use { query ->
-                query.execute()
-            }
-        }
-
-        if (!doesTableExist(connection, TableNames.userTableName)) {
-            connection.prepareStatement(
-                """
+            phone VARCHAR(32));"""),
+            Pair(TableNames.userTableName, """
             CREATE TABLE ${TableNames.userTableName} (
             id INTEGER PRIMARY KEY,
             businessName VARCHAR(64),
@@ -143,26 +130,12 @@ object DatabaseManager {
             state VARCHAR(32),
             zip INTEGER,
             email VARCHAR(64),
-            phone VARCHAR(32));"""
-            ).use { query ->
-                query.execute()
-            }
-        }
-
-        if (!doesTableExist(connection, TableNames.noteTableName)) {
-            connection.prepareStatement(
-                """
+            phone VARCHAR(32));"""),
+            Pair(TableNames.noteTableName, """
             CREATE TABLE ${TableNames.noteTableName} (
             id INTEGER PRIMARY KEY,
-            note VARCHAR(1000));"""
-            ).use { query ->
-                query.execute()
-            }
-        }
-
-        if (!doesTableExist(connection, TableNames.itemTableName)) {
-            connection.prepareStatement(
-                """
+            note VARCHAR(1000));"""),
+            Pair(TableNames.itemTableName, """
             CREATE TABLE ${TableNames.itemTableName} (
             id INTEGER PRIMARY KEY,
             name VARCHAR(64),
@@ -170,15 +143,8 @@ object DatabaseManager {
             endDate DATE,
             quantity DOUBLE PRECISION,
             price DECIMAL(10,2),
-            description VARCHAR(4096));"""
-            ).use { query ->
-                query.execute()
-            }
-        }
-
-        if (!doesTableExist(connection, TableNames.invoiceTableName)) {
-            connection.prepareStatement(
-                """
+            description VARCHAR(4096));"""),
+            Pair(TableNames.clientTableName, """
             CREATE TABLE ${TableNames.invoiceTableName} (
             id INTEGER PRIMARY KEY,
             sendDate DATE,
@@ -186,11 +152,98 @@ object DatabaseManager {
             sender VARCHAR(64),
             clientBusinessName VARCHAR(64),
             clientEmail VARCHAR(64),
-            clientPhone VARCHAR(64));"""
-            ).use { query ->
-                query.execute()
+            clientPhone VARCHAR(64));""")
+        )
+
+        for(table in tables) {
+            if(!doesTableExist(connection, table.first)) {
+                connection.prepareStatement(
+                    table.second
+                ).use { query ->
+                    query.execute()
+                }
             }
         }
+
+//        if (!doesTableExist(connection, TableNames.clientTableName)) {
+//            connection.prepareStatement(
+//                """
+//            CREATE TABLE ${TableNames.clientTableName} (
+//            id INTEGER PRIMARY KEY,
+//            businessName VARCHAR(64),
+//            contactName VARCHAR(64),
+//            street VARCHAR(256),
+//            city VARCHAR(64),
+//            state VARCHAR(32),
+//            zip INTEGER,
+//            email VARCHAR(64),
+//            phone VARCHAR(32));"""
+//            ).use { query ->
+//                query.execute()
+//            }
+//        }
+//
+//        if (!doesTableExist(connection, TableNames.userTableName)) {
+//            connection.prepareStatement(
+//                """
+//            CREATE TABLE ${TableNames.userTableName} (
+//            id INTEGER PRIMARY KEY,
+//            businessName VARCHAR(64),
+//            contactName VARCHAR(64),
+//            subtitle VARCHAR(4096),
+//            street VARCHAR(256),
+//            city VARCHAR(64),
+//            state VARCHAR(32),
+//            zip INTEGER,
+//            email VARCHAR(64),
+//            phone VARCHAR(32));"""
+//            ).use { query ->
+//                query.execute()
+//            }
+//        }
+//
+//        if (!doesTableExist(connection, TableNames.noteTableName)) {
+//            connection.prepareStatement(
+//                """
+//            CREATE TABLE ${TableNames.noteTableName} (
+//            id INTEGER PRIMARY KEY,
+//            note VARCHAR(1000));"""
+//            ).use { query ->
+//                query.execute()
+//            }
+//        }
+//
+//        if (!doesTableExist(connection, TableNames.itemTableName)) {
+//            connection.prepareStatement(
+//                """
+//            CREATE TABLE ${TableNames.itemTableName} (
+//            id INTEGER PRIMARY KEY,
+//            name VARCHAR(64),
+//            startDate DATE,
+//            endDate DATE,
+//            quantity DOUBLE PRECISION,
+//            price DECIMAL(10,2),
+//            description VARCHAR(4096));"""
+//            ).use { query ->
+//                query.execute()
+//            }
+//        }
+//
+//        if (!doesTableExist(connection, TableNames.invoiceTableName)) {
+//            connection.prepareStatement(
+//                """
+//            CREATE TABLE ${TableNames.invoiceTableName} (
+//            id INTEGER PRIMARY KEY,
+//            sendDate DATE,
+//            status VARCHAR(32),
+//            sender VARCHAR(64),
+//            clientBusinessName VARCHAR(64),
+//            clientEmail VARCHAR(64),
+//            clientPhone VARCHAR(64));"""
+//            ).use { query ->
+//                query.execute()
+//            }
+//        }
     }
 
 
@@ -214,6 +267,7 @@ object DatabaseManager {
                     setString(4, invoice.clientBusinessName)
                     setString(5, invoice.clientEmail)
                     setString(6, invoice.clientPhone)
+
                     executeUpdate()
                 }
                 invalidateInvoiceCache()
@@ -227,19 +281,81 @@ object DatabaseManager {
         }
     }
 
-    /**
-     * Inserts a user into the correct table and returns the ID of the newly inserted row
-     *
-     * @param user user object that will be inserted
-     * @return ID of newly inserted row
-     * @throws SQLInsertException Could not get the ID after insertion
-     */
-    fun insertUser(user: User): Int {
-        connect().use { connection ->
-            val insertQuery =
-                "INSERT INTO ${TableNames.userTableName} (businessName, contactName, subtitle, street, city, state, zip, email, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+//    /**
+//     * Inserts a user into the correct table and returns the ID of the newly inserted row
+//     *
+//     * @param user user object that will be inserted
+//     * @return ID of newly inserted row
+//     * @throws SQLInsertException Could not get the ID after insertion
+//     */
+//    fun insertUser(user: User): Int {
+//        connect().use { connection ->
+//            val insertQuery =
+//                "INSERT INTO ${TableNames.userTableName} (businessName, contactName, subtitle, street, city, state, zip, email, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+//
+//            connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS).use { preparedStatement ->
+//                with(preparedStatement) {
+//                    setString(1, user.businessName)
+//                    setString(2, user.contactName)
+//                    setString(3, user.subtitle)
+//                    setString(4, user.street)
+//                    setString(5, user.city)
+//                    setString(6, user.state)
+//                    setInt(7, user.zip)
+//                    setString(8, user.email)
+//                    setString(9, user.phone)
+//                    executeUpdate()
+//                }
+//                invalidateUserCache()
+//                val generatedKeys: ResultSet = preparedStatement.generatedKeys
+//                if (generatedKeys.next()) {
+//                    return generatedKeys.getInt(1)
+//                } else {
+//                    throw SQLInsertException("Failed to get primary key after insertion")
+//                }
+//            }
+//        }
+//    }
 
-            connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS).use { preparedStatement ->
+//    /**
+//     * Inserts a client into the correct table and returns the ID of the newly inserted row
+//     *
+//     * @param client client object that will be inserted
+//     * @return ID of newly inserted row
+//     * @throws SQLInsertException Could not get the ID after insertion
+//     */
+//    fun insertClient(client: Client): Int {
+//        connect().use { connection ->
+//            val insertQuery =
+//                "INSERT INTO ${TableNames.clientTableName} (businessName, contactName, street, city, state, zip, email, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+//
+//            connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS).use { preparedStatement ->
+//                with(preparedStatement) {
+//
+//                    setString(1, client.businessName)
+//                    setString(2, client.contactName)
+//                    setString(3, client.street)
+//                    setString(4, client.city)
+//                    setString(5, client.state)
+//                    setInt(6, client.zip)
+//                    setString(7, client.email)
+//                    setString(8, client.phone)
+//                    executeUpdate()
+//                }
+//                invalidateClientCache()
+//                val generatedKeys: ResultSet = preparedStatement.generatedKeys
+//                if (generatedKeys.next()) {
+//                    return generatedKeys.getInt(1)
+//                } else {
+//                    throw SQLInsertException("Failed to get primary key after insertion")
+//                }
+//            }
+//        }
+//    }
+
+    fun insertUser(user: User): Int {
+        return insert(user, UserColumns.columnList, TableNames.userTableName,
+            { preparedStatement: PreparedStatement ->
                 with(preparedStatement) {
                     setString(1, user.businessName)
                     setString(2, user.contactName)
@@ -252,42 +368,50 @@ object DatabaseManager {
                     setString(9, user.phone)
                     executeUpdate()
                 }
-                invalidateUserCache()
-                val generatedKeys: ResultSet = preparedStatement.generatedKeys
-                if (generatedKeys.next()) {
-                    return generatedKeys.getInt(1)
-                } else {
-                    throw SQLInsertException("Failed to get primary key after insertion")
-                }
-            }
-        }
+            },
+            ::invalidateUserCache)
     }
 
-    /**
-     * Inserts a client into the correct table and returns the ID of the newly inserted row
-     *
-     * @param client client object that will be inserted
-     * @return ID of newly inserted row
-     * @throws SQLInsertException Could not get the ID after insertion
-     */
     fun insertClient(client: Client): Int {
-        connect().use { connection ->
-            val insertQuery =
-                "INSERT INTO ${TableNames.clientTableName} (businessName, contactName, street, city, state, zip, email, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-
-            connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS).use { preparedStatement ->
+        return insert(client, ClientColumns.columnList, TableNames.clientTableName,
+            { preparedStatement: PreparedStatement ->
                 with(preparedStatement) {
-                    setString(1, client.businessName)
-                    setString(2, client.contactName)
-                    setString(3, client.street)
-                    setString(4, client.city)
-                    setString(5, client.state)
-                    setInt(6, client.zip)
-                    setString(7, client.email)
-                    setString(8, client.phone)
-                    executeUpdate()
+                        setString(1, client.businessName)
+                        setString(2, client.contactName)
+                        setString(3, client.street)
+                        setString(4, client.city)
+                        setString(5, client.state)
+                        setInt(6, client.zip)
+                        setString(7, client.email)
+                        setString(8, client.phone)
+                        executeUpdate()
                 }
-                invalidateClientCache()
+            },
+            ::invalidateClientCache)
+    }
+
+    private fun makeInsertString(tableName: String, fields: List<String>): String {
+        var fieldString = "("
+        var questionMarkString = "("
+        for(field in fields) {
+            fieldString += "$field, "
+            questionMarkString += "?, "
+        }
+        // remove the trailing commas and spaces, and then close the parenthesis
+        fieldString = fieldString.removeSuffix(", ")
+        fieldString += ")"
+        questionMarkString = questionMarkString.removeSuffix(", ")
+        questionMarkString += ")"
+
+        return "INSERT INTO $tableName $fieldString VALUES $questionMarkString"
+    }
+
+    fun <T> insert(element: T, fields: List<String>, tableName: String, resultInterpreter: (PreparedStatement) -> Unit, invalidateCache: () -> Unit): Int {
+        connect().use { connection ->
+            val insertQuery = makeInsertString(tableName, fields)
+            connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS).use {preparedStatement ->
+                resultInterpreter(preparedStatement)
+                invalidateCache()
                 val generatedKeys: ResultSet = preparedStatement.generatedKeys
                 if (generatedKeys.next()) {
                     return generatedKeys.getInt(1)
@@ -1021,13 +1145,22 @@ object TableNames {
  * @constructor Create empty Invoice columns
  */
 object InvoiceColumns {
-    const val sendDate: String = "sendDate"
-    const val status: String = "status"
-    const val sender: String = "sender"
-    const val clientBusinessName: String = "clientBusinessName"
-    const val clientEmail: String = "clientEmail"
-    const val clientPhone: String = "clientPhone"
-    const val id: String = "id"
+    var sendDate: String = "sendDate"
+    var status: String = "status"
+    var sender: String = "sender"
+    var clientBusinessName: String = "clientBusinessName"
+    var clientEmail: String = "clientEmail"
+    var clientPhone: String = "clientPhone"
+    var id: String = "id"
+    val columnList: List<String> = listOf(
+        sendDate,
+        status,
+        sender,
+        clientBusinessName,
+        clientEmail,
+        clientPhone,
+        id
+    )
 }
 
 /**
@@ -1046,6 +1179,18 @@ object UserColumns {
     const val email: String = "email"
     const val phone: String = "phone"
     const val id: String = "id"
+    val columnList: List<String> = listOf(
+        businessName,
+        contactName,
+        subtitle,
+        street,
+        city,
+        state,
+        zip,
+        email,
+        phone,
+        id
+    )
 }
 
 /**
@@ -1063,6 +1208,17 @@ object ClientColumns {
     const val email: String = "email"
     const val phone: String = "phone"
     const val id: String = "id"
+    val columnList: List<String> = listOf(
+        businessName,
+        contactName,
+        street,
+        city,
+        state,
+        zip,
+        email,
+        phone,
+        id
+    )
 }
 
 /**
@@ -1078,6 +1234,15 @@ object ItemColumns {
     const val price: String = "price"
     const val description: String = "description"
     const val id: String = "id"
+    val columnList: List<String> = listOf(
+        name,
+        startDate,
+        endDate,
+        quantity,
+        price,
+        description,
+        id
+    )
 }
 
 /**
@@ -1087,6 +1252,9 @@ object ItemColumns {
  */
 object NoteColumns {
     const val note: String = "note"
+    val columnList: List<String> = listOf(
+        note
+    )
 }
 
 /**
