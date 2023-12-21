@@ -75,8 +75,9 @@ class DatabaseManager {
     }
 
     private fun <T> createCacheElementNullifier(cache: MutableList<T?>): (Int) -> Unit {
-        return fun(id: Int) {nullifyCacheElement<T>(id, cache)}
+        return fun(id: Int) { nullifyCacheElement<T>(id, cache) }
     }
+
     private fun <T> nullifyCacheElement(id: Int, cache: MutableList<T?>) {
         if (id - 1 >= cache.size) return
         cache[id - 1] = null
@@ -108,7 +109,8 @@ class DatabaseManager {
      */
     private fun createTables(connection: Connection) {
         val tables = listOf<Pair<String, String>>(
-            Pair(TableNames.clientTableName, """
+            Pair(
+                TableNames.clientTableName, """
             CREATE TABLE ${TableNames.clientTableName} (
             id INTEGER PRIMARY KEY,
             businessName VARCHAR(64),
@@ -118,8 +120,10 @@ class DatabaseManager {
             state VARCHAR(32),
             zip INTEGER,
             email VARCHAR(64),
-            phone VARCHAR(32));"""),
-            Pair(TableNames.userTableName, """
+            phone VARCHAR(32));"""
+            ),
+            Pair(
+                TableNames.userTableName, """
             CREATE TABLE ${TableNames.userTableName} (
             id INTEGER PRIMARY KEY,
             businessName VARCHAR(64),
@@ -130,12 +134,16 @@ class DatabaseManager {
             state VARCHAR(32),
             zip INTEGER,
             email VARCHAR(64),
-            phone VARCHAR(32));"""),
-            Pair(TableNames.noteTableName, """
+            phone VARCHAR(32));"""
+            ),
+            Pair(
+                TableNames.noteTableName, """
             CREATE TABLE ${TableNames.noteTableName} (
             id INTEGER PRIMARY KEY,
-            note VARCHAR(1000));"""),
-            Pair(TableNames.itemTableName, """
+            note VARCHAR(1000));"""
+            ),
+            Pair(
+                TableNames.itemTableName, """
             CREATE TABLE ${TableNames.itemTableName} (
             id INTEGER PRIMARY KEY,
             name VARCHAR(64),
@@ -143,8 +151,10 @@ class DatabaseManager {
             endDate DATE,
             quantity DOUBLE PRECISION,
             price DECIMAL(10,2),
-            description VARCHAR(4096));"""),
-            Pair(TableNames.clientTableName, """
+            description VARCHAR(4096));"""
+            ),
+            Pair(
+                TableNames.clientTableName, """
             CREATE TABLE ${TableNames.invoiceTableName} (
             id INTEGER PRIMARY KEY,
             sendDate DATE,
@@ -152,11 +162,12 @@ class DatabaseManager {
             sender VARCHAR(64),
             clientBusinessName VARCHAR(64),
             clientEmail VARCHAR(64),
-            clientPhone VARCHAR(64));""")
+            clientPhone VARCHAR(64));"""
+            )
         )
 
-        for(table in tables) {
-            if(!doesTableExist(connection, table.first)) {
+        for (table in tables) {
+            if (!doesTableExist(connection, table.first)) {
                 connection.prepareStatement(
                     table.second
                 ).use { query ->
@@ -247,19 +258,44 @@ class DatabaseManager {
     }
 
 
-    /**
-     * Inserts an invoice into the correct table and returns the ID of the newly inserted row
-     *
-     * @param invoice invoice object that will be inserted
-     * @return ID of newly inserted row
-     * @throws SQLInsertException Could not get the ID after insertion
-     */
-    fun insertInvoice(invoice: Invoice): Int {
-        connect().use { connection ->
-            val insertQuery =
-                "INSERT INTO ${TableNames.invoiceTableName} (sendDate, status, sender, clientBusinessName, clientEmail, clientPhone) VALUES (?, ?, ?, ?, ?, ?)"
+//    /**
+//     * Inserts an invoice into the correct table and returns the ID of the newly inserted row
+//     *
+//     * @param invoice invoice object that will be inserted
+//     * @return ID of newly inserted row
+//     * @throws SQLInsertException Could not get the ID after insertion
+//     */
+//    fun insertInvoice(invoice: Invoice): Int {
+//        connect().use { connection ->
+//            val insertQuery =
+//                "INSERT INTO ${TableNames.invoiceTableName} (sendDate, status, sender, clientBusinessName, clientEmail, clientPhone) VALUES (?, ?, ?, ?, ?, ?)"
+//
+//            connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS).use { preparedStatement ->
+//                with(preparedStatement) {
+//                    setDate(1, invoice.sendDate)
+//                    setString(2, invoice.status)
+//                    setString(3, invoice.sender)
+//                    setString(4, invoice.clientBusinessName)
+//                    setString(5, invoice.clientEmail)
+//                    setString(6, invoice.clientPhone)
+//
+//                    executeUpdate()
+//                }
+//                invalidateInvoiceCache()
+//                val generatedKeys: ResultSet = preparedStatement.generatedKeys
+//                if (generatedKeys.next()) {
+//                    return generatedKeys.getInt(1)
+//                } else {
+//                    throw SQLInsertException("Failed to get primary key after insertion")
+//                }
+//            }
+//        }
+//    }
 
-            connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS).use { preparedStatement ->
+    fun insertInvoice(invoice: Invoice): Int {
+        return insert(
+            invoice, InvoiceColumns.columnList, TableNames.invoiceTableName,
+            { preparedStatement: PreparedStatement ->
                 with(preparedStatement) {
                     setDate(1, invoice.sendDate)
                     setString(2, invoice.status)
@@ -270,15 +306,9 @@ class DatabaseManager {
 
                     executeUpdate()
                 }
-                invalidateInvoiceCache()
-                val generatedKeys: ResultSet = preparedStatement.generatedKeys
-                if (generatedKeys.next()) {
-                    return generatedKeys.getInt(1)
-                } else {
-                    throw SQLInsertException("Failed to get primary key after insertion")
-                }
-            }
-        }
+            },
+            ::invalidateInvoiceCache
+        )
     }
 
 //    /**
@@ -354,7 +384,8 @@ class DatabaseManager {
 //    }
 
     fun insertUser(user: User): Int {
-        return insert(user, UserColumns.columnList, TableNames.userTableName,
+        return insert(
+            user, UserColumns.columnList, TableNames.userTableName,
             { preparedStatement: PreparedStatement ->
                 with(preparedStatement) {
                     setString(1, user.businessName)
@@ -369,31 +400,34 @@ class DatabaseManager {
                     executeUpdate()
                 }
             },
-            ::invalidateUserCache)
+            ::invalidateUserCache
+        )
     }
 
     fun insertClient(client: Client): Int {
-        return insert(client, ClientColumns.columnList, TableNames.clientTableName,
+        return insert(
+            client, ClientColumns.columnList, TableNames.clientTableName,
             { preparedStatement: PreparedStatement ->
                 with(preparedStatement) {
-                        setString(1, client.businessName)
-                        setString(2, client.contactName)
-                        setString(3, client.street)
-                        setString(4, client.city)
-                        setString(5, client.state)
-                        setInt(6, client.zip)
-                        setString(7, client.email)
-                        setString(8, client.phone)
-                        executeUpdate()
+                    setString(1, client.businessName)
+                    setString(2, client.contactName)
+                    setString(3, client.street)
+                    setString(4, client.city)
+                    setString(5, client.state)
+                    setInt(6, client.zip)
+                    setString(7, client.email)
+                    setString(8, client.phone)
+                    executeUpdate()
                 }
             },
-            ::invalidateClientCache)
+            ::invalidateClientCache
+        )
     }
 
     private fun makeInsertString(tableName: String, fields: List<String>): String {
         var fieldString = "("
         var questionMarkString = "("
-        for(field in fields) {
+        for (field in fields) {
             fieldString += "$field, "
             questionMarkString += "?, "
         }
@@ -406,10 +440,16 @@ class DatabaseManager {
         return "INSERT INTO $tableName $fieldString VALUES $questionMarkString"
     }
 
-    fun <T> insert(element: T, fields: List<String>, tableName: String, resultInterpreter: (PreparedStatement) -> Unit, invalidateCache: () -> Unit): Int {
+    fun <T> insert(
+        element: T,
+        fields: List<String>,
+        tableName: String,
+        resultInterpreter: (PreparedStatement) -> Unit,
+        invalidateCache: () -> Unit
+    ): Int {
         connect().use { connection ->
             val insertQuery = makeInsertString(tableName, fields)
-            connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS).use {preparedStatement ->
+            connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS).use { preparedStatement ->
                 resultInterpreter(preparedStatement)
                 invalidateCache()
                 val generatedKeys: ResultSet = preparedStatement.generatedKeys
@@ -422,46 +462,85 @@ class DatabaseManager {
         }
     }
 
-    /**
-     * Inserts a note into the correct table and returns the ID of the newly inserted row
-     *
-     * @param noteText string that will be inserted
-     * @return ID of newly inserted row
-     * @throws SQLInsertException Could not get the ID after insertion
-     */
-    fun insertNote(noteText: String): Int {
-        connect().use { connection ->
-            val insertQuery =
-                "INSERT INTO ${TableNames.noteTableName} (note) VALUES (?)"
+//    /**
+//     * Inserts a note into the correct table and returns the ID of the newly inserted row
+//     *
+//     * @param noteText string that will be inserted
+//     * @return ID of newly inserted row
+//     * @throws SQLInsertException Could not get the ID after insertion
+//     */
+//    fun insertNote(noteText: String): Int {
+//        connect().use { connection ->
+//            val insertQuery =
+//                "INSERT INTO ${TableNames.noteTableName} (note) VALUES (?)"
+//
+//            connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS).use { preparedStatement ->
+//                with(preparedStatement) {
+//                    setString(1, noteText)
+//                    executeUpdate()
+//                }
+//                invalidateClientCache()
+//                val generatedKeys: ResultSet = preparedStatement.generatedKeys
+//                if (generatedKeys.next()) {
+//                    return generatedKeys.getInt(1)
+//                } else {
+//                    throw SQLInsertException("Failed to get primary key after insertion")
+//                }
+//            }
+//        }
+//    }
 
-            connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS).use { preparedStatement ->
+    fun insertNote(noteText: String): Int {
+        return insert(
+            noteText, NoteColumns.columnList, TableNames.noteTableName,
+            { preparedStatement: PreparedStatement ->
                 with(preparedStatement) {
                     setString(1, noteText)
                     executeUpdate()
                 }
-                invalidateClientCache()
-                val generatedKeys: ResultSet = preparedStatement.generatedKeys
-                if (generatedKeys.next()) {
-                    return generatedKeys.getInt(1)
-                } else {
-                    throw SQLInsertException("Failed to get primary key after insertion")
-                }
-            }
-        }
+            },
+            ::invalidateNoteCache
+        )
     }
 
-    /**
-     * Inserts an item into the correct table and returns the ID of the newly inserted row
-     *
-     * @param item item object that will be inserted
-     * @return ID of newly inserted row
-     * @throws SQLInsertException Could not get the ID after insertion
-     */
+
+
+//    /**
+//     * Inserts an item into the correct table and returns the ID of the newly inserted row
+//     *
+//     * @param item item object that will be inserted
+//     * @return ID of newly inserted row
+//     * @throws SQLInsertException Could not get the ID after insertion
+//     */
+//    fun insertItem(item: Item): Int {
+//        connect().use { connection ->
+//            val insertQuery =
+//                "INSERT INTO ${TableNames.itemTableName} (name, startDate, endDate, quantity, price, description) VALUES (?, ?, ?, ?, ?, ?)"
+//            connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS).use { preparedStatement ->
+//                with(preparedStatement) {
+//                    setString(1, item.name)
+//                    setDate(2, item.startDate)
+//                    setDate(3, item.endDate)
+//                    setDouble(4, item.quantity)
+//                    setBigDecimal(5, item.price)
+//                    setString(6, item.description)
+//                    executeUpdate()
+//                }
+//                invalidateItemCache()
+//                val generatedKeys: ResultSet = preparedStatement.generatedKeys
+//                if (generatedKeys.next()) {
+//                    return generatedKeys.getInt(1)
+//                } else {
+//                    throw SQLInsertException("Failed to get primary key after insertion")
+//                }
+//            }
+//        }
+//    }
+
     fun insertItem(item: Item): Int {
-        connect().use { connection ->
-            val insertQuery =
-                "INSERT INTO ${TableNames.itemTableName} (name, startDate, endDate, quantity, price, description) VALUES (?, ?, ?, ?, ?, ?)"
-            connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS).use { preparedStatement ->
+        return insert(
+            item, ItemColumns.columnList, TableNames.itemTableName,
+            { preparedStatement: PreparedStatement ->
                 with(preparedStatement) {
                     setString(1, item.name)
                     setDate(2, item.startDate)
@@ -471,15 +550,9 @@ class DatabaseManager {
                     setString(6, item.description)
                     executeUpdate()
                 }
-                invalidateItemCache()
-                val generatedKeys: ResultSet = preparedStatement.generatedKeys
-                if (generatedKeys.next()) {
-                    return generatedKeys.getInt(1)
-                } else {
-                    throw SQLInsertException("Failed to get primary key after insertion")
-                }
-            }
-        }
+            },
+            ::invalidateItemCache
+        )
     }
 
     /**
