@@ -24,27 +24,34 @@ class ItemInputDialog {
 
     private val _rows: MutableList<ItemInputRowDialog> = mutableListOf(ItemInputRowDialog(iteration++))
 
-    var modifier:Modifier = Modifier
+    var modifier: Modifier = Modifier
 
     val isError: Boolean
         get() {
-            var isErrorTentative: Boolean = false
-            for (row in _rows) {
-                if (row.isError) {
-                    isErrorTentative = true
-                }
+//            var isErrorTentative = false
+//            for (row in _rows) {
+//                if (row.isError) {
+//                    isErrorTentative = true
+//                }
+//            }
+//            return isErrorTentative
+            return _rows.fold(false) { running, row ->
+                running && row.isError
             }
-            return isErrorTentative
         }
     val results: List<Item>
         get() {
-            val returnList: MutableList<Item> = mutableListOf()
-
-            for (row in _rows) {
-                returnList.add(row.result)
+//            val returnList: MutableList<Item> = mutableListOf()
+//
+//            for (row in _rows) {
+//                returnList.add(row.result)
+//            }
+//
+//
+//            return returnList.toList()
+            return _rows.map { row ->
+                row.result
             }
-
-            return returnList.toList()
         }
 
     @Composable
@@ -53,7 +60,7 @@ class ItemInputDialog {
         Column(modifier = modifier.padding(PaddingValues(10.dp))) {
             val state = rememberLazyListState()
 
-            Box (modifier = Modifier.weight(5f)){
+            Box(modifier = Modifier.weight(5f)) {
                 LazyColumn(state = state) {
                     items(
                         items = rows,

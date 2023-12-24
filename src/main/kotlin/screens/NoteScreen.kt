@@ -17,7 +17,8 @@ import storage.StateBundle
 class NoteScreen : Screen {
     private val notesEntry = NonRequiredTextMultiline("Notes to be placed in the footer of the invoice")
 
-    val result: String = notesEntry.result
+    val result: String
+        get() = notesEntry.result
 
     @Composable
     override fun Content() {

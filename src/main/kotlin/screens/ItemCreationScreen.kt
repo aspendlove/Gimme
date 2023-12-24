@@ -9,17 +9,44 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import components.CustomButton
 import layouts.ItemInputDialog
+import storage.Item
 import storage.StateBundle
+import javax.swing.JOptionPane
 
 class ItemCreationScreen: Screen {
+    private val itemInputDialog = ItemInputDialog()
+
+    val isError: Boolean
+        get() = itemInputDialog.isError
+    val result: List<Item>
+        get() = itemInputDialog.results
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val itemInputDialog = ItemInputDialog()
+
         val backCustomButton = CustomButton({
+            if (isError) {
+                JOptionPane.showMessageDialog(
+                    null,
+                    "Please fill out all required fields",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                )
+                return@CustomButton;
+            }
             navigator.pop()
         }, "Back")
         val forwardCustomButton = CustomButton({
+            if (isError) {
+                JOptionPane.showMessageDialog(
+                    null,
+                    "Please fill out all required fields",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                )
+                return@CustomButton;
+            }
+            StateBundle.items = result.toMutableList()
             navigator += NoteScreen() // TODO add items to state bundle
         }, "Forward")
         Column(
