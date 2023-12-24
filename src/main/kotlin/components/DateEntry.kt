@@ -18,26 +18,34 @@ import androidx.compose.ui.text.input.TextFieldValue
 import kotlinx.datetime.LocalDate
 import java.sql.Date
 
-class DateEntry(val title: String) : CustomComponentBase(Modifier) {
+class DateEntry(val title: String, private val required: Boolean = true) : CustomComponentBase(Modifier) {
     private var _text = ""
     private var _error = true
 
 
     val isError: Boolean
-        get() = _error ||
-                _text.filter { toFilter ->
-                    toFilter.isDigit()
-                }.length != 8
+        get() = if (required) {
+            _error ||
+                    _text.filter { toFilter ->
+                        toFilter.isDigit()
+                    }.length != 8
+        } else {
+            false
+        }
 
-    val result: Date
+    val result: Date?
         get() {
-            val digits = _text.filter { toFilter -> toFilter.isDigit() }
-            val date = LocalDate(
-                digits.substring(0, 2).toInt(),
-                digits.substring(2, 4).toInt(),
-                digits.substring(4, 8).toInt()
-            )
-            return Date(date.toEpochDays() * 31556952000L) // convert from days to milliseconds
+            if(isError) {
+                return null
+            } else {
+                val digits = _text.filter { toFilter -> toFilter.isDigit() }
+                val date = LocalDate(
+                    digits.substring(0, 2).toInt(),
+                    digits.substring(2, 4).toInt(),
+                    digits.substring(4, 8).toInt()
+                )
+                return Date(date.toEpochDays() * 31556952000L) // convert from days to milliseconds
+            }
         }
 
     @Composable

@@ -12,15 +12,13 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import components.CustomButton
 import components.NonRequiredTextMultiline
-import storage.Notes
 import storage.StateBundle
 
-class NoteScreen: Screen {
+class NoteScreen : Screen {
     private val notesEntry = NonRequiredTextMultiline("Notes to be placed in the footer of the invoice")
 
-    val result:Notes = Notes(
-        notesEntry.result
-    )
+    val result: String = notesEntry.result
+
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow

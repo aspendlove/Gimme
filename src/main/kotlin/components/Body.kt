@@ -12,6 +12,6 @@ import androidx.compose.ui.unit.sp
 class Body(private val text: String): CustomComponentBase(Modifier.padding(10.dp)) {
     @Composable
     override fun compose() {
-        Text(text,modifier, color = darkColors().onBackground, fontSize = 20.sp, textAlign = TextAlign.Center)
+        Text(text,modifier, color = darkColors().onBackground, fontSize = 20.sp, textAlign = TextAlign.Left)
     }
 }

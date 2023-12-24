@@ -16,5 +16,5 @@ object StateBundle {
         "",
     )
     var items: MutableList<Item> = mutableListOf()
-    var notes: Notes = Notes("")
+    var notes: String = ""
 }

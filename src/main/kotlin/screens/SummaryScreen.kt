@@ -10,17 +10,63 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import components.Body
+import components.CustomButton
 import storage.StateBundle
 
-class SummaryScreen: Screen {
+class SummaryScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
 
-        val userText= Body("hello")
-        val clientText = Body("hello")
-        val serviceText = Body("hello")
-        val notesText = Body("hello")
+        val userText = with(StateBundle.user) {
+            Body(
+                """
+                User Details
+                Business: $businessName
+                Name: $contactName
+                Subtitle: $subtitle
+                Address:
+                    $street
+                    $city, $state $zip
+                Email: $email
+                Phone: $phone
+                """.trimIndent()
+            )
+        }
+        val clientText = with(StateBundle.client) {
+            Body(
+                """
+                User Details
+                Business: $businessName
+                Name: $contactName
+                Address:
+                    $street
+                    $city, $state $zip
+                Email: $email
+                Phone: $phone
+                """.trimIndent()
+            )
+        }
+        var formattedItems = ""
+        for (item in StateBundle.items) {
+            formattedItems += with(item) {
+                """$name: $startDate${
+                    if (endDate != null) {
+                        " - $endDate"
+                    } else {
+                        ""
+                    }
+                }, $quantity x $price, $description"""
+            }
+        }
+        val itemText = Body(formattedItems)
+        val notesText = Body(StateBundle.notes)
+        val forwardButton = CustomButton({
+            navigator += ConclusionScreen()
+        }, "Forward")
+        val backButton = CustomButton({
+            navigator.pop()
+        }, "Back")
 
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -42,10 +88,18 @@ class SummaryScreen: Screen {
                 }
             }
             Card(modifier = cardModifier) {
-                serviceText.compose()
+                itemText.compose()
             }
             Card(modifier = cardModifier) {
                 notesText.compose()
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                backButton.compose()
+                forwardButton.compose()
             }
         }
     }

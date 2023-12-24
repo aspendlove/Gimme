@@ -1,4 +1,4 @@
-
+package components
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Icon
@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
-import components.CustomComponentBase
 
 class RequiredTextMultiline(private var title: String, private var initialText: String = ""): CustomComponentBase(Modifier.fillMaxWidth()) {
     private var _text = initialText

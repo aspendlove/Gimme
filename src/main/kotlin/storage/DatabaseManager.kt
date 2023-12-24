@@ -4,6 +4,7 @@ import java.io.File
 import java.sql.*
 
 // TODO add fully featured invoice tracking (enough info to recreate a full pdf from an entry in the invoice table)
+// TODO add apartment info to addresses
 object DatabaseManager {
     private var UserCache: MutableList<User?> = mutableListOf()
     private var ClientCache: MutableList<Client?> = mutableListOf()

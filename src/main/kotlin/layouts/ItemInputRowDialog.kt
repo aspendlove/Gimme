@@ -1,7 +1,7 @@
 package layouts
 
 
-import RequiredTextMultiline
+import components.RequiredTextMultiline
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -22,7 +22,7 @@ class ItemInputRowDialog(val id: Int) : CustomComponentBase(_modifier = Modifier
 
     private val nameInput = RequiredText("Service")
     private val startDateInput = DateEntry("Start Date")
-    private val endDateInput = DateEntry("End Date")
+    private val endDateInput = DateEntry("End Date", required = false)
     private val descriptionInput = RequiredTextMultiline("Description")
     private val quantityInput = RequiredText("Quantity")
     private val priceInput = RequiredText("Price")
@@ -40,7 +40,7 @@ class ItemInputRowDialog(val id: Int) : CustomComponentBase(_modifier = Modifier
         get() {
             return Item(
                 nameInput.result,
-                startDateInput.result,
+                startDateInput.result!!,
                 endDateInput.result,
                 quantityInput.result.toDouble(),
                 priceInput.result.toBigDecimal(),
