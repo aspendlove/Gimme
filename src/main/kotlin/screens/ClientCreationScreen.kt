@@ -59,6 +59,16 @@ class ClientCreationScreen : Screen {
             TODO("Save Dialog")
         }, "Save User")
         val backCustomButton = CustomButton({
+            if (isError) {
+                JOptionPane.showMessageDialog(
+                    null,
+                    "Please fill out all required fields",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                )
+                return@CustomButton;
+            }
+            StateBundle.client = result
             navigator.pop()
         }, "Back")
         val forwardCustomButton = CustomButton({

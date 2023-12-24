@@ -47,51 +47,6 @@ internal class DatabaseSingletonTest {
         )
     }
 
-//    private fun deleteDatabase(databaseFilePath: String) {
-//        val databaseFile = File(databaseFilePath)
-//        if (databaseFile.exists()) {
-//            databaseFile.delete()
-//        }
-//    }
-
-//    @Test
-//    fun testConnect() {
-//        val databaseFilePath = "${::testSelectAll.name}.db"
-//        assertTrue(DatabaseManager.doesTableExist(connection, TableNames.clientTableName))
-//        try {
-//            createTables(connection)
-//        } catch (e: Exception) {
-//            throw AssertionError("createTables() threw an exception")
-//        }
-//        assertTrue(doesTableExist(connection, TableNames.clientTableName))
-//        DatabaseManager.wipeDatabase("DELETE THE DATABASE")
-//    }
-
-//    @Test
-//    fun testCreateTables() {
-//        val databaseFilePath = "${::testSelectAll.name}.db"
-//        DriverManager.getConnection("jdbc:sqlite:$databaseFilePath").use { connection ->
-//            createTables(connection)
-//            assertTrue(doesTableExist(connection, TableNames.invoiceTableName))
-//            assertTrue(doesTableExist(connection, TableNames.userTableName))
-//            assertTrue(doesTableExist(connection, TableNames.clientTableName))
-//            assertTrue(doesTableExist(connection, TableNames.itemTableName))
-//        }
-//        DatabaseManager.wipeDatabase("DELETE THE DATABASE")
-//    }
-
-//    @Test
-//    fun testNonExistentTable() {
-//        val databaseFilePath = "${::testSelectAll.name}.db"
-//        DriverManager.getConnection("jdbc:sqlite:$databaseFilePath").use { connection ->
-//            assertFalse(doesTableExist(connection, TableNames.invoiceTableName))
-//            assertFalse(doesTableExist(connection, TableNames.userTableName))
-//            assertFalse(doesTableExist(connection, TableNames.clientTableName))
-//            assertFalse(doesTableExist(connection, TableNames.itemTableName))
-//        }
-//        DatabaseManager.wipeDatabase("DELETE THE DATABASE")
-//    }
-
     @Test
     fun testInsert() {
         insertFakeData()
@@ -204,11 +159,7 @@ internal class DatabaseSingletonTest {
     @Test
     fun testSelectAllSortByDateDescending() {
         with (DatabaseManager) {
-            val times = listOf<Long>(
-//                Instant.parse(createIso8601String(2023, 9, 21)).toEpochMilliseconds(),
-//                Instant.parse(createIso8601String(2022, 9, 21)).toEpochMilliseconds(),
-//                Instant.parse(createIso8601String(2021, 9, 21)).toEpochMilliseconds(),
-//                Instant.parse(createIso8601String(2020, 9, 21)).toEpochMilliseconds()
+            val times = listOf(
                 System.currentTimeMillis(),
                 System.currentTimeMillis(),
                 System.currentTimeMillis(),
@@ -301,9 +252,9 @@ internal class DatabaseSingletonTest {
         with (DatabaseManager) {
             insertFakeData()
             val fullNameClient: Client =
-                searchClients<String>(ClientColumns.BUSINESS_NAME, "businessName")[0]
-            val partNameUser: User = searchUsers<String>(UserColumns.BUSINESS_NAME, "iness")[0]
-            val wrongNameItem: List<Item> = searchItems<String>(ItemColumns.DESCRIPTION, "bad query")
+                searchClients(ClientColumns.BUSINESS_NAME, "businessName")[0]
+            val partNameUser: User = searchUsers(UserColumns.BUSINESS_NAME, "iness")[0]
+            val wrongNameItem: List<Item> = searchItems(ItemColumns.DESCRIPTION, "bad query")
 
             assertEquals("businessName", fullNameClient.businessName)
             assertEquals("businessName", partNameUser.businessName)

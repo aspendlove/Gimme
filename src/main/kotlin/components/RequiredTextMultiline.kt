@@ -16,8 +16,14 @@ import androidx.compose.ui.text.input.TextFieldValue
 import components.CustomComponentBase
 
 class RequiredTextMultiline(private var title: String, private var initialText: String = ""): CustomComponentBase(Modifier.fillMaxWidth()) {
-    private var _text = ""
+    private var _text = initialText
     private var _error = true
+
+    init {
+        if(initialText.isNotEmpty()) {
+            _error = false
+        }
+    }
 
     val isError: Boolean
         get() = _error

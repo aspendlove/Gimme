@@ -3,7 +3,7 @@ package storage
 import java.io.File
 import java.sql.*
 
-// TODO add notes
+// TODO add fully featured invoice tracking (enough info to recreate a full pdf from an entry in the invoice table)
 object DatabaseManager {
     private var UserCache: MutableList<User?> = mutableListOf()
     private var ClientCache: MutableList<Client?> = mutableListOf()

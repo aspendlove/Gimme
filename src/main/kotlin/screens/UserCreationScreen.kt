@@ -14,14 +14,15 @@ import storage.StateBundle
 import storage.User
 import javax.swing.JOptionPane
 
-class UserCreationScreen: Screen {
+class UserCreationScreen : Screen {
     private val businessNameEntry = RequiredText("Business Name", StateBundle.user.businessName)
     private val contactNameEntry = RequiredText("Contact Name", StateBundle.user.contactName)
     private val subtitleEntry = RequiredText("Subtitle", StateBundle.user.subtitle)
     private val streetEntry = RequiredText("Street", StateBundle.user.street)
     private val cityEntry = RequiredText("City", StateBundle.user.city)
     private val stateEntry = RequiredText("State", StateBundle.user.state)
-    private val zipEntry = RequiredText("Zip Code", if (StateBundle.user.zip != -1) StateBundle.user.zip.toString() else "")
+    private val zipEntry =
+        RequiredText("Zip Code", if (StateBundle.user.zip != -1) StateBundle.user.zip.toString() else "")
     private val emailEntry = RequiredText("Email", StateBundle.user.email)
     private val phoneEntry = RequiredText("Phone", StateBundle.user.phone)
 
@@ -60,11 +61,26 @@ class UserCreationScreen: Screen {
             TODO("Save Dialog")
         }, "Save User")
         val backCustomButton = CustomButton({
+            if (isError) {
+                JOptionPane.showMessageDialog(
+                    null,
+                    "Please fill out all required fields",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                )
+                return@CustomButton;
+            }
+            StateBundle.user = result
             navigator.pop()
         }, "Back")
         val forwardCustomButton = CustomButton({
-            if(isError) {
-                JOptionPane.showMessageDialog(null, "Please fill out all required fields", "Error", JOptionPane.ERROR_MESSAGE)
+            if (isError) {
+                JOptionPane.showMessageDialog(
+                    null,
+                    "Please fill out all required fields",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                )
                 return@CustomButton;
             }
             StateBundle.user = result
