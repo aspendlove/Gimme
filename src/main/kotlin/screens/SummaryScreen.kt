@@ -12,6 +12,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import components.Body
 import components.CustomButton
 import storage.StateBundle
+import java.text.SimpleDateFormat
 
 class SummaryScreen : Screen {
     @Composable
@@ -48,15 +49,16 @@ class SummaryScreen : Screen {
             )
         }
         var formattedItems = ""
+        val dateFormat = SimpleDateFormat("MM/dd/yyyy")
         for (item in StateBundle.items) {
             formattedItems += with(item) {
-                """$name: $startDate${
+                """Name: $name, Date: ${dateFormat.format(startDate)}${
                     if (endDate != null) {
-                        " - $endDate"
+                        " - ${dateFormat.format(endDate)}"
                     } else {
                         ""
                     }
-                }, $quantity x $price, $description"""
+                }, Price: $quantity x $$price, Description: $description""" + "\n"
             }
         }
         val itemText = Body(formattedItems)

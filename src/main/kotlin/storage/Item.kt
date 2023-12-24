@@ -9,11 +9,13 @@ data class Item(
     val startDate: Date,
     val endDate: Date?,
     val quantity: Double,
-    val price: BigDecimal,
+    private val _price: BigDecimal,
     val description: String,
     val id: Int = -1
 ) {
     private var total: BigDecimal = BigDecimal("0.0")
+    val price: BigDecimal
+        get() = _price.setScale(2, RoundingMode.HALF_EVEN)
 
     init {
         total = (price * BigDecimal(quantity)).setScale(2, RoundingMode.HALF_EVEN)

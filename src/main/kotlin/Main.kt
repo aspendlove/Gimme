@@ -13,6 +13,7 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import cafe.adriel.voyager.navigator.Navigator
 import screens.GreetingScreen
+import screens.ItemCreationScreen
 
 fun main() = application {
     val windowState = rememberWindowState(size = DpSize(1200.dp, 800.dp))

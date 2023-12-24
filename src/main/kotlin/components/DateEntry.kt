@@ -15,42 +15,40 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
-import kotlinx.datetime.LocalDate
 import java.sql.Date
+import java.text.SimpleDateFormat
 
 class DateEntry(val title: String, private val required: Boolean = true) : CustomComponentBase(Modifier) {
     private var _text = ""
-    private var _error = true
+    private var _error = required
 
 
     val isError: Boolean
-        get() = if (required) {
-            _error ||
-                    _text.filter { toFilter ->
-                        toFilter.isDigit()
-                    }.length != 8
-        } else {
-            false
-        }
+        get() = _error || _text.filter { toFilter ->
+            toFilter.isDigit()
+        }.length != 8
+
 
     val result: Date?
         get() {
-            if(isError) {
-                return null
+            return if (isError) {
+                null
             } else {
-                val digits = _text.filter { toFilter -> toFilter.isDigit() }
-                val date = LocalDate(
-                    digits.substring(0, 2).toInt(),
-                    digits.substring(2, 4).toInt(),
-                    digits.substring(4, 8).toInt()
+                Date(
+                    SimpleDateFormat("MM/dd/yyyy").parse(_text).time
                 )
-                return Date(date.toEpochDays() * 31556952000L) // convert from days to milliseconds
             }
         }
 
     @Composable
     @Preview
     override fun compose() {
+        val icon: @Composable (() -> Unit)? = if (required) {
+            @Composable { Icon(Icons.Default.Star, "Star") }
+        } else {
+            null
+        }
+
         var text by rememberSaveable(stateSaver = TextFieldValue.Saver) {
             mutableStateOf(TextFieldValue("MM/DD/YYYY"))
         }
@@ -59,8 +57,7 @@ class DateEntry(val title: String, private val required: Boolean = true) : Custo
         var first by remember { mutableStateOf(true) }
         var cursorPlacement by remember { mutableStateOf(0) }
 
-        TextField(
-            value = text,
+        TextField(value = text,
             textStyle = TextStyle(color = darkColors().onBackground),
             onValueChange = { newValue ->
 
@@ -76,8 +73,7 @@ class DateEntry(val title: String, private val required: Boolean = true) : Custo
 
                 if (digits.isEmpty()) {
                     text = TextFieldValue(
-                        "MM/DD/YYYY",
-                        TextRange(cursorPlacement)
+                        "MM/DD/YYYY", TextRange(cursorPlacement)
                     )
                 } else {
                     while (digits.length < 8) {
@@ -96,27 +92,23 @@ class DateEntry(val title: String, private val required: Boolean = true) : Custo
             label = { Text(title) },
             singleLine = true,
             isError = error,
-            trailingIcon = {
-                Icon(Icons.Default.Star, "Star")
-            },
-            modifier = modifier
-                .fillMaxWidth()
-                .onFocusChanged {
-                    if (it.isFocused) {
-                        error = false
-                        _error = false
-                        return@onFocusChanged
-                    }
-                    if (!it.isFocused && first) {
-                        first = false
-                        return@onFocusChanged
-                    }
-                    error = _text.isEmpty() || _text.filter { toFilter ->
-                        toFilter.isDigit()
-                    }.length != 8
-
-                    _error = error
+            trailingIcon = icon,
+            modifier = modifier.fillMaxWidth().onFocusChanged {
+                if (!required) return@onFocusChanged
+                if (it.isFocused) {
+                    error = false
+                    _error = false
+                    return@onFocusChanged
                 }
-        )
+                if (!it.isFocused && first) {
+                    first = false
+                    return@onFocusChanged
+                }
+                error = _text.isEmpty() || _text.filter { toFilter ->
+                    toFilter.isDigit()
+                }.length != 8
+
+                _error = error
+            })
     }
 }

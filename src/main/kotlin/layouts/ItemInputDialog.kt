@@ -36,7 +36,7 @@ class ItemInputDialog {
 //            }
 //            return isErrorTentative
             return _rows.fold(false) { running, row ->
-                running && row.isError
+                running || row.isError
             }
         }
     val results: List<Item>
