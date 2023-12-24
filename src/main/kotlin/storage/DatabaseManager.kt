@@ -4,7 +4,7 @@ import java.io.File
 import java.sql.*
 
 // TODO add notes
-class DatabaseManager {
+object DatabaseManager {
     private var UserCache: MutableList<User?> = mutableListOf()
     private var ClientCache: MutableList<Client?> = mutableListOf()
     private var ItemCache: MutableList<Item?> = mutableListOf()
@@ -42,7 +42,7 @@ class DatabaseManager {
         invalidateAllCaches()
     }
 
-    internal fun invalidateAllCaches() {
+    private fun invalidateAllCaches() {
         invalidateUserCache()
         invalidateClientCache()
         invalidateItemCache()
@@ -154,7 +154,7 @@ class DatabaseManager {
             description VARCHAR(4096));"""
             ),
             Pair(
-                TableNames.clientTableName, """
+                TableNames.invoiceTableName, """
             CREATE TABLE ${TableNames.invoiceTableName} (
             id INTEGER PRIMARY KEY,
             sendDate DATE,
@@ -175,253 +175,6 @@ class DatabaseManager {
                 }
             }
         }
-
-//        if (!doesTableExist(connection, TableNames.clientTableName)) {
-//            connection.prepareStatement(
-//                """
-//            CREATE TABLE ${TableNames.clientTableName} (
-//            id INTEGER PRIMARY KEY,
-//            businessName VARCHAR(64),
-//            contactName VARCHAR(64),
-//            street VARCHAR(256),
-//            city VARCHAR(64),
-//            state VARCHAR(32),
-//            zip INTEGER,
-//            email VARCHAR(64),
-//            phone VARCHAR(32));"""
-//            ).use { query ->
-//                query.execute()
-//            }
-//        }
-//
-//        if (!doesTableExist(connection, TableNames.userTableName)) {
-//            connection.prepareStatement(
-//                """
-//            CREATE TABLE ${TableNames.userTableName} (
-//            id INTEGER PRIMARY KEY,
-//            businessName VARCHAR(64),
-//            contactName VARCHAR(64),
-//            subtitle VARCHAR(4096),
-//            street VARCHAR(256),
-//            city VARCHAR(64),
-//            state VARCHAR(32),
-//            zip INTEGER,
-//            email VARCHAR(64),
-//            phone VARCHAR(32));"""
-//            ).use { query ->
-//                query.execute()
-//            }
-//        }
-//
-//        if (!doesTableExist(connection, TableNames.noteTableName)) {
-//            connection.prepareStatement(
-//                """
-//            CREATE TABLE ${TableNames.noteTableName} (
-//            id INTEGER PRIMARY KEY,
-//            note VARCHAR(1000));"""
-//            ).use { query ->
-//                query.execute()
-//            }
-//        }
-//
-//        if (!doesTableExist(connection, TableNames.itemTableName)) {
-//            connection.prepareStatement(
-//                """
-//            CREATE TABLE ${TableNames.itemTableName} (
-//            id INTEGER PRIMARY KEY,
-//            name VARCHAR(64),
-//            startDate DATE,
-//            endDate DATE,
-//            quantity DOUBLE PRECISION,
-//            price DECIMAL(10,2),
-//            description VARCHAR(4096));"""
-//            ).use { query ->
-//                query.execute()
-//            }
-//        }
-//
-//        if (!doesTableExist(connection, TableNames.invoiceTableName)) {
-//            connection.prepareStatement(
-//                """
-//            CREATE TABLE ${TableNames.invoiceTableName} (
-//            id INTEGER PRIMARY KEY,
-//            sendDate DATE,
-//            status VARCHAR(32),
-//            sender VARCHAR(64),
-//            clientBusinessName VARCHAR(64),
-//            clientEmail VARCHAR(64),
-//            clientPhone VARCHAR(64));"""
-//            ).use { query ->
-//                query.execute()
-//            }
-//        }
-    }
-
-
-//    /**
-//     * Inserts an invoice into the correct table and returns the ID of the newly inserted row
-//     *
-//     * @param invoice invoice object that will be inserted
-//     * @return ID of newly inserted row
-//     * @throws SQLInsertException Could not get the ID after insertion
-//     */
-//    fun insertInvoice(invoice: Invoice): Int {
-//        connect().use { connection ->
-//            val insertQuery =
-//                "INSERT INTO ${TableNames.invoiceTableName} (sendDate, status, sender, clientBusinessName, clientEmail, clientPhone) VALUES (?, ?, ?, ?, ?, ?)"
-//
-//            connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS).use { preparedStatement ->
-//                with(preparedStatement) {
-//                    setDate(1, invoice.sendDate)
-//                    setString(2, invoice.status)
-//                    setString(3, invoice.sender)
-//                    setString(4, invoice.clientBusinessName)
-//                    setString(5, invoice.clientEmail)
-//                    setString(6, invoice.clientPhone)
-//
-//                    executeUpdate()
-//                }
-//                invalidateInvoiceCache()
-//                val generatedKeys: ResultSet = preparedStatement.generatedKeys
-//                if (generatedKeys.next()) {
-//                    return generatedKeys.getInt(1)
-//                } else {
-//                    throw SQLInsertException("Failed to get primary key after insertion")
-//                }
-//            }
-//        }
-//    }
-
-    fun insertInvoice(invoice: Invoice): Int {
-        return insert(
-            invoice, InvoiceColumns.columnList, TableNames.invoiceTableName,
-            { preparedStatement: PreparedStatement ->
-                with(preparedStatement) {
-                    setDate(1, invoice.sendDate)
-                    setString(2, invoice.status)
-                    setString(3, invoice.sender)
-                    setString(4, invoice.clientBusinessName)
-                    setString(5, invoice.clientEmail)
-                    setString(6, invoice.clientPhone)
-
-                    executeUpdate()
-                }
-            },
-            ::invalidateInvoiceCache
-        )
-    }
-
-//    /**
-//     * Inserts a user into the correct table and returns the ID of the newly inserted row
-//     *
-//     * @param user user object that will be inserted
-//     * @return ID of newly inserted row
-//     * @throws SQLInsertException Could not get the ID after insertion
-//     */
-//    fun insertUser(user: User): Int {
-//        connect().use { connection ->
-//            val insertQuery =
-//                "INSERT INTO ${TableNames.userTableName} (businessName, contactName, subtitle, street, city, state, zip, email, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-//
-//            connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS).use { preparedStatement ->
-//                with(preparedStatement) {
-//                    setString(1, user.businessName)
-//                    setString(2, user.contactName)
-//                    setString(3, user.subtitle)
-//                    setString(4, user.street)
-//                    setString(5, user.city)
-//                    setString(6, user.state)
-//                    setInt(7, user.zip)
-//                    setString(8, user.email)
-//                    setString(9, user.phone)
-//                    executeUpdate()
-//                }
-//                invalidateUserCache()
-//                val generatedKeys: ResultSet = preparedStatement.generatedKeys
-//                if (generatedKeys.next()) {
-//                    return generatedKeys.getInt(1)
-//                } else {
-//                    throw SQLInsertException("Failed to get primary key after insertion")
-//                }
-//            }
-//        }
-//    }
-
-//    /**
-//     * Inserts a client into the correct table and returns the ID of the newly inserted row
-//     *
-//     * @param client client object that will be inserted
-//     * @return ID of newly inserted row
-//     * @throws SQLInsertException Could not get the ID after insertion
-//     */
-//    fun insertClient(client: Client): Int {
-//        connect().use { connection ->
-//            val insertQuery =
-//                "INSERT INTO ${TableNames.clientTableName} (businessName, contactName, street, city, state, zip, email, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-//
-//            connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS).use { preparedStatement ->
-//                with(preparedStatement) {
-//
-//                    setString(1, client.businessName)
-//                    setString(2, client.contactName)
-//                    setString(3, client.street)
-//                    setString(4, client.city)
-//                    setString(5, client.state)
-//                    setInt(6, client.zip)
-//                    setString(7, client.email)
-//                    setString(8, client.phone)
-//                    executeUpdate()
-//                }
-//                invalidateClientCache()
-//                val generatedKeys: ResultSet = preparedStatement.generatedKeys
-//                if (generatedKeys.next()) {
-//                    return generatedKeys.getInt(1)
-//                } else {
-//                    throw SQLInsertException("Failed to get primary key after insertion")
-//                }
-//            }
-//        }
-//    }
-
-    fun insertUser(user: User): Int {
-        return insert(
-            user, UserColumns.columnList, TableNames.userTableName,
-            { preparedStatement: PreparedStatement ->
-                with(preparedStatement) {
-                    setString(1, user.businessName)
-                    setString(2, user.contactName)
-                    setString(3, user.subtitle)
-                    setString(4, user.street)
-                    setString(5, user.city)
-                    setString(6, user.state)
-                    setInt(7, user.zip)
-                    setString(8, user.email)
-                    setString(9, user.phone)
-                    executeUpdate()
-                }
-            },
-            ::invalidateUserCache
-        )
-    }
-
-    fun insertClient(client: Client): Int {
-        return insert(
-            client, ClientColumns.columnList, TableNames.clientTableName,
-            { preparedStatement: PreparedStatement ->
-                with(preparedStatement) {
-                    setString(1, client.businessName)
-                    setString(2, client.contactName)
-                    setString(3, client.street)
-                    setString(4, client.city)
-                    setString(5, client.state)
-                    setInt(6, client.zip)
-                    setString(7, client.email)
-                    setString(8, client.phone)
-                    executeUpdate()
-                }
-            },
-            ::invalidateClientCache
-        )
     }
 
     private fun makeInsertString(tableName: String, fields: List<String>): String {
@@ -440,8 +193,7 @@ class DatabaseManager {
         return "INSERT INTO $tableName $fieldString VALUES $questionMarkString"
     }
 
-    fun <T> insert(
-        element: T,
+    private fun insert(
         fields: List<String>,
         tableName: String,
         resultInterpreter: (PreparedStatement) -> Unit,
@@ -462,37 +214,50 @@ class DatabaseManager {
         }
     }
 
-//    /**
-//     * Inserts a note into the correct table and returns the ID of the newly inserted row
-//     *
-//     * @param noteText string that will be inserted
-//     * @return ID of newly inserted row
-//     * @throws SQLInsertException Could not get the ID after insertion
-//     */
-//    fun insertNote(noteText: String): Int {
-//        connect().use { connection ->
-//            val insertQuery =
-//                "INSERT INTO ${TableNames.noteTableName} (note) VALUES (?)"
-//
-//            connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS).use { preparedStatement ->
-//                with(preparedStatement) {
-//                    setString(1, noteText)
-//                    executeUpdate()
-//                }
-//                invalidateClientCache()
-//                val generatedKeys: ResultSet = preparedStatement.generatedKeys
-//                if (generatedKeys.next()) {
-//                    return generatedKeys.getInt(1)
-//                } else {
-//                    throw SQLInsertException("Failed to get primary key after insertion")
-//                }
-//            }
-//        }
-//    }
+    fun insertUser(user: User): Int {
+        return insert(
+            UserColumns.columnList, TableNames.userTableName,
+            { preparedStatement: PreparedStatement ->
+                with(preparedStatement) {
+                    setString(1, user.businessName)
+                    setString(2, user.contactName)
+                    setString(3, user.subtitle)
+                    setString(4, user.street)
+                    setString(5, user.city)
+                    setString(6, user.state)
+                    setInt(7, user.zip)
+                    setString(8, user.email)
+                    setString(9, user.phone)
+                    executeUpdate()
+                }
+            },
+            ::invalidateUserCache
+        )
+    }
+
+    fun insertClient(client: Client): Int {
+        return insert(
+            ClientColumns.columnList, TableNames.clientTableName,
+            { preparedStatement: PreparedStatement ->
+                with(preparedStatement) {
+                    setString(1, client.businessName)
+                    setString(2, client.contactName)
+                    setString(3, client.street)
+                    setString(4, client.city)
+                    setString(5, client.state)
+                    setInt(6, client.zip)
+                    setString(7, client.email)
+                    setString(8, client.phone)
+                    executeUpdate()
+                }
+            },
+            ::invalidateClientCache
+        )
+    }
 
     fun insertNote(noteText: String): Int {
         return insert(
-            noteText, NoteColumns.columnList, TableNames.noteTableName,
+            NoteColumns.columnList, TableNames.noteTableName,
             { preparedStatement: PreparedStatement ->
                 with(preparedStatement) {
                     setString(1, noteText)
@@ -503,43 +268,9 @@ class DatabaseManager {
         )
     }
 
-
-
-//    /**
-//     * Inserts an item into the correct table and returns the ID of the newly inserted row
-//     *
-//     * @param item item object that will be inserted
-//     * @return ID of newly inserted row
-//     * @throws SQLInsertException Could not get the ID after insertion
-//     */
-//    fun insertItem(item: Item): Int {
-//        connect().use { connection ->
-//            val insertQuery =
-//                "INSERT INTO ${TableNames.itemTableName} (name, startDate, endDate, quantity, price, description) VALUES (?, ?, ?, ?, ?, ?)"
-//            connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS).use { preparedStatement ->
-//                with(preparedStatement) {
-//                    setString(1, item.name)
-//                    setDate(2, item.startDate)
-//                    setDate(3, item.endDate)
-//                    setDouble(4, item.quantity)
-//                    setBigDecimal(5, item.price)
-//                    setString(6, item.description)
-//                    executeUpdate()
-//                }
-//                invalidateItemCache()
-//                val generatedKeys: ResultSet = preparedStatement.generatedKeys
-//                if (generatedKeys.next()) {
-//                    return generatedKeys.getInt(1)
-//                } else {
-//                    throw SQLInsertException("Failed to get primary key after insertion")
-//                }
-//            }
-//        }
-//    }
-
     fun insertItem(item: Item): Int {
         return insert(
-            item, ItemColumns.columnList, TableNames.itemTableName,
+            ItemColumns.columnList, TableNames.itemTableName,
             { preparedStatement: PreparedStatement ->
                 with(preparedStatement) {
                     setString(1, item.name)
@@ -555,6 +286,25 @@ class DatabaseManager {
         )
     }
 
+    fun insertInvoice(invoice: Invoice): Int {
+        return insert(
+            InvoiceColumns.columnList, TableNames.invoiceTableName,
+            { preparedStatement: PreparedStatement ->
+                with(preparedStatement) {
+                    setDate(1, invoice.sendDate)
+                    setString(2, invoice.status)
+                    setString(3, invoice.sender)
+                    setString(4, invoice.clientBusinessName)
+                    setString(5, invoice.clientEmail)
+                    setString(6, invoice.clientPhone)
+
+                    executeUpdate()
+                }
+            },
+            ::invalidateInvoiceCache
+        )
+    }
+
     /**
      * Returns all invoices ordered by the given column name either ascending or descending
      *
@@ -567,31 +317,22 @@ class DatabaseManager {
         ascending: Boolean = true,
         cache: Boolean = true
     ): List<Invoice> {
-        if (columnToSortBy == InvoiceColumns.id && cache) {
-            return if (ascending) {
-                InvoiceCache.filterNotNull()
-            } else {
-                InvoiceCache.reversed().filterNotNull()
-            }
-        }
-
-        var sortDirection = "DESC"
-        if (ascending) {
-            sortDirection = "ASC"
-        }
-
-        connect().use { connection ->
-            connection.prepareStatement("SELECT * FROM ${TableNames.invoiceTableName} ORDER BY $columnToSortBy $sortDirection")
-                .use { preparedStatement ->
-                    val results = preparedStatement.executeQuery()
-                    val returnList = mutableListOf<Invoice>()
-                    while (results.next()) {
-                        returnList.add(
-                            invoiceFromResult(results)
-                        )
-                    }
-                    return returnList
-                }
+        if (cache) {
+            return selectAll(
+                InvoiceCache,
+                TableNames.invoiceTableName,
+                ::invoiceFromResult,
+                columnToSortBy = columnToSortBy,
+                ascending = ascending
+            )
+        } else {
+            return selectAll(
+                null,
+                TableNames.invoiceTableName,
+                ::invoiceFromResult,
+                columnToSortBy = columnToSortBy,
+                ascending = ascending
+            )
         }
     }
 
@@ -602,7 +343,7 @@ class DatabaseManager {
      * @param ascending whether to sort by ascending or not
      * @return a users of invoice objects
      */
-    fun <T> selectAll(
+    private fun <T> selectAll(
         cache: MutableList<T?>?,
         tableName: String,
         resultToT: (ResultSet) -> T,
@@ -650,32 +391,22 @@ class DatabaseManager {
         ascending: Boolean = true,
         cache: Boolean = true
     ): List<User> {
-        if (columnToSortBy == UserColumns.id && cache) {
-            return if (ascending) {
-                UserCache.filterNotNull()
-            } else {
-                UserCache.reversed().filterNotNull()
-            }
-        }
-
-        var sortDirection = "DESC"
-        if (ascending) {
-            sortDirection = "ASC"
-        }
-
-        connect().use { connection ->
-            connection.prepareStatement("SELECT * FROM ${TableNames.userTableName} ORDER BY $columnToSortBy $sortDirection")
-                .use { preparedStatement ->
-                    val results = preparedStatement.executeQuery()
-                    val returnList = mutableListOf<User>()
-                    while (results.next()) {
-                        returnList.add(
-                            userFromResult(results)
-                        )
-                    }
-                    return returnList
-                }
-
+        if (cache) {
+            return selectAll(
+                UserCache,
+                TableNames.userTableName,
+                ::userFromResult,
+                columnToSortBy = columnToSortBy,
+                ascending = ascending
+            )
+        } else {
+            return selectAll(
+                null,
+                TableNames.userTableName,
+                ::userFromResult,
+                columnToSortBy = columnToSortBy,
+                ascending = ascending
+            )
         }
     }
 
@@ -691,31 +422,22 @@ class DatabaseManager {
         ascending: Boolean = true,
         cache: Boolean = true
     ): List<Client> {
-        if (columnToSortBy == ClientColumns.id && cache) {
-            return if (ascending) {
-                ClientCache.filterNotNull()
-            } else {
-                ClientCache.reversed().filterNotNull()
-            }
-        }
-
-        var sortDirection = "DESC"
-        if (ascending) {
-            sortDirection = "ASC"
-        }
-
-        connect().use { connection ->
-            connection.prepareStatement("SELECT * FROM ${TableNames.clientTableName} ORDER BY $columnToSortBy $sortDirection")
-                .use { preparedStatement ->
-                    val results = preparedStatement.executeQuery()
-                    val returnList = mutableListOf<Client>()
-                    while (results.next()) {
-                        returnList.add(
-                            clientFromResult(results)
-                        )
-                    }
-                    return returnList
-                }
+        if (cache) {
+            return selectAll(
+                ClientCache,
+                TableNames.clientTableName,
+                ::clientFromResult,
+                columnToSortBy = columnToSortBy,
+                ascending = ascending
+            )
+        } else {
+            return selectAll(
+                null,
+                TableNames.clientTableName,
+                ::clientFromResult,
+                columnToSortBy = columnToSortBy,
+                ascending = ascending
+            )
         }
     }
 
@@ -731,57 +453,22 @@ class DatabaseManager {
         ascending: Boolean = true,
         cache: Boolean = true
     ): List<Item> {
-        if (columnToSortBy == ItemColumns.id && cache) {
-            return if (ascending) {
-                ItemCache.filterNotNull()
-            } else {
-                ItemCache.reversed().filterNotNull()
-            }
-        }
-
-        var sortDirection = "DESC"
-        if (ascending) {
-            sortDirection = "ASC"
-        }
-        connect().use { connection ->
-            connection.prepareStatement("SELECT * FROM ${TableNames.itemTableName} ORDER BY $columnToSortBy $sortDirection")
-                .use { preparedStatement ->
-                    val results = preparedStatement.executeQuery()
-                    val returnList = mutableListOf<Item>()
-                    while (results.next()) {
-                        returnList.add(
-                            itemFromResult(results)
-                        )
-                    }
-                    return returnList
-                }
-        }
-    }
-
-    /**
-     * Select a single invoice with a given id
-     *
-     * @param id
-     * @return
-     */
-    fun selectInvoice(id: Int): Invoice {
-        if (InvoiceCache.size >= id && id >= 1) {
-            val cacheHit = InvoiceCache[id - 1]
-            if (cacheHit != null) {
-                return cacheHit
-            } else {
-                throw NoResultException("no row with given id")
-            }
-        }
-
-        connect().use { connection ->
-            connection.prepareStatement(
-                "SELECT * FROM ${TableNames.invoiceTableName} WHERE id = $id"
-            ).use { preparedStatement ->
-                val result = preparedStatement.executeQuery()
-                if (!result.next()) throw NoResultException("no row with given id")
-                return invoiceFromResult(result)
-            }
+        if (cache) {
+            return selectAll(
+                ItemCache,
+                TableNames.itemTableName,
+                ::itemFromResult,
+                columnToSortBy = columnToSortBy,
+                ascending = ascending
+            )
+        } else {
+            return selectAll(
+                null,
+                TableNames.itemTableName,
+                ::itemFromResult,
+                columnToSortBy = columnToSortBy,
+                ascending = ascending
+            )
         }
     }
 
@@ -819,24 +506,7 @@ class DatabaseManager {
      * @return
      */
     fun selectUser(id: Int): User {
-        if (UserCache.size >= id && id >= 1) {
-            val cacheHit = UserCache[id - 1]
-            if (cacheHit != null) {
-                return cacheHit
-            } else {
-                throw NoResultException("no row with given id")
-            }
-        }
-
-        connect().use { connection ->
-            connection.prepareStatement(
-                "SELECT * FROM ${TableNames.userTableName} WHERE id = $id"
-            ).use { preparedStatement ->
-                val result = preparedStatement.executeQuery()
-                if (!result.next()) throw NoResultException("no row with given id")
-                return userFromResult(result)
-            }
-        }
+        return select(id, UserCache, TableNames.userTableName, ::userFromResult)
     }
 
     /**
@@ -846,24 +516,7 @@ class DatabaseManager {
      * @return
      */
     fun selectClient(id: Int): Client {
-        if (ClientCache.size >= id && id >= 1) {
-            val cacheHit = ClientCache[id - 1]
-            if (cacheHit != null) {
-                return cacheHit
-            } else {
-                throw NoResultException("no row with given id")
-            }
-        }
-
-        connect().use { connection ->
-            connection.prepareStatement(
-                "SELECT * FROM ${TableNames.clientTableName} WHERE id = $id"
-            ).use { preparedStatement ->
-                val result = preparedStatement.executeQuery()
-                if (!result.next()) throw NoResultException("no row with given id")
-                return clientFromResult(result)
-            }
-        }
+        return select(id, ClientCache, TableNames.clientTableName, ::clientFromResult)
     }
 
     /**
@@ -873,24 +526,21 @@ class DatabaseManager {
      * @return
      */
     fun selectItem(id: Int): Item {
-        if (ItemCache.size >= id && id >= 1) {
-            val cacheHit = ItemCache[id - 1]
-            if (cacheHit != null) {
-                return cacheHit
-            } else {
-                throw NoResultException("no row with given id")
-            }
-        }
+        return select(id, ItemCache, TableNames.itemTableName, ::itemFromResult)
+    }
 
-        connect().use { connection ->
-            connection.prepareStatement(
-                "SELECT * FROM ${TableNames.itemTableName} WHERE id = $id"
-            ).use { preparedStatement ->
-                val result = preparedStatement.executeQuery()
-                if (!result.next()) throw NoResultException("no row with given id")
-                return itemFromResult(result)
-            }
-        }
+    fun selectNote(id: Int): String {
+        return select(id, NoteCache, TableNames.noteTableName, ::noteFromResult)
+    }
+
+    /**
+     * Select a single invoice with a given id
+     *
+     * @param id
+     * @return
+     */
+    fun selectInvoice(id: Int): Invoice {
+        return select(id, InvoiceCache, TableNames.invoiceTableName, ::invoiceFromResult)
     }
 
     /**
@@ -957,7 +607,7 @@ class DatabaseManager {
     }
 
     fun deleteNote(id: Int): Boolean {
-        return deleteRowById(TableNames.itemTableName, id, createCacheElementNullifier(NoteCache))
+        return deleteRowById(TableNames.noteTableName, id, createCacheElementNullifier(NoteCache))
     }
 
     /**
@@ -970,21 +620,7 @@ class DatabaseManager {
      * @return
      */
     fun <T> searchClients(columnName: String, query: T): List<Client> {
-        val returnList = mutableListOf<Client>()
-
-        connect().use { connection ->
-            connection.prepareStatement("SELECT * FROM ${TableNames.clientTableName} WHERE $columnName LIKE ?")
-                .use { preparedStatement ->
-                    preparedStatement.setString(1, "%$query%")
-                    val results = preparedStatement.executeQuery()
-
-                    while (results.next()) {
-                        returnList.add(clientFromResult(results))
-                    }
-                }
-        }
-
-        return returnList
+        return search(columnName, TableNames.clientTableName, ::clientFromResult, query)
     }
 
     /**
@@ -1024,22 +660,7 @@ class DatabaseManager {
      * @return
      */
     fun <T> searchUsers(columnName: String, query: T): List<User> {
-        val returnList = mutableListOf<User>()
-
-        connect().use { connection ->
-            connection.prepareStatement("SELECT * FROM ${TableNames.userTableName} WHERE $columnName LIKE ?")
-                .use { preparedStatement ->
-                    preparedStatement.setString(1, "%$query%")
-                    val results = preparedStatement.executeQuery()
-
-                    while (results.next()) {
-                        returnList.add(userFromResult(results))
-                    }
-                }
-        }
-
-
-        return returnList
+        return search(columnName, TableNames.userTableName, ::userFromResult, query)
     }
 
     /**
@@ -1052,22 +673,7 @@ class DatabaseManager {
      * @return
      */
     fun <T> searchInvoices(columnName: String, query: T): List<Invoice> {
-        val returnList = mutableListOf<Invoice>()
-
-        connect().use { connection ->
-            connection.prepareStatement("SELECT * FROM ${TableNames.invoiceTableName} WHERE $columnName LIKE ?")
-                .use { preparedStatement ->
-                    preparedStatement.setString(1, "%$query%")
-                    val results = preparedStatement.executeQuery()
-
-                    while (results.next()) {
-                        returnList.add(invoiceFromResult(results))
-                    }
-                }
-        }
-
-
-        return returnList
+        return search(columnName, TableNames.invoiceTableName, ::invoiceFromResult, query)
     }
 
     /**
@@ -1080,21 +686,7 @@ class DatabaseManager {
      * @return
      */
     fun <T> searchItems(columnName: String, query: T): List<Item> {
-        val returnList = mutableListOf<Item>()
-
-        connect().use { connection ->
-            connection.prepareStatement("SELECT * FROM ${TableNames.itemTableName} WHERE $columnName LIKE ?")
-                .use { preparedStatement ->
-                    preparedStatement.setString(1, "%$query%")
-                    val results = preparedStatement.executeQuery()
-
-                    while (results.next()) {
-                        returnList.add(itemFromResult(results))
-                    }
-                }
-        }
-
-        return returnList
+        return search(columnName, TableNames.itemTableName, ::itemFromResult, query)
     }
 
     /**
@@ -1356,4 +948,3 @@ class SQLInsertException(message: String) : Exception(message)
  * @param message
  */
 class SQLDataRetrievalException(message: String) : Exception(message)
-

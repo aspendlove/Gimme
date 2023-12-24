@@ -1,6 +1,6 @@
+
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
-import kotlinx.datetime.Instant
 import storage.*
 import java.sql.Date
 import kotlin.test.Test
@@ -11,7 +11,7 @@ import kotlin.test.assertTrue
 internal class DatabaseSingletonTest {
 
     init {
-        DatabaseManager.databaseFilePath = this::class.simpleName.toString()
+        DatabaseManager.databaseFilePath = this::class.simpleName.toString() + ".db"
     }
 
     private fun insertFakeData() {
