@@ -14,7 +14,7 @@ import storage.StateBundle
 import javax.swing.JOptionPane
 
 class ItemCreationScreen: Screen {
-    private val itemInputDialog = ItemInputDialog()
+    private val itemInputDialog = ItemInputDialog(StateBundle.items)
 
     val isError: Boolean
         get() = itemInputDialog.isError
@@ -34,6 +34,7 @@ class ItemCreationScreen: Screen {
                 )
                 return@CustomButton;
             }
+            StateBundle.items = result.toMutableList()
             navigator.pop()
         }, "Back")
         val forwardCustomButton = CustomButton({

@@ -18,14 +18,32 @@ import compose.icons.feathericons.FileText
 import compose.icons.feathericons.Save
 import storage.Item
 
-class ItemInputRowDialog(val id: Int) : CustomComponentBase(_modifier = Modifier) {
-
-    private val nameInput = RequiredText("Service")
-    private val startDateInput = DateEntry("Start Date")
-    private val endDateInput = DateEntry("End Date", required = false)
-    private val descriptionInput = RequiredTextMultiline("Description")
-    private val quantityInput = RequiredText("Quantity")
-    private val priceInput = RequiredText("Price")
+class ItemInputRowDialog(val id: Int, item: Item? = null) : CustomComponentBase(_modifier = Modifier) {
+    private val nameInput: RequiredText
+    private val startDateInput: DateEntry
+    private val endDateInput: DateEntry
+    private val descriptionInput: RequiredTextMultiline
+    private val quantityInput: RequiredText
+    private val priceInput: RequiredText
+    init {
+        if(item != null) {
+            with(item) {
+                nameInput = RequiredText("Name",name)
+                startDateInput = DateEntry("Start Date", millisSinceEpoch = startDate.time)
+                endDateInput = DateEntry("End Date", required = false, millisSinceEpoch = endDate?.time)
+                descriptionInput = RequiredTextMultiline("Description", description)
+                quantityInput = RequiredText("Quantity", quantity.toString())
+                priceInput = RequiredText("Price", price.toString())
+            }
+        } else {
+            nameInput = RequiredText("Name")
+            startDateInput = DateEntry("Start Date")
+            endDateInput = DateEntry("End Date", required = false)
+            descriptionInput = RequiredTextMultiline("Description")
+            quantityInput = RequiredText("Quantity")
+            priceInput = RequiredText("Price")
+        }
+    }
 
     val isError: Boolean
         get() {

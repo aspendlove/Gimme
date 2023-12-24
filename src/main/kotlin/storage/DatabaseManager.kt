@@ -23,6 +23,7 @@ object DatabaseManager {
         }
 
     init {
+        connect()
         invalidateAllCaches()
     }
 

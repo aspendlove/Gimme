@@ -19,6 +19,10 @@ class NonRequiredText(private var title: String, private var initialText: String
     val result: String
         get() = _text
 
+    fun changeText(newText: String) {
+        _text = newText
+    }
+
     @Composable
     @Preview
     override fun compose() {

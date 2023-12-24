@@ -53,11 +53,11 @@ class ClientCreationScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val userTitle = Title("Create or Select a Client")
         val presetButton = CustomButton({
-            TODO("Load Dialog")
-        }, "Load User")
+            navigator.replace(ClientLoadScreen())
+        }, "Load Client")
         val saveButton = CustomButton({
             TODO("Save Dialog")
-        }, "Save User")
+        }, "Save Client")
         val backCustomButton = CustomButton({
             if (isError) {
                 JOptionPane.showMessageDialog(

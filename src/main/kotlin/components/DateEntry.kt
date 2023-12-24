@@ -16,11 +16,25 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import java.sql.Date
+import java.text.ParseException
 import java.text.SimpleDateFormat
 
-class DateEntry(val title: String, private val required: Boolean = true) : CustomComponentBase(Modifier) {
-    private var _text = ""
-    private var _error = required
+class DateFormatException(message: String) : Exception(message)
+
+class DateEntry(val title: String, private val required: Boolean = true, private val millisSinceEpoch: Long? = null) :
+    CustomComponentBase(Modifier) {
+    private var _text: String
+    private var _error: Boolean
+
+    init {
+        if (millisSinceEpoch != null) {
+            _text = SimpleDateFormat("MM/dd/yyyy").format(java.util.Date(millisSinceEpoch))
+            _error = false
+        } else {
+            _text = "MM/DD/YYYY"
+            _error = required
+        }
+    }
 
 
     val isError: Boolean
@@ -34,9 +48,13 @@ class DateEntry(val title: String, private val required: Boolean = true) : Custo
             return if (isError) {
                 null
             } else {
-                Date(
-                    SimpleDateFormat("MM/dd/yyyy").parse(_text).time
-                )
+                try {
+                    Date(
+                        SimpleDateFormat("MM/dd/yyyy").parse(_text).time
+                    )
+                } catch(e: ParseException) {
+                    throw DateFormatException("Malformed date in input field")
+                }
             }
         }
 
@@ -50,7 +68,7 @@ class DateEntry(val title: String, private val required: Boolean = true) : Custo
         }
 
         var text by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-            mutableStateOf(TextFieldValue("MM/DD/YYYY"))
+            mutableStateOf(TextFieldValue(_text))
         }
 
         var error by remember { mutableStateOf(false) }

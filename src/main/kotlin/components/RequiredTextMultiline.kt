@@ -30,6 +30,10 @@ class RequiredTextMultiline(private var title: String, private var initialText: 
     val result: String
         get() = _text
 
+    fun changeText(newText: String) {
+        _text = newText
+    }
+
     @Composable
     @Preview
     override fun compose() {

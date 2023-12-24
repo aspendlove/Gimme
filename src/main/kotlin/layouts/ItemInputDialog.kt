@@ -18,11 +18,19 @@ import compose.icons.FeatherIcons
 import compose.icons.feathericons.XCircle
 import storage.Item
 
-class ItemInputDialog {
+class ItemInputDialog(startingItems: MutableList<Item>) {
 
     private var iteration: Int = 0
 
-    private val _rows: MutableList<ItemInputRowDialog> = mutableListOf(ItemInputRowDialog(iteration++))
+    private val _rows: MutableList<ItemInputRowDialog> = startingItems.map { item ->
+        ItemInputRowDialog(iteration++, item)
+    }.toMutableList()
+
+    init {
+        if(_rows.isEmpty()) {
+            _rows.add(ItemInputRowDialog(iteration++))
+        }
+    }
 
     var modifier: Modifier = Modifier
 

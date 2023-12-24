@@ -18,6 +18,10 @@ class NonRequiredTextMultiline(private var title: String, private var initialTex
     val result: String
         get() = _text
 
+    fun changeText(newText: String) {
+        _text = newText
+    }
+
     @Composable
     @Preview
     override fun compose() {

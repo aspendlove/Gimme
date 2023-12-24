@@ -55,7 +55,7 @@ class UserCreationScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val userTitle = Title("Create or Select a User")
         val presetButton = CustomButton({
-            TODO("Load Dialog")
+            navigator.replace(UserLoadScreen())
         }, "Load User")
         val saveButton = CustomButton({
             TODO("Save Dialog")
