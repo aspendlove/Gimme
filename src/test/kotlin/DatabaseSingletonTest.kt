@@ -96,14 +96,14 @@ internal class DatabaseSingletonTest {
     fun testInsert() {
         insertFakeData()
         assertEquals(
-            DatabaseManager.selectAllInvoices(InvoiceColumns.id)[0].status,
+            DatabaseManager.selectAllInvoices(InvoiceColumns.ID)[0].status,
             "status"
         )
-        assertEquals(DatabaseManager.selectAllClients(ClientColumns.id)[0].businessName,
+        assertEquals(DatabaseManager.selectAllClients(ClientColumns.ID)[0].businessName,
             "businessName")
-        assertEquals(DatabaseManager.selectAllUsers(UserColumns.id)[0].businessName,
+        assertEquals(DatabaseManager.selectAllUsers(UserColumns.ID)[0].businessName,
             "businessName")
-        assertEquals(DatabaseManager.selectAllItems(ItemColumns.id, true)[0].description,
+        assertEquals(DatabaseManager.selectAllItems(ItemColumns.ID, true)[0].description,
             "description")
         DatabaseManager.wipeDatabase("DELETE THE DATABASE")
     }
@@ -160,7 +160,7 @@ internal class DatabaseSingletonTest {
                 )
             }
             var i = 1
-            for (client: Client in selectAllClients(ClientColumns.businessName)) {
+            for (client: Client in selectAllClients(ClientColumns.BUSINESS_NAME)) {
                 assertEquals("${i++}", client.businessName)
             }
         }
@@ -194,7 +194,7 @@ internal class DatabaseSingletonTest {
             )
 
             var i = 0
-            for (client in selectAllClients(ClientColumns.contactName)) {
+            for (client in selectAllClients(ClientColumns.CONTACT_NAME)) {
                 assertEquals(names[i++], client.contactName)
             }
         }
@@ -240,7 +240,7 @@ internal class DatabaseSingletonTest {
             )
 
             var i = 0
-            for (item in selectAllItems(ItemColumns.startDate, false)) {
+            for (item in selectAllItems(ItemColumns.START_DATE, false)) {
                 assertEquals(Date(times[i++]), item.startDate)
             }
         }
@@ -301,9 +301,9 @@ internal class DatabaseSingletonTest {
         with (DatabaseManager) {
             insertFakeData()
             val fullNameClient: Client =
-                searchClients<String>(ClientColumns.businessName, "businessName")[0]
-            val partNameUser: User = searchUsers<String>(UserColumns.businessName, "iness")[0]
-            val wrongNameItem: List<Item> = searchItems<String>(ItemColumns.description, "bad query")
+                searchClients<String>(ClientColumns.BUSINESS_NAME, "businessName")[0]
+            val partNameUser: User = searchUsers<String>(UserColumns.BUSINESS_NAME, "iness")[0]
+            val wrongNameItem: List<Item> = searchItems<String>(ItemColumns.DESCRIPTION, "bad query")
 
             assertEquals("businessName", fullNameClient.businessName)
             assertEquals("businessName", partNameUser.businessName)

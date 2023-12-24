@@ -22,11 +22,7 @@ object DatabaseManager {
         }
 
     init {
-        UserCache = selectAll(null, TableNames.userTableName, ::userFromResult)
-        ClientCache = selectAll(null, TableNames.clientTableName, ::clientFromResult)
-        ItemCache = selectAll(null, TableNames.itemTableName, ::itemFromResult)
-        InvoiceCache = selectAll(null, TableNames.invoiceTableName, ::invoiceFromResult)
-        NoteCache = selectAll(null, TableNames.invoiceTableName, ::noteFromResult)
+        invalidateAllCaches()
     }
 
     /**
@@ -51,27 +47,27 @@ object DatabaseManager {
 
     private fun invalidateUserCache() {
         UserCache.clear()
-        UserCache = selectAll(null, TableNames.userTableName, ::userFromResult)
+        UserCache = selectAllUsers(cache = false).toMutableList()
     }
 
     private fun invalidateClientCache() {
         ClientCache.clear()
-        ClientCache = selectAll(null, TableNames.clientTableName, ::clientFromResult)
+        ClientCache = selectAllClients(cache = false).toMutableList()
     }
 
     private fun invalidateNoteCache() {
         NoteCache.clear()
-        NoteCache = selectAll(null, TableNames.noteTableName, ::noteFromResult)
+        NoteCache = selectAllNotes(cache = false).toMutableList()
     }
 
     private fun invalidateItemCache() {
         ItemCache.clear()
-        ItemCache = selectAll(null, TableNames.itemTableName, ::itemFromResult)
+        ItemCache = selectAllItems(cache = false).toMutableList()
     }
 
     private fun invalidateInvoiceCache() {
         InvoiceCache.clear()
-        InvoiceCache = selectAll(null, TableNames.invoiceTableName, ::invoiceFromResult)
+        InvoiceCache = selectAllInvoices(cache = false).toMutableList()
     }
 
     private fun <T> createCacheElementNullifier(cache: MutableList<T?>): (Int) -> Unit {
@@ -108,10 +104,10 @@ object DatabaseManager {
      *
      */
     private fun createTables(connection: Connection) {
-        val tables = listOf<Pair<String, String>>(
+        val tables = listOf(
             Pair(
-                TableNames.clientTableName, """
-            CREATE TABLE ${TableNames.clientTableName} (
+                TableNames.CLIENT_TABLE_NAME, """
+            CREATE TABLE ${TableNames.CLIENT_TABLE_NAME} (
             id INTEGER PRIMARY KEY,
             businessName VARCHAR(64),
             contactName VARCHAR(64),
@@ -123,8 +119,8 @@ object DatabaseManager {
             phone VARCHAR(32));"""
             ),
             Pair(
-                TableNames.userTableName, """
-            CREATE TABLE ${TableNames.userTableName} (
+                TableNames.USER_TABLE_NAME, """
+            CREATE TABLE ${TableNames.USER_TABLE_NAME} (
             id INTEGER PRIMARY KEY,
             businessName VARCHAR(64),
             contactName VARCHAR(64),
@@ -137,14 +133,14 @@ object DatabaseManager {
             phone VARCHAR(32));"""
             ),
             Pair(
-                TableNames.noteTableName, """
-            CREATE TABLE ${TableNames.noteTableName} (
+                TableNames.NOTE_TABLE_NAME, """
+            CREATE TABLE ${TableNames.NOTE_TABLE_NAME} (
             id INTEGER PRIMARY KEY,
             note VARCHAR(1000));"""
             ),
             Pair(
-                TableNames.itemTableName, """
-            CREATE TABLE ${TableNames.itemTableName} (
+                TableNames.ITEM_TABLE_NAME, """
+            CREATE TABLE ${TableNames.ITEM_TABLE_NAME} (
             id INTEGER PRIMARY KEY,
             name VARCHAR(64),
             startDate DATE,
@@ -154,8 +150,8 @@ object DatabaseManager {
             description VARCHAR(4096));"""
             ),
             Pair(
-                TableNames.invoiceTableName, """
-            CREATE TABLE ${TableNames.invoiceTableName} (
+                TableNames.INVOICE_TABLE_NAME, """
+            CREATE TABLE ${TableNames.INVOICE_TABLE_NAME} (
             id INTEGER PRIMARY KEY,
             sendDate DATE,
             status VARCHAR(32),
@@ -216,7 +212,7 @@ object DatabaseManager {
 
     fun insertUser(user: User): Int {
         return insert(
-            UserColumns.columnList, TableNames.userTableName,
+            UserColumns.columnList, TableNames.USER_TABLE_NAME,
             { preparedStatement: PreparedStatement ->
                 with(preparedStatement) {
                     setString(1, user.businessName)
@@ -237,7 +233,7 @@ object DatabaseManager {
 
     fun insertClient(client: Client): Int {
         return insert(
-            ClientColumns.columnList, TableNames.clientTableName,
+            ClientColumns.columnList, TableNames.CLIENT_TABLE_NAME,
             { preparedStatement: PreparedStatement ->
                 with(preparedStatement) {
                     setString(1, client.businessName)
@@ -257,7 +253,7 @@ object DatabaseManager {
 
     fun insertNote(noteText: String): Int {
         return insert(
-            NoteColumns.columnList, TableNames.noteTableName,
+            NoteColumns.columnList, TableNames.NOTE_TABLE_NAME,
             { preparedStatement: PreparedStatement ->
                 with(preparedStatement) {
                     setString(1, noteText)
@@ -270,7 +266,7 @@ object DatabaseManager {
 
     fun insertItem(item: Item): Int {
         return insert(
-            ItemColumns.columnList, TableNames.itemTableName,
+            ItemColumns.columnList, TableNames.ITEM_TABLE_NAME,
             { preparedStatement: PreparedStatement ->
                 with(preparedStatement) {
                     setString(1, item.name)
@@ -288,7 +284,7 @@ object DatabaseManager {
 
     fun insertInvoice(invoice: Invoice): Int {
         return insert(
-            InvoiceColumns.columnList, TableNames.invoiceTableName,
+            InvoiceColumns.columnList, TableNames.INVOICE_TABLE_NAME,
             { preparedStatement: PreparedStatement ->
                 with(preparedStatement) {
                     setDate(1, invoice.sendDate)
@@ -306,37 +302,6 @@ object DatabaseManager {
     }
 
     /**
-     * Returns all invoices ordered by the given column name either ascending or descending
-     *
-     * @param columnToSortBy the name of the column that will be used to sort the results
-     * @param ascending whether to sort by ascending or not
-     * @return a list of invoice objects
-     */
-    fun selectAllInvoices(
-        columnToSortBy: String = InvoiceColumns.id,
-        ascending: Boolean = true,
-        cache: Boolean = true
-    ): List<Invoice> {
-        if (cache) {
-            return selectAll(
-                InvoiceCache,
-                TableNames.invoiceTableName,
-                ::invoiceFromResult,
-                columnToSortBy = columnToSortBy,
-                ascending = ascending
-            )
-        } else {
-            return selectAll(
-                null,
-                TableNames.invoiceTableName,
-                ::invoiceFromResult,
-                columnToSortBy = columnToSortBy,
-                ascending = ascending
-            )
-        }
-    }
-
-    /**
      * Returns all users ordered by the given column name either ascending or descending
      *
      * @param columnToSortBy the name of the column that will be used to sort the results
@@ -350,7 +315,7 @@ object DatabaseManager {
         columnToSortBy: String = "id",
         ascending: Boolean = true,
     ): MutableList<T> {
-        if (columnToSortBy == UserColumns.id && cache != null) {
+        if (columnToSortBy == UserColumns.ID && cache != null) {
             return if (ascending) {
                 cache.filterNotNull().toMutableList()
             } else {
@@ -358,9 +323,10 @@ object DatabaseManager {
             }
         }
 
-        var sortDirection = "DESC"
-        if (ascending) {
-            sortDirection = "ASC"
+        val sortDirection = if (ascending) {
+            "ASC"
+        } else {
+            "DESC"
         }
 
         connect().use { connection ->
@@ -380,6 +346,31 @@ object DatabaseManager {
     }
 
     /**
+     * Returns all invoices ordered by the given column name either ascending or descending
+     *
+     * @param columnToSortBy the name of the column that will be used to sort the results
+     * @param ascending whether to sort by ascending or not
+     * @return a list of invoice objects
+     */
+    fun selectAllInvoices(
+        columnToSortBy: String = InvoiceColumns.ID,
+        ascending: Boolean = true,
+        cache: Boolean = true
+    ): List<Invoice> {
+        return selectAll(
+            if (cache) {
+                InvoiceCache
+            } else {
+                null
+            },
+            TableNames.INVOICE_TABLE_NAME,
+            ::invoiceFromResult,
+            columnToSortBy = columnToSortBy,
+            ascending = ascending
+        )
+    }
+
+    /**
      * Returns all users ordered by the given column name either ascending or descending
      *
      * @param columnToSortBy the name of the column that will be used to sort the results
@@ -387,27 +378,21 @@ object DatabaseManager {
      * @return a users of invoice objects
      */
     fun selectAllUsers(
-        columnToSortBy: String = UserColumns.id,
+        columnToSortBy: String = UserColumns.ID,
         ascending: Boolean = true,
         cache: Boolean = true
     ): List<User> {
-        if (cache) {
-            return selectAll(
-                UserCache,
-                TableNames.userTableName,
-                ::userFromResult,
-                columnToSortBy = columnToSortBy,
-                ascending = ascending
-            )
-        } else {
-            return selectAll(
-                null,
-                TableNames.userTableName,
-                ::userFromResult,
-                columnToSortBy = columnToSortBy,
-                ascending = ascending
-            )
-        }
+        return selectAll(
+            if (cache) {
+                UserCache
+            } else {
+                null
+            },
+            TableNames.USER_TABLE_NAME,
+            ::userFromResult,
+            columnToSortBy = columnToSortBy,
+            ascending = ascending
+        )
     }
 
     /**
@@ -418,27 +403,46 @@ object DatabaseManager {
      * @return a list of client objects
      */
     fun selectAllClients(
-        columnToSortBy: String = ClientColumns.id,
+        columnToSortBy: String = ClientColumns.ID,
         ascending: Boolean = true,
         cache: Boolean = true
     ): List<Client> {
-        if (cache) {
-            return selectAll(
-                ClientCache,
-                TableNames.clientTableName,
-                ::clientFromResult,
-                columnToSortBy = columnToSortBy,
-                ascending = ascending
-            )
-        } else {
-            return selectAll(
-                null,
-                TableNames.clientTableName,
-                ::clientFromResult,
-                columnToSortBy = columnToSortBy,
-                ascending = ascending
-            )
-        }
+        return selectAll(
+            if (cache) {
+                ClientCache
+            } else {
+                null
+            },
+            TableNames.CLIENT_TABLE_NAME,
+            ::clientFromResult,
+            columnToSortBy = columnToSortBy,
+            ascending = ascending
+        )
+    }
+
+    /**
+     * Returns all items ordered by the given column name either ascending or descending
+     *
+     * @param columnToSortBy the name of the column that will be used to sort the results
+     * @param ascending whether to sort by ascending or not
+     * @return a list of item objects
+     */
+    fun selectAllNotes(
+        columnToSortBy: String = NoteColumns.ID,
+        ascending: Boolean = true,
+        cache: Boolean = true
+    ): List<String> {
+        return selectAll(
+            if (cache) {
+                NoteCache
+            } else {
+                null
+            },
+            TableNames.NOTE_TABLE_NAME,
+            ::noteFromResult,
+            columnToSortBy = columnToSortBy,
+            ascending = ascending
+        )
     }
 
     /**
@@ -449,27 +453,21 @@ object DatabaseManager {
      * @return a list of item objects
      */
     fun selectAllItems(
-        columnToSortBy: String = ItemColumns.id,
+        columnToSortBy: String = ItemColumns.ID,
         ascending: Boolean = true,
         cache: Boolean = true
     ): List<Item> {
-        if (cache) {
-            return selectAll(
-                ItemCache,
-                TableNames.itemTableName,
-                ::itemFromResult,
-                columnToSortBy = columnToSortBy,
-                ascending = ascending
-            )
-        } else {
-            return selectAll(
-                null,
-                TableNames.itemTableName,
-                ::itemFromResult,
-                columnToSortBy = columnToSortBy,
-                ascending = ascending
-            )
-        }
+        return selectAll(
+            if (cache) {
+                ItemCache
+            } else {
+                null
+            },
+            TableNames.ITEM_TABLE_NAME,
+            ::itemFromResult,
+            columnToSortBy = columnToSortBy,
+            ascending = ascending
+        )
     }
 
     /**
@@ -478,7 +476,7 @@ object DatabaseManager {
      * @param id
      * @return
      */
-    fun <T> select(id: Int, cache: MutableList<T?>, tableName: String, resultToT: (ResultSet) -> T): T {
+    private fun <T> select(id: Int, cache: MutableList<T?>, tableName: String, resultToT: (ResultSet) -> T): T {
         if (cache.size >= id && id >= 1) {
             val cacheHit = cache[id - 1]
             if (cacheHit != null) {
@@ -490,8 +488,9 @@ object DatabaseManager {
 
         connect().use { connection ->
             connection.prepareStatement(
-                "SELECT * FROM $tableName WHERE id = $id"
+                "SELECT * FROM $tableName WHERE id = ?"
             ).use { preparedStatement ->
+                preparedStatement.setInt(1, id)
                 val result = preparedStatement.executeQuery()
                 if (!result.next()) throw NoResultException("no row with given id")
                 return resultToT(result)
@@ -506,7 +505,7 @@ object DatabaseManager {
      * @return
      */
     fun selectUser(id: Int): User {
-        return select(id, UserCache, TableNames.userTableName, ::userFromResult)
+        return select(id, UserCache, TableNames.USER_TABLE_NAME, ::userFromResult)
     }
 
     /**
@@ -516,7 +515,7 @@ object DatabaseManager {
      * @return
      */
     fun selectClient(id: Int): Client {
-        return select(id, ClientCache, TableNames.clientTableName, ::clientFromResult)
+        return select(id, ClientCache, TableNames.CLIENT_TABLE_NAME, ::clientFromResult)
     }
 
     /**
@@ -526,11 +525,17 @@ object DatabaseManager {
      * @return
      */
     fun selectItem(id: Int): Item {
-        return select(id, ItemCache, TableNames.itemTableName, ::itemFromResult)
+        return select(id, ItemCache, TableNames.ITEM_TABLE_NAME, ::itemFromResult)
     }
 
+    /**
+     * Select a single note with a given id
+     *
+     * @param id
+     * @return
+     */
     fun selectNote(id: Int): String {
-        return select(id, NoteCache, TableNames.noteTableName, ::noteFromResult)
+        return select(id, NoteCache, TableNames.NOTE_TABLE_NAME, ::noteFromResult)
     }
 
     /**
@@ -540,7 +545,7 @@ object DatabaseManager {
      * @return
      */
     fun selectInvoice(id: Int): Invoice {
-        return select(id, InvoiceCache, TableNames.invoiceTableName, ::invoiceFromResult)
+        return select(id, InvoiceCache, TableNames.INVOICE_TABLE_NAME, ::invoiceFromResult)
     }
 
     /**
@@ -573,7 +578,7 @@ object DatabaseManager {
      * @return whether any rows were deleted
      */
     fun deleteInvoice(id: Int): Boolean {
-        return deleteRowById(TableNames.invoiceTableName, id, createCacheElementNullifier(ClientCache))
+        return deleteRowById(TableNames.INVOICE_TABLE_NAME, id, createCacheElementNullifier(ClientCache))
     }
 
     /**
@@ -583,7 +588,7 @@ object DatabaseManager {
      * @return whether any rows were deleted
      */
     fun deleteUser(id: Int): Boolean {
-        return deleteRowById(TableNames.userTableName, id, createCacheElementNullifier(UserCache))
+        return deleteRowById(TableNames.USER_TABLE_NAME, id, createCacheElementNullifier(UserCache))
     }
 
     /**
@@ -593,7 +598,7 @@ object DatabaseManager {
      * @return whether any rows were deleted
      */
     fun deleteClient(id: Int): Boolean {
-        return deleteRowById(TableNames.clientTableName, id, createCacheElementNullifier(ClientCache))
+        return deleteRowById(TableNames.CLIENT_TABLE_NAME, id, createCacheElementNullifier(ClientCache))
     }
 
     /**
@@ -603,36 +608,31 @@ object DatabaseManager {
      * @return
      */
     fun deleteItem(id: Int): Boolean {
-        return deleteRowById(TableNames.itemTableName, id, createCacheElementNullifier(ItemCache))
+        return deleteRowById(TableNames.ITEM_TABLE_NAME, id, createCacheElementNullifier(ItemCache))
     }
 
+    /**
+     * Delete a single note by id
+     *
+     * @param id
+     * @return
+     */
     fun deleteNote(id: Int): Boolean {
-        return deleteRowById(TableNames.noteTableName, id, createCacheElementNullifier(NoteCache))
+        return deleteRowById(TableNames.NOTE_TABLE_NAME, id, createCacheElementNullifier(NoteCache))
     }
 
     /**
-     * Search the clients table for a given value in a given column. The specified query must be a part or a whole of a
-     * value in the table. If the value contains a difference from one of the values, it is not a valid match.
+     * Generic search function that
+     * searches the clients table for a given value in a given column. The specified query must be a part or a whole of
+     * a value in the table. If the value contains a difference from one of the values, it is not a valid match.
      *
-     * @param T the data type of the given column name
+     * @param T the data type of the given column
+     * @param S the data type of the given query
      * @param columnName the column name to search
      * @param query the query to be searched against the clients table. It is of the generic type given.
      * @return
      */
-    fun <T> searchClients(columnName: String, query: T): List<Client> {
-        return search(columnName, TableNames.clientTableName, ::clientFromResult, query)
-    }
-
-    /**
-     * Search the clients table for a given value in a given column. The specified query must be a part or a whole of a
-     * value in the table. If the value contains a difference from one of the values, it is not a valid match.
-     *
-     * @param T the data type of the given column name
-     * @param columnName the column name to search
-     * @param query the query to be searched against the clients table. It is of the generic type given.
-     * @return
-     */
-    fun <S, T> search(columnName: String, tableName: String, resultToT: (ResultSet) -> T, query: S): List<T> {
+    private fun <S, T> search(columnName: String, tableName: String, resultToT: (ResultSet) -> T, query: S): List<T> {
         val returnList = mutableListOf<T>()
 
         connect().use { connection ->
@@ -651,42 +651,68 @@ object DatabaseManager {
     }
 
     /**
+     * Search the clients table for a given value in a given column. The specified query must be a part or a whole of a
+     * value in the table. If the value contains a difference from one of the values, it is not a valid match.
+     *
+     * @param T the data type of the given column
+     * @param columnName the column name to search
+     * @param query the query to be searched against the clients table. It is of the generic type given.
+     * @return
+     */
+    fun <T> searchClients(columnName: String, query: T): List<Client> {
+        return search(columnName, TableNames.CLIENT_TABLE_NAME, ::clientFromResult, query)
+    }
+
+    /**
      * Search the users table for a given value in a given column. The specified query must be a part or a whole of a
      * value in the table. If the value contains a difference from one of the values, it is not a valid match.
      *
-     * @param T the data type of the given column name
+     * @param T the data type of the given column
      * @param columnName the column name to search
      * @param query the query to be searched against the users table. It is of the generic type given.
      * @return
      */
     fun <T> searchUsers(columnName: String, query: T): List<User> {
-        return search(columnName, TableNames.userTableName, ::userFromResult, query)
+        return search(columnName, TableNames.USER_TABLE_NAME, ::userFromResult, query)
     }
 
     /**
      * Search the invoices table for a given value in a given column. The specified query must be a part or a whole of a
      * value in the table. If the value contains a difference from one of the values, it is not a valid match.
      *
-     * @param T the data type of the given column name
+     * @param T the data type of the given column
      * @param columnName the column name to search
      * @param query the query to be searched against the invoices table. It is of the generic type given.
      * @return
      */
     fun <T> searchInvoices(columnName: String, query: T): List<Invoice> {
-        return search(columnName, TableNames.invoiceTableName, ::invoiceFromResult, query)
+        return search(columnName, TableNames.INVOICE_TABLE_NAME, ::invoiceFromResult, query)
     }
 
     /**
      * Search the items table for a given value in a given column. The specified query must be a part or a whole of a
      * value in the table. If the value contains a difference from one of the values, it is not a valid match.
      *
-     * @param T the data type of the given column name
+     * @param T the data type of the given column
      * @param columnName the column name to search
      * @param query the query to be searched against the items table. It is of the generic type given.
      * @return
      */
     fun <T> searchItems(columnName: String, query: T): List<Item> {
-        return search(columnName, TableNames.itemTableName, ::itemFromResult, query)
+        return search(columnName, TableNames.ITEM_TABLE_NAME, ::itemFromResult, query)
+    }
+
+    /**
+     * Search the notes table for a given value in a given column. The specified query must be a part or a whole of a
+     * value in the table. If the value contains a difference from one of the values, it is not a valid match.
+     *
+     * @param T the data type of the given column
+     * @param columnName the column name to search
+     * @param query the query to be searched against the notes table. It is of the generic type given.
+     * @return
+     */
+    fun <T> searchNotes(columnName: String, query: T): List<String> {
+        return search(columnName, TableNames.NOTE_TABLE_NAME, ::noteFromResult, query)
     }
 
     /**
@@ -698,13 +724,13 @@ object DatabaseManager {
     private fun invoiceFromResult(result: ResultSet): Invoice {
         try {
             return Invoice(
-                result.getDate(InvoiceColumns.sendDate),
-                result.getString(InvoiceColumns.status),
-                result.getString(InvoiceColumns.sender),
-                result.getString(InvoiceColumns.clientBusinessName),
-                result.getString(InvoiceColumns.clientEmail),
-                result.getString(InvoiceColumns.clientPhone),
-                id = result.getInt(InvoiceColumns.id)
+                result.getDate(InvoiceColumns.SEND_DATE),
+                result.getString(InvoiceColumns.STATUS),
+                result.getString(InvoiceColumns.SENDER),
+                result.getString(InvoiceColumns.CLIENT_BUSINESS_NAME),
+                result.getString(InvoiceColumns.CLIENT_EMAIL),
+                result.getString(InvoiceColumns.CLIENT_PHONE),
+                id = result.getInt(InvoiceColumns.ID)
             )
         } catch (e: SQLException) {
             throw SQLDataRetrievalException("Row Mapping is Incorrect")
@@ -720,16 +746,16 @@ object DatabaseManager {
     private fun userFromResult(result: ResultSet): User {
         try {
             return User(
-                result.getString(UserColumns.businessName),
-                result.getString(UserColumns.contactName),
-                result.getString(UserColumns.subtitle),
-                result.getString(UserColumns.street),
-                result.getString(UserColumns.city),
-                result.getString(UserColumns.state),
-                result.getInt(UserColumns.zip),
-                result.getString(UserColumns.email),
-                result.getString(UserColumns.phone),
-                id = result.getInt(UserColumns.id)
+                result.getString(UserColumns.BUSINESS_NAME),
+                result.getString(UserColumns.CONTACT_NAME),
+                result.getString(UserColumns.SUBTITLE),
+                result.getString(UserColumns.STREET),
+                result.getString(UserColumns.CITY),
+                result.getString(UserColumns.STATE),
+                result.getInt(UserColumns.ZIP),
+                result.getString(UserColumns.EMAIL),
+                result.getString(UserColumns.PHONE),
+                id = result.getInt(UserColumns.ID)
             )
         } catch (e: SQLException) {
             throw SQLDataRetrievalException("Row Mapping is Incorrect")
@@ -745,15 +771,15 @@ object DatabaseManager {
     private fun clientFromResult(result: ResultSet): Client {
         try {
             return Client(
-                result.getString(ClientColumns.businessName),
-                result.getString(ClientColumns.contactName),
-                result.getString(ClientColumns.street),
-                result.getString(ClientColumns.city),
-                result.getString(ClientColumns.state),
-                result.getInt(ClientColumns.zip),
-                result.getString(ClientColumns.email),
-                result.getString(ClientColumns.phone),
-                id = result.getInt(ClientColumns.id)
+                result.getString(ClientColumns.BUSINESS_NAME),
+                result.getString(ClientColumns.CONTACT_NAME),
+                result.getString(ClientColumns.STREET),
+                result.getString(ClientColumns.CITY),
+                result.getString(ClientColumns.STATE),
+                result.getInt(ClientColumns.ZIP),
+                result.getString(ClientColumns.EMAIL),
+                result.getString(ClientColumns.PHONE),
+                id = result.getInt(ClientColumns.ID)
             )
         } catch (e: SQLException) {
             throw SQLDataRetrievalException("Row Mapping is Incorrect")
@@ -769,22 +795,28 @@ object DatabaseManager {
     private fun itemFromResult(result: ResultSet): Item {
         try {
             return Item(
-                result.getString(ItemColumns.name),
-                result.getDate(ItemColumns.startDate),
-                result.getDate(ItemColumns.endDate),
-                result.getDouble(ItemColumns.quantity),
-                result.getBigDecimal(ItemColumns.price),
-                result.getString(ItemColumns.description),
-                id = result.getInt(ItemColumns.id)
+                result.getString(ItemColumns.NAME),
+                result.getDate(ItemColumns.START_DATE),
+                result.getDate(ItemColumns.END_DATE),
+                result.getDouble(ItemColumns.QUANTITY),
+                result.getBigDecimal(ItemColumns.PRICE),
+                result.getString(ItemColumns.DESCRIPTION),
+                id = result.getInt(ItemColumns.ID)
             )
         } catch (e: SQLException) {
             throw SQLDataRetrievalException("Row Mapping is Incorrect")
         }
     }
 
+    /**
+     * Produces a single note object from a ResultSet's current position
+     *
+     * @param result a JDBC result set
+     * @return
+     */
     private fun noteFromResult(result: ResultSet): String {
         try {
-            return result.getString(NoteColumns.note)
+            return result.getString(NoteColumns.NOTE)
         } catch (e: SQLException) {
             throw SQLDataRetrievalException("Row Mapping is Incorrect")
         }
@@ -797,11 +829,11 @@ object DatabaseManager {
  * @constructor Create empty Table names
  */
 object TableNames {
-    const val invoiceTableName: String = "Invoices"
-    const val userTableName: String = "Users"
-    const val clientTableName: String = "Clients"
-    const val itemTableName: String = "Items"
-    const val noteTableName: String = "Notes"
+    const val INVOICE_TABLE_NAME: String = "Invoices"
+    const val USER_TABLE_NAME: String = "Users"
+    const val CLIENT_TABLE_NAME: String = "Clients"
+    const val ITEM_TABLE_NAME: String = "Items"
+    const val NOTE_TABLE_NAME: String = "Notes"
 }
 
 /**
@@ -810,21 +842,21 @@ object TableNames {
  * @constructor Create empty Invoice columns
  */
 object InvoiceColumns {
-    var sendDate: String = "sendDate"
-    var status: String = "status"
-    var sender: String = "sender"
-    var clientBusinessName: String = "clientBusinessName"
-    var clientEmail: String = "clientEmail"
-    var clientPhone: String = "clientPhone"
-    var id: String = "id"
+    const val SEND_DATE: String = "sendDate"
+    const val STATUS: String = "status"
+    const val SENDER: String = "sender"
+    const val CLIENT_BUSINESS_NAME: String = "clientBusinessName"
+    const val CLIENT_EMAIL: String = "clientEmail"
+    const val CLIENT_PHONE: String = "clientPhone"
+    const val ID: String = "id"
     val columnList: List<String> = listOf(
-        sendDate,
-        status,
-        sender,
-        clientBusinessName,
-        clientEmail,
-        clientPhone,
-        id
+        SEND_DATE,
+        STATUS,
+        SENDER,
+        CLIENT_BUSINESS_NAME,
+        CLIENT_EMAIL,
+        CLIENT_PHONE,
+        ID
     )
 }
 
@@ -834,27 +866,27 @@ object InvoiceColumns {
  * @constructor Create empty Invoice columns
  */
 object UserColumns {
-    const val businessName: String = "businessName"
-    const val contactName: String = "contactName"
-    const val subtitle: String = "subtitle"
-    const val street: String = "street"
-    const val city: String = "city"
-    const val state: String = "state"
-    const val zip: String = "zip"
-    const val email: String = "email"
-    const val phone: String = "phone"
-    const val id: String = "id"
+    const val BUSINESS_NAME: String = "businessName"
+    const val CONTACT_NAME: String = "contactName"
+    const val SUBTITLE: String = "subtitle"
+    const val STREET: String = "street"
+    const val CITY: String = "city"
+    const val STATE: String = "state"
+    const val ZIP: String = "zip"
+    const val EMAIL: String = "email"
+    const val PHONE: String = "phone"
+    const val ID: String = "id"
     val columnList: List<String> = listOf(
-        businessName,
-        contactName,
-        subtitle,
-        street,
-        city,
-        state,
-        zip,
-        email,
-        phone,
-        id
+        BUSINESS_NAME,
+        CONTACT_NAME,
+        SUBTITLE,
+        STREET,
+        CITY,
+        STATE,
+        ZIP,
+        EMAIL,
+        PHONE,
+        ID
     )
 }
 
@@ -864,25 +896,25 @@ object UserColumns {
  * @constructor Create empty Invoice columns
  */
 object ClientColumns {
-    const val businessName: String = "businessName"
-    const val contactName: String = "contactName"
-    const val street: String = "street"
-    const val city: String = "city"
-    const val state: String = "state"
-    const val zip: String = "zip"
-    const val email: String = "email"
-    const val phone: String = "phone"
-    const val id: String = "id"
+    const val BUSINESS_NAME: String = "businessName"
+    const val CONTACT_NAME: String = "contactName"
+    const val STREET: String = "street"
+    const val CITY: String = "city"
+    const val STATE: String = "state"
+    const val ZIP: String = "zip"
+    const val EMAIL: String = "email"
+    const val PHONE: String = "phone"
+    const val ID: String = "id"
     val columnList: List<String> = listOf(
-        businessName,
-        contactName,
-        street,
-        city,
-        state,
-        zip,
-        email,
-        phone,
-        id
+        BUSINESS_NAME,
+        CONTACT_NAME,
+        STREET,
+        CITY,
+        STATE,
+        ZIP,
+        EMAIL,
+        PHONE,
+        ID
     )
 }
 
@@ -892,21 +924,21 @@ object ClientColumns {
  * @constructor Create empty Invoice columns
  */
 object ItemColumns {
-    const val name: String = "name"
-    const val startDate: String = "startDate"
-    const val endDate: String = "endDate"
-    const val quantity: String = "quantity"
-    const val price: String = "price"
-    const val description: String = "description"
-    const val id: String = "id"
+    const val NAME: String = "name"
+    const val START_DATE: String = "startDate"
+    const val END_DATE: String = "endDate"
+    const val QUANTITY: String = "quantity"
+    const val PRICE: String = "price"
+    const val DESCRIPTION: String = "description"
+    const val ID: String = "id"
     val columnList: List<String> = listOf(
-        name,
-        startDate,
-        endDate,
-        quantity,
-        price,
-        description,
-        id
+        NAME,
+        START_DATE,
+        END_DATE,
+        QUANTITY,
+        PRICE,
+        DESCRIPTION,
+        ID
     )
 }
 
@@ -916,9 +948,11 @@ object ItemColumns {
  * @constructor Create empty Invoice columns
  */
 object NoteColumns {
-    const val note: String = "note"
+    const val NOTE: String = "note"
+    const val ID: String = "id"
     val columnList: List<String> = listOf(
-        note
+        NOTE,
+        ID
     )
 }
 
