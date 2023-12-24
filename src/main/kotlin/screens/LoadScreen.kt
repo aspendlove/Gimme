@@ -9,29 +9,40 @@ import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import components.SearchBar
 import layouts.ItemInputRowDialog
 import layouts.LoadScreenItem
 
-abstract class LoadScreen<T>: Screen {
+abstract class LoadScreen<T> : Screen {
     var iteration: Int = 0
-    private var _rows: MutableList<LoadScreenItem<T>> = mutableListOf()
+    protected var _rows: SnapshotStateList<LoadScreenItem<T>> = mutableListOf<LoadScreenItem<T>>().toMutableStateList()
     var modifier: Modifier = Modifier
-    @Composable
-    abstract fun loadRows(): MutableList<LoadScreenItem<T>>
+
+
+    abstract fun loadRows(navigator: Navigator, filter: String)
+
+    abstract fun goToPreviousScreen(navigator: Navigator)
 
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        _rows = loadRows()
-        val rows = _rows.toMutableStateList()
+        loadRows(navigator, "")
+        val rows = remember { _rows }
+        val searchBar = SearchBar("Search") { query ->
+            loadRows(navigator, query)
+        }
         Column(modifier = modifier.padding(PaddingValues(10.dp))) {
+            searchBar.compose()
             val state = rememberLazyListState()
 
             Box(modifier = Modifier.weight(5f)) {
@@ -52,7 +63,7 @@ abstract class LoadScreen<T>: Screen {
             }
             Button(
                 onClick = {
-                    navigator.pop()
+                    goToPreviousScreen(navigator)
                 },
                 modifier = Modifier.height(40.dp).fillMaxWidth()
             ) {

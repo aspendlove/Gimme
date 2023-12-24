@@ -20,26 +20,6 @@ import storage.DatabaseManager
 import storage.User
 
 fun main() = application {
-//    DatabaseManager.insertUser(User(
-//        "BusinessName",
-//        "contactName",
-//        "sub",
-//        "street",
-//        "city",
-//        "state",
-//        1,
-//        "email",
-//        "phone"
-//    ))
-//    DatabaseManager.insertClient(Client("Amy",
-//        "Amy",
-//        "1366 S Stewart St.",
-//        "Salt Lake City",
-//        "Utah",
-//        84104,
-//        "mrsamyj1@gmail.com",
-//        "801-560-1810")
-//    )
     val windowState = rememberWindowState(size = DpSize(1200.dp, 800.dp))
     Window(onCloseRequest = ::exitApplication, state = windowState, title = "Gimme! Invoice Creator") {
         App();

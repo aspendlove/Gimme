@@ -10,6 +10,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import components.CustomButton
 import components.RequiredText
 import components.Title
+import storage.DatabaseManager
 import storage.StateBundle
 import storage.User
 import javax.swing.JOptionPane
@@ -58,7 +59,16 @@ class UserCreationScreen : Screen {
             navigator.replace(UserLoadScreen())
         }, "Load User")
         val saveButton = CustomButton({
-            TODO("Save Dialog")
+            if (isError) {
+                JOptionPane.showMessageDialog(
+                    null,
+                    "Please fill out all required fields",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                )
+                return@CustomButton;
+            }
+            DatabaseManager.insertUser(result)
         }, "Save User")
         val backCustomButton = CustomButton({
             if (isError) {
