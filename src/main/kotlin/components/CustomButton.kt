@@ -16,7 +16,7 @@ class CustomButton(private val onClick:() -> Unit, private val text: String) :
             onClick = onClick,
             modifier = modifier
         ) {
-            Text(text);
+            Text(text)
         }
     }
 }

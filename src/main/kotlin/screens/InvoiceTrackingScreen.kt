@@ -1,4 +1,3 @@
 package screens
 
-class InvoiceTrackingScreen {
-}
+class InvoiceTrackingScreen

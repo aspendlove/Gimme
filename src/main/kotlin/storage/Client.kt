@@ -9,5 +9,5 @@ data class Client(
     val zip: Int,
     val email: String,
     val phone: String,
-    val id: Int = -1
-)
+    override val id: Int = -1
+): hasId

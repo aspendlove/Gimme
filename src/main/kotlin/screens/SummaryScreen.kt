@@ -22,7 +22,7 @@ class SummaryScreen : Screen {
         val userText = with(StateBundle.user) {
             Body(
                 """
-                User Details
+                User Details:
                 Business: $businessName
                 Name: $contactName
                 Subtitle: $subtitle
@@ -37,7 +37,7 @@ class SummaryScreen : Screen {
         val clientText = with(StateBundle.client) {
             Body(
                 """
-                User Details
+                Client Details:
                 Business: $businessName
                 Name: $contactName
                 Address:
@@ -48,7 +48,7 @@ class SummaryScreen : Screen {
                 """.trimIndent()
             )
         }
-        var formattedItems = ""
+        var formattedItems = "Services:\n"
         val dateFormat = SimpleDateFormat("MM/dd/yyyy")
         for (item in StateBundle.items) {
             formattedItems += with(item) {
@@ -62,7 +62,7 @@ class SummaryScreen : Screen {
             }
         }
         val itemText = Body(formattedItems)
-        val notesText = Body(StateBundle.notes)
+        val notesText = Body("Notes:\n" + StateBundle.notes.note)
         val forwardButton = CustomButton({
             navigator += ConclusionScreen()
         }, "Forward")

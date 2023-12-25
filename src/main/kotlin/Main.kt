@@ -22,7 +22,7 @@ import storage.User
 fun main() = application {
     val windowState = rememberWindowState(size = DpSize(1200.dp, 800.dp))
     Window(onCloseRequest = ::exitApplication, state = windowState, title = "Gimme! Invoice Creator") {
-        App();
+        App()
     }
 }
 

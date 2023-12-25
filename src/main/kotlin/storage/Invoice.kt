@@ -9,5 +9,5 @@ data class Invoice(
     val clientBusinessName: String,
     val clientEmail: String,
     val clientPhone: String,
-    val id: Int = -1
-)
+    override val id: Int = -1
+): hasId

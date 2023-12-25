@@ -10,15 +10,20 @@ import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import components.CustomComponentBase
 import components.DateEntry
 import components.RequiredText
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.FileText
 import compose.icons.feathericons.Save
+import screens.ItemLoadScreen
+import storage.DatabaseManager
 import storage.Item
 
-class ItemInputRowDialog(val id: Int, item: Item? = null) : CustomComponentBase(_modifier = Modifier) {
+class ItemInputRowDialog(val id: Int, val onSave: () -> Unit, val item: Item? = null) : CustomComponentBase(_modifier = Modifier) {
     private val nameInput: RequiredText
     private val startDateInput: DateEntry
     private val endDateInput: DateEntry
@@ -68,6 +73,7 @@ class ItemInputRowDialog(val id: Int, item: Item? = null) : CustomComponentBase(
 
     @Composable
     override fun compose() {
+        val navigator = LocalNavigator.currentOrThrow
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -91,7 +97,7 @@ class ItemInputRowDialog(val id: Int, item: Item? = null) : CustomComponentBase(
             }
             Button(
                 onClick = {
-                    TODO("Implement Loading items")
+                    navigator.replace(ItemLoadScreen())
                 },
                 modifier = Modifier.fillMaxHeight()
             ) {
@@ -99,7 +105,8 @@ class ItemInputRowDialog(val id: Int, item: Item? = null) : CustomComponentBase(
             }
             Button(
                 onClick = {
-                    TODO("Implement Saving items")
+                    DatabaseManager.insertItem(result)
+                    onSave()
                 },
                 modifier = Modifier.fillMaxHeight()
             ) {

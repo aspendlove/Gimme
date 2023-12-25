@@ -1,15 +1,19 @@
 package screens
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
+import androidx.compose.material.Snackbar
+import androidx.compose.material.Text
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import components.CustomButton
 import components.RequiredText
 import components.Title
+import kotlinx.coroutines.*
 import storage.Client
 import storage.DatabaseManager
 import storage.StateBundle
@@ -26,6 +30,7 @@ class ClientCreationScreen : Screen {
         RequiredText("Zip Code", if (StateBundle.client.zip != -1) StateBundle.client.zip.toString() else "")
     private val emailEntry = RequiredText("Email", StateBundle.client.email)
     private val phoneEntry = RequiredText("Phone", StateBundle.client.phone)
+
 
     val isError: Boolean
         get() = businessNameEntry.isError ||
@@ -51,11 +56,13 @@ class ClientCreationScreen : Screen {
 
     @Composable
     override fun Content() {
+        var showSnackbar by remember { mutableStateOf(false) }
+        val snackbarVisibleTime: Long by remember { mutableStateOf(3000) } // Delay in milliseconds
         val navigator = LocalNavigator.currentOrThrow
         val userTitle = Title("Create or Select a Client")
         val presetButton = CustomButton({
             navigator.replace(ClientLoadScreen())
-        }, "Load Client")
+        }, "Load / Edit Clients")
         val saveButton = CustomButton({
             if (isError) {
                 JOptionPane.showMessageDialog(
@@ -64,9 +71,14 @@ class ClientCreationScreen : Screen {
                     "Error",
                     JOptionPane.ERROR_MESSAGE
                 )
-                return@CustomButton;
+                return@CustomButton
             }
             DatabaseManager.insertClient(result)
+            CoroutineScope(Dispatchers.Default).launch {
+                showSnackbar = true
+                delay(snackbarVisibleTime)
+                showSnackbar = false
+            }
         }, "Save Client")
         val backCustomButton = CustomButton({
             if (isError) {
@@ -76,7 +88,7 @@ class ClientCreationScreen : Screen {
                     "Error",
                     JOptionPane.ERROR_MESSAGE
                 )
-                return@CustomButton;
+                return@CustomButton
             }
             StateBundle.client = result
             navigator.pop()
@@ -89,7 +101,7 @@ class ClientCreationScreen : Screen {
                     "Error",
                     JOptionPane.ERROR_MESSAGE
                 )
-                return@CustomButton;
+                return@CustomButton
             }
             StateBundle.client = result
             navigator += ItemCreationScreen()
@@ -121,6 +133,14 @@ class ClientCreationScreen : Screen {
                 forwardCustomButton.compose()
             }
         }
-    }
 
+        if (showSnackbar) {
+            Snackbar(
+                modifier = Modifier
+                    .zIndex(2f)
+            ) {
+                Text("Client saved successfully!") // Adjust message as needed
+            }
+        }
+    }
 }

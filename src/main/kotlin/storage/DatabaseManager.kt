@@ -2,15 +2,16 @@ package storage
 
 import java.io.File
 import java.sql.*
+import kotlin.collections.HashMap
 
 // TODO add fully featured invoice tracking (enough info to recreate a full pdf from an entry in the invoice table)
 // TODO add apartment info to addresses
 object DatabaseManager {
-    private var UserCache: MutableList<User?> = mutableListOf()
-    private var ClientCache: MutableList<Client?> = mutableListOf()
-    private var ItemCache: MutableList<Item?> = mutableListOf()
-    private var NoteCache: MutableList<String?> = mutableListOf()
-    private var InvoiceCache: MutableList<Invoice?> = mutableListOf()
+    private var UserCache: HashMap<Int, User> = hashMapOf()
+    private var ClientCache: HashMap<Int, Client> = hashMapOf()
+    private var ItemCache: HashMap<Int, Item> = hashMapOf()
+    private var NoteCache: HashMap<Int, Note> = hashMapOf()
+    private var InvoiceCache: HashMap<Int, Invoice> = hashMapOf()
 
     private var _databaseFilePath: String = "GimmeDatabase.db"
     var databaseFilePath: String
@@ -45,40 +46,40 @@ object DatabaseManager {
         invalidateClientCache()
         invalidateItemCache()
         invalidateInvoiceCache()
+        invalidateNoteCache()
+    }
+
+    private fun <T : hasId> listToCache(list: List<T>): HashMap<Int, T> {
+        val returnList: HashMap<Int, T> = hashMapOf()
+        list.map { element ->
+            returnList[element.id] = element
+        }
+        return returnList
     }
 
     private fun invalidateUserCache() {
         UserCache.clear()
-        UserCache = selectAllUsers(cache = false).toMutableList()
+        UserCache = listToCache(selectAllUsers(cache = false))
     }
 
     private fun invalidateClientCache() {
         ClientCache.clear()
-        ClientCache = selectAllClients(cache = false).toMutableList()
+        ClientCache = listToCache(selectAllClients(cache = false))
     }
 
     private fun invalidateNoteCache() {
         NoteCache.clear()
-        NoteCache = selectAllNotes(cache = false).toMutableList()
+        NoteCache = listToCache(selectAllNotes(cache = false))
     }
 
     private fun invalidateItemCache() {
         ItemCache.clear()
-        ItemCache = selectAllItems(cache = false).toMutableList()
+        ItemCache = listToCache(selectAllItems(cache = false))
     }
 
     private fun invalidateInvoiceCache() {
         InvoiceCache.clear()
-        InvoiceCache = selectAllInvoices(cache = false).toMutableList()
-    }
-
-    private fun <T> createCacheElementNullifier(cache: MutableList<T?>): (Int) -> Unit {
-        return fun(id: Int) { nullifyCacheElement<T>(id, cache) }
-    }
-
-    private fun <T> nullifyCacheElement(id: Int, cache: MutableList<T?>) {
-        if (id - 1 >= cache.size) return
-        cache[id - 1] = null
+        InvoiceCache = listToCache(selectAllInvoices(cache = false))
     }
 
     private fun connect(): Connection {
@@ -311,17 +312,29 @@ object DatabaseManager {
      * @return a users of invoice objects
      */
     private fun <T> selectAll(
-        cache: MutableList<T?>?,
+        cache: HashMap<Int, T>?,
         tableName: String,
         resultToT: (ResultSet) -> T,
         columnToSortBy: String = "id",
         ascending: Boolean = true,
-    ): MutableList<T> {
+    ): List<T> {
         if (columnToSortBy == UserColumns.ID && cache != null) {
             return if (ascending) {
-                cache.filterNotNull().toMutableList()
+                val returnList: MutableList<T> = mutableListOf()
+                cache.mapValues { entry ->
+                    if (entry.value != null) {
+                        returnList.add(entry.value!!)
+                    }
+                }
+                returnList
             } else {
-                cache.reversed().filterNotNull().toMutableList()
+                val returnList: MutableList<T> = mutableListOf()
+                cache.mapValues { entry ->
+                    if (entry.value != null) {
+                        returnList.add(entry.value!!)
+                    }
+                }
+                returnList.reversed()
             }
         }
 
@@ -433,7 +446,7 @@ object DatabaseManager {
         columnToSortBy: String = NoteColumns.ID,
         ascending: Boolean = true,
         cache: Boolean = true
-    ): List<String> {
+    ): List<Note> {
         return selectAll(
             if (cache) {
                 NoteCache
@@ -478,14 +491,17 @@ object DatabaseManager {
      * @param id
      * @return
      */
-    private fun <T> select(id: Int, cache: MutableList<T?>, tableName: String, resultToT: (ResultSet) -> T): T {
-        if (cache.size >= id && id >= 1) {
-            val cacheHit = cache[id - 1]
-            if (cacheHit != null) {
-                return cacheHit
-            } else {
-                throw NoResultException("no row with given id")
-            }
+    private fun <T> select(id: Int, cache: HashMap<Int, T>, tableName: String, resultToT: (ResultSet) -> T): T {
+//        if (cache.size >= id && id >= 1) {
+//            val cacheHit = cache[id - 1]
+//            if (cacheHit != null) {
+//                return cacheHit
+//            } else {
+//                throw NoResultException("no row with given id")
+//            }
+//        }
+        if (cache.contains(id)) {
+            return cache[id]!!
         }
 
         connect().use { connection ->
@@ -536,7 +552,7 @@ object DatabaseManager {
      * @param id
      * @return
      */
-    fun selectNote(id: Int): String {
+    fun selectNote(id: Int): Note {
         return select(id, NoteCache, TableNames.NOTE_TABLE_NAME, ::noteFromResult)
     }
 
@@ -580,7 +596,9 @@ object DatabaseManager {
      * @return whether any rows were deleted
      */
     fun deleteInvoice(id: Int): Boolean {
-        return deleteRowById(TableNames.INVOICE_TABLE_NAME, id, createCacheElementNullifier(ClientCache))
+        return deleteRowById(TableNames.INVOICE_TABLE_NAME, id) { toDeleteId ->
+            InvoiceCache.remove(toDeleteId)
+        }
     }
 
     /**
@@ -590,7 +608,9 @@ object DatabaseManager {
      * @return whether any rows were deleted
      */
     fun deleteUser(id: Int): Boolean {
-        return deleteRowById(TableNames.USER_TABLE_NAME, id, createCacheElementNullifier(UserCache))
+        return deleteRowById(TableNames.USER_TABLE_NAME, id) { toDeleteId ->
+            UserCache.remove(toDeleteId)
+        }
     }
 
     /**
@@ -600,7 +620,9 @@ object DatabaseManager {
      * @return whether any rows were deleted
      */
     fun deleteClient(id: Int): Boolean {
-        return deleteRowById(TableNames.CLIENT_TABLE_NAME, id, createCacheElementNullifier(ClientCache))
+        return deleteRowById(TableNames.CLIENT_TABLE_NAME, id) { toDeleteId ->
+            ClientCache.remove(toDeleteId)
+        }
     }
 
     /**
@@ -610,7 +632,9 @@ object DatabaseManager {
      * @return
      */
     fun deleteItem(id: Int): Boolean {
-        return deleteRowById(TableNames.ITEM_TABLE_NAME, id, createCacheElementNullifier(ItemCache))
+        return deleteRowById(TableNames.ITEM_TABLE_NAME, id) { toDeleteId ->
+            ItemCache.remove(toDeleteId)
+        }
     }
 
     /**
@@ -620,7 +644,9 @@ object DatabaseManager {
      * @return
      */
     fun deleteNote(id: Int): Boolean {
-        return deleteRowById(TableNames.NOTE_TABLE_NAME, id, createCacheElementNullifier(NoteCache))
+        return deleteRowById(TableNames.NOTE_TABLE_NAME, id) { toDeleteId ->
+            NoteCache.remove(toDeleteId)
+        }
     }
 
     /**
@@ -713,7 +739,7 @@ object DatabaseManager {
      * @param query the query to be searched against the notes table. It is of the generic type given.
      * @return
      */
-    fun <T> searchNotes(columnName: String, query: T): List<String> {
+    fun <T> searchNotes(columnName: String, query: T): List<Note> {
         return search(columnName, TableNames.NOTE_TABLE_NAME, ::noteFromResult, query)
     }
 
@@ -816,9 +842,12 @@ object DatabaseManager {
      * @param result a JDBC result set
      * @return
      */
-    private fun noteFromResult(result: ResultSet): String {
+    private fun noteFromResult(result: ResultSet): Note {
         try {
-            return result.getString(NoteColumns.NOTE)
+            return Note(
+                result.getString(NoteColumns.NOTE),
+                id = result.getInt(NoteColumns.ID)
+            )
         } catch (e: SQLException) {
             throw SQLDataRetrievalException("Row Mapping is Incorrect")
         }

@@ -9,7 +9,7 @@ import storage.DatabaseManager.searchClients
 import storage.DatabaseManager.selectAllClients
 import storage.StateBundle
 
-class ClientLoadScreen() : LoadScreen<Client>() {
+class ClientLoadScreen : LoadScreen<Client>() {
     override fun loadRows(navigator: Navigator, filter: String) {
         _rows.clear()
 
@@ -19,7 +19,7 @@ class ClientLoadScreen() : LoadScreen<Client>() {
         )).map { client ->
             _rows.add(LoadScreenItem(iteration++, client.businessName, client, { chosenClient ->
                 StateBundle.client = chosenClient
-                navigator.replace(ClientCreationScreen())
+                goToPreviousScreen(navigator)
             }, {
                 DatabaseManager.deleteClient(client.id)
                 loadRows(navigator, filter)

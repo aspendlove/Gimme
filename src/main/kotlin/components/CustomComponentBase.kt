@@ -13,7 +13,7 @@ abstract class CustomComponentBase(private var _modifier: Modifier) {
             return _modifier
         }
         set(value){
-            _modifier = value;
+            _modifier = value
         }
 
     @Composable

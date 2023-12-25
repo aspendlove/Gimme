@@ -11,8 +11,8 @@ data class Item(
     val quantity: Double,
     private val _price: BigDecimal,
     val description: String,
-    val id: Int = -1
-) {
+    override val id: Int = -1
+): hasId {
     private var total: BigDecimal = BigDecimal("0.0")
     val price: BigDecimal
         get() = _price.setScale(2, RoundingMode.HALF_EVEN)

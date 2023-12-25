@@ -1,15 +1,22 @@
 package screens
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
+import androidx.compose.material.Snackbar
+import androidx.compose.material.Text
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import components.CustomButton
 import components.RequiredText
 import components.Title
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import storage.DatabaseManager
 import storage.StateBundle
 import storage.User
@@ -53,11 +60,13 @@ class UserCreationScreen : Screen {
 
     @Composable
     override fun Content() {
+        var showSnackbar by remember { mutableStateOf(false) }
+        val snackbarVisibleTime: Long by remember { mutableStateOf(3000) } // Delay in milliseconds
         val navigator = LocalNavigator.currentOrThrow
         val userTitle = Title("Create or Select a User")
         val presetButton = CustomButton({
             navigator.replace(UserLoadScreen())
-        }, "Load User")
+        }, "Load / Edit Users")
         val saveButton = CustomButton({
             if (isError) {
                 JOptionPane.showMessageDialog(
@@ -66,9 +75,14 @@ class UserCreationScreen : Screen {
                     "Error",
                     JOptionPane.ERROR_MESSAGE
                 )
-                return@CustomButton;
+                return@CustomButton
             }
             DatabaseManager.insertUser(result)
+            CoroutineScope(Dispatchers.Default).launch {
+                showSnackbar = true
+                delay(snackbarVisibleTime)
+                showSnackbar = false
+            }
         }, "Save User")
         val backCustomButton = CustomButton({
             if (isError) {
@@ -78,7 +92,7 @@ class UserCreationScreen : Screen {
                     "Error",
                     JOptionPane.ERROR_MESSAGE
                 )
-                return@CustomButton;
+                return@CustomButton
             }
             StateBundle.user = result
             navigator.pop()
@@ -91,7 +105,7 @@ class UserCreationScreen : Screen {
                     "Error",
                     JOptionPane.ERROR_MESSAGE
                 )
-                return@CustomButton;
+                return@CustomButton
             }
             StateBundle.user = result
             navigator += ClientCreationScreen()
@@ -122,6 +136,15 @@ class UserCreationScreen : Screen {
                 forwardCustomButton.addModifier(commonModifier)
                 backCustomButton.compose()
                 forwardCustomButton.compose()
+            }
+        }
+
+        if (showSnackbar) {
+            Snackbar(
+                modifier = Modifier
+                    .zIndex(2f)
+            ) {
+                Text("Client saved successfully!") // Adjust message as needed
             }
         }
     }

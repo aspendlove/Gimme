@@ -1,20 +1,37 @@
 package screens
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
+import androidx.compose.material.Snackbar
+import androidx.compose.material.Text
+import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotMutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import components.CustomButton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import layouts.ItemInputDialog
 import storage.Item
 import storage.StateBundle
 import javax.swing.JOptionPane
 
 class ItemCreationScreen: Screen {
-    private val itemInputDialog = ItemInputDialog(StateBundle.items)
+    private var _showSnackbar: MutableState<Boolean> = mutableStateOf(false)
+    private val snackbarVisibleTime: Long = 3000
+
+    private val itemInputDialog = ItemInputDialog(StateBundle.items) {
+        CoroutineScope(Dispatchers.Default).launch {
+            _showSnackbar.value = true
+            delay(snackbarVisibleTime)
+            _showSnackbar.value = false
+        }
+    }
 
     val isError: Boolean
         get() = itemInputDialog.isError
@@ -22,6 +39,7 @@ class ItemCreationScreen: Screen {
         get() = itemInputDialog.results
     @Composable
     override fun Content() {
+        var showSnackbar by remember { _showSnackbar }
         val navigator = LocalNavigator.currentOrThrow
 
         val backCustomButton = CustomButton({
@@ -32,7 +50,7 @@ class ItemCreationScreen: Screen {
                     "Error",
                     JOptionPane.ERROR_MESSAGE
                 )
-                return@CustomButton;
+                return@CustomButton
             }
             StateBundle.items = result.toMutableList()
             navigator.pop()
@@ -45,7 +63,7 @@ class ItemCreationScreen: Screen {
                     "Error",
                     JOptionPane.ERROR_MESSAGE
                 )
-                return@CustomButton;
+                return@CustomButton
             }
             StateBundle.items = result.toMutableList()
             navigator += NoteScreen() // TODO add items to state bundle
@@ -61,6 +79,14 @@ class ItemCreationScreen: Screen {
                 forwardCustomButton.addModifier(commonModifier)
                 backCustomButton.compose()
                 forwardCustomButton.compose()
+            }
+        }
+        if (showSnackbar) {
+            Snackbar(
+                modifier = Modifier
+                    .zIndex(2f)
+            ) {
+                Text("Client saved successfully!") // Adjust message as needed
             }
         }
     }
