@@ -1,5 +1,7 @@
 package screens
 
+import HtmlBuilder
+import InvoiceBuilder
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Card
 import androidx.compose.runtime.Composable
@@ -11,8 +13,15 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import components.Body
 import components.CustomButton
+import storage.DatabaseManager
+import storage.Invoice
+import storage.Item
 import storage.StateBundle
+import java.awt.FileDialog
+import java.awt.Frame
+import java.sql.Date
 import java.text.SimpleDateFormat
+import java.time.Instant
 
 class SummaryScreen : Screen {
     @Composable
@@ -64,8 +73,45 @@ class SummaryScreen : Screen {
         val itemText = Body(formattedItems)
         val notesText = Body("Notes:\n" + StateBundle.notes.note)
         val forwardButton = CustomButton({
+            val completedInvoice = with(StateBundle) {
+                Invoice(
+                    Date(System.currentTimeMillis()),
+                    "unpaid",
+                    user.businessName,
+                    client.businessName,
+                    client.email,
+                    client.phone,
+                )
+            }
+
+            val invoiceId = DatabaseManager.insertInvoice(completedInvoice)
+
+            // TODO fix this stupid way of getting the invoice name
+            val invoiceName = Invoice(
+                completedInvoice.sendDate,
+                completedInvoice.status,
+                completedInvoice.sender,
+                completedInvoice.clientBusinessName,
+                completedInvoice.clientEmail,
+                completedInvoice.clientPhone,
+                id = invoiceId
+            ).name
+
+            val dialog = FileDialog(null as Frame?, "Save File")
+            dialog.mode = FileDialog.SAVE
+            dialog.file = "$invoiceName.html"
+
+            dialog.isVisible = true
+            if (dialog.directory == null || dialog.file == null) {
+                DatabaseManager.deleteInvoice(invoiceId)
+                return@CustomButton
+            }
+            val fullPath: String = dialog.directory + dialog.file
+            val invoiceBuilder: InvoiceBuilder = HtmlBuilder()
+            invoiceBuilder.build(fullPath, invoiceName)
+
             navigator += ConclusionScreen()
-        }, "Forward")
+        }, "Create Invoice")
         val backButton = CustomButton({
             navigator.pop()
         }, "Back")

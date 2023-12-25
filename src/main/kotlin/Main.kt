@@ -15,6 +15,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import screens.GreetingScreen
 import screens.ItemCreationScreen
 import screens.LoadScreen
+import screens.NoteCreationScreen
 import storage.Client
 import storage.DatabaseManager
 import storage.User

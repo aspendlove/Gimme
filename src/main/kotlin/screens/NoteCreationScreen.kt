@@ -1,22 +1,26 @@
 package screens
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.Snackbar
+import androidx.compose.material.Text
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import components.CustomButton
 import components.NonRequiredTextMultiline
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import storage.DatabaseManager
 import storage.Note
 import storage.StateBundle
 
-class NoteScreen : Screen {
+class NoteCreationScreen : Screen {
     private val notesEntry =
         NonRequiredTextMultiline("Notes to be placed in the footer of the invoice", StateBundle.notes.note)
 
@@ -25,6 +29,8 @@ class NoteScreen : Screen {
 
     @Composable
     override fun Content() {
+        var showSnackbar by remember { mutableStateOf(false) }
+        val snackbarVisibleTime: Long by remember { mutableStateOf(3000) } // Delay in milliseconds
         val navigator = LocalNavigator.currentOrThrow
 
         val loadCustomButton = CustomButton({
@@ -32,6 +38,11 @@ class NoteScreen : Screen {
         }, "Load Note")
         val saveCustomButton = CustomButton({
             DatabaseManager.insertNote(result)
+            CoroutineScope(Dispatchers.Default).launch {
+                showSnackbar = true
+                delay(snackbarVisibleTime)
+                showSnackbar = false
+            }
         }, "Save Note")
         val backCustomButton = CustomButton({
             navigator.pop()
@@ -40,8 +51,8 @@ class NoteScreen : Screen {
             StateBundle.notes = Note(result)
             navigator += SummaryScreen()
         }, "Forward")
-        Column {
-            notesEntry.addModifier(Modifier.fillMaxWidth().padding(100.dp).weight(7f))
+        Column(modifier = Modifier.fillMaxHeight()) {
+            notesEntry.addModifier(Modifier.fillMaxWidth().fillMaxHeight(0.75F))
             notesEntry.compose()
             Row(modifier = Modifier.fillMaxWidth().weight(1f).padding(0.dp, 10.dp, 0.dp, 0.dp)) {
                 loadCustomButton.addModifier(Modifier.weight(1f))
@@ -55,6 +66,14 @@ class NoteScreen : Screen {
                 forwardCustomButton.addModifier(commonModifier)
                 backCustomButton.compose()
                 forwardCustomButton.compose()
+            }
+        }
+        if (showSnackbar) {
+            Snackbar(
+                modifier = Modifier
+                    .zIndex(2f)
+            ) {
+                Text("Client saved successfully!") // Adjust message as needed
             }
         }
     }

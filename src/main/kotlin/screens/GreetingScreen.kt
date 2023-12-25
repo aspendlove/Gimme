@@ -19,7 +19,7 @@ class GreetingScreen: Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val trackCustomButton = CustomButton({
-            TODO("track invoice screen")
+            navigator += InvoiceTrackingScreen()
         }, "Track Invoices")
         val continueCustomButton = CustomButton({
             navigator += UserCreationScreen()

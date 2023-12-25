@@ -28,6 +28,6 @@ class NoteLoadScreen: LoadScreen<Note>() {
     }
 
     override fun goToPreviousScreen(navigator: Navigator) {
-        navigator.replace(NoteScreen())
+        navigator.replace(NoteCreationScreen())
     }
 }

@@ -10,4 +10,10 @@ data class Invoice(
     val clientEmail: String,
     val clientPhone: String,
     override val id: Int = -1
-): hasId
+): hasId {
+    val name: String
+    init {
+        val iteration = id.toString()
+        name = "INV-" + iteration.padStart(8 - iteration.length, '0')
+    }
+}

@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Snackbar
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotMutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -66,7 +65,7 @@ class ItemCreationScreen: Screen {
                 return@CustomButton
             }
             StateBundle.items = result.toMutableList()
-            navigator += NoteScreen() // TODO add items to state bundle
+            navigator += NoteCreationScreen() // TODO add items to state bundle
         }, "Forward")
         Column(
             modifier = Modifier.fillMaxHeight()
