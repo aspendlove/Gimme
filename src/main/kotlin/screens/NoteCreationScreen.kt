@@ -73,7 +73,7 @@ class NoteCreationScreen : Screen {
                 modifier = Modifier
                     .zIndex(2f)
             ) {
-                Text("Client saved successfully!") // Adjust message as needed
+                Text("Note saved successfully!") // Adjust message as needed
             }
         }
     }

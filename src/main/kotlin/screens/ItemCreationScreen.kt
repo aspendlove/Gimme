@@ -85,7 +85,7 @@ class ItemCreationScreen: Screen {
                 modifier = Modifier
                     .zIndex(2f)
             ) {
-                Text("Client saved successfully!") // Adjust message as needed
+                Text("Item saved successfully!") // Adjust message as needed
             }
         }
     }

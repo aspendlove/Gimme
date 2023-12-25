@@ -61,6 +61,13 @@ compose.desktop {
             targetFormats(TargetFormat.Exe, TargetFormat.AppImage)
             packageName = "Gimme"
             packageVersion = gimmeVersion
+            version = gimmeVersion
+            includeAllModules = true
+        }
+
+        buildTypes.release.proguard {
+            configurationFiles.from(project.file("compose-desktop.pro"))
+
         }
     }
 }

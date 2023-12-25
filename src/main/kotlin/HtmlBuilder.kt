@@ -18,7 +18,7 @@ class HtmlBuilder : InvoiceBuilder {
         CoroutineScope(Dispatchers.IO).launch {
             val fullPrice = StateBundle.items.fold(BigDecimal(0)) { running, item ->
                 running + item.price
-            }.setScale(2, RoundingMode.HALF_EVEN).toDouble()
+            }.setScale(2, RoundingMode.HALF_EVEN)
             val htmlString = generateString(
                 StateBundle.user,
                 StateBundle.client,
@@ -158,7 +158,7 @@ class HtmlBuilder : InvoiceBuilder {
                     ${formatOptionals(client.email, client.phone)}
                 </div>
                 <div id="invoice">
-                    <p> <span style="font-weight: bold">Invoice Number:</span> INV-$invoiceName<br/>
+                    <p> <span style="font-weight: bold">Invoice Number:</span> $invoiceName<br/>
                         <span style="font-weight: bold">Invoice Date:</span> $invoiceDate<br/>
                         <span style="font-weight: bold">Due date:</span> $dueDate</p>
                 </div>
