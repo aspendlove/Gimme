@@ -2,7 +2,10 @@ package screens
 
 import cafe.adriel.voyager.navigator.Navigator
 import layouts.LoadScreenItem
-import storage.*
+import storage.DatabaseManager
+import storage.Item
+import storage.ItemColumns
+import storage.StateBundle
 
 class ItemLoadScreen: LoadScreen<Item>() {
     override fun loadRows(navigator: Navigator, filter: String) {
@@ -12,11 +15,11 @@ class ItemLoadScreen: LoadScreen<Item>() {
             ItemColumns.NAME,
             filter
         )).map { item ->
-            _rows.add(LoadScreenItem(iteration++, item.name, item, { chosenItem ->
+            _rows.add(LoadScreenItem(iteration++, item.name, item, {
                 StateBundle.items.add(item)
                 goToPreviousScreen(navigator)
             }, {
-                DatabaseManager.deleteUser(item.id)
+                DatabaseManager.deleteItem(item.id)
                 loadRows(navigator, filter)
             }))
         }

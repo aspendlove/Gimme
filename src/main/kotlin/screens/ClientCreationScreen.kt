@@ -13,7 +13,10 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import components.CustomButton
 import components.RequiredText
 import components.Title
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import storage.Client
 import storage.DatabaseManager
 import storage.StateBundle
@@ -139,7 +142,7 @@ class ClientCreationScreen : Screen {
                 modifier = Modifier
                     .zIndex(2f)
             ) {
-                Text("Client saved successfully!") // Adjust message as needed
+                Text("Client saved successfully!")
             }
         }
     }
