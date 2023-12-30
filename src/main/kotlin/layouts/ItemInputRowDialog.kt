@@ -1,7 +1,6 @@
 package layouts
 
 
-import components.RequiredTextMultiline
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -11,15 +10,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import components.CustomComponentBase
 import components.DateEntry
 import components.RequiredText
+import components.RequiredTextMultiline
 import compose.icons.FeatherIcons
-import compose.icons.feathericons.FileText
 import compose.icons.feathericons.Save
-import screens.ItemLoadScreen
 import storage.DatabaseManager
 import storage.Item
 
@@ -33,7 +30,7 @@ class ItemInputRowDialog(val id: Int, val onSave: () -> Unit, val item: Item? = 
     init {
         if(item != null) {
             with(item) {
-                nameInput = RequiredText("Name",name)
+                nameInput = RequiredText("Service",name)
                 startDateInput = DateEntry("Start Date", millisSinceEpoch = startDate.time)
                 endDateInput = DateEntry("End Date", required = false, millisSinceEpoch = endDate?.time)
                 descriptionInput = RequiredTextMultiline("Description", description)
@@ -41,7 +38,7 @@ class ItemInputRowDialog(val id: Int, val onSave: () -> Unit, val item: Item? = 
                 priceInput = RequiredText("Price", price.toString())
             }
         } else {
-            nameInput = RequiredText("Name")
+            nameInput = RequiredText("Service")
             startDateInput = DateEntry("Start Date")
             endDateInput = DateEntry("End Date", required = false)
             descriptionInput = RequiredTextMultiline("Description")
@@ -94,14 +91,6 @@ class ItemInputRowDialog(val id: Int, val onSave: () -> Unit, val item: Item? = 
             }
             Box(modifier = Modifier.weight(2f)) {
                 descriptionInput.compose()
-            }
-            Button(
-                onClick = {
-                    navigator.replace(ItemLoadScreen())
-                },
-                modifier = Modifier.fillMaxHeight()
-            ) {
-                Icon(FeatherIcons.FileText, "Load")
             }
             Button(
                 onClick = {
