@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
@@ -19,18 +18,17 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import components.CustomButton
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.XCircle
-import screens.ItemCreationScreen
 import screens.ItemLoadScreen
 import storage.Item
 import storage.StateBundle
 
-class ItemInputDialog(startingItems: MutableList<Item>, private val onSave: () -> Unit) {
+class ItemInputDialog(startingItems: MutableList<Item>, private val onSave: () -> Unit, unfinishedRows: List<ItemInputRowDialog> = listOf()) {
 
     private var iteration: Int = 0
 
-    private val _rows: MutableList<ItemInputRowDialog> = startingItems.map { item ->
-        ItemInputRowDialog(iteration++, onSave, item)
-    }.toMutableList()
+    private val _rows: MutableList<ItemInputRowDialog> = (unfinishedRows + startingItems.map { item ->
+        ItemInputRowDialog(unfinishedRows.size + iteration++, onSave, item)
+    }).toMutableList()
 
     init {
         if(_rows.isEmpty()) {
@@ -63,6 +61,10 @@ class ItemInputDialog(startingItems: MutableList<Item>, private val onSave: () -
             _rows.add(newRow)
         }, "New Service")
         val loadButton = CustomButton({
+            StateBundle.clear()
+            _rows.map {row ->
+                StateBundle.items.add(row.result)
+            }
             navigator.replace(ItemLoadScreen())
         }, "Load Service")
         Column(modifier = modifier.padding(PaddingValues(10.dp))) {

@@ -9,8 +9,6 @@ import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import components.CustomComponentBase
 import components.DateEntry
 import components.RequiredText
@@ -62,7 +60,7 @@ class ItemInputRowDialog(val id: Int, val onSave: () -> Unit, val item: Item? = 
                 nameInput.result,
                 startDateInput.result!!,
                 endDateInput.result,
-                quantityInput.result.toDouble(),
+                if(quantityInput.result.isEmpty()) 0.0 else quantityInput.result.toDouble(),
                 priceInput.result.toBigDecimal(),
                 descriptionInput.result
             )
@@ -70,7 +68,6 @@ class ItemInputRowDialog(val id: Int, val onSave: () -> Unit, val item: Item? = 
 
     @Composable
     override fun compose() {
-        val navigator = LocalNavigator.currentOrThrow
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {

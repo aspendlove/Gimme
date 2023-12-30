@@ -16,29 +16,31 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import layouts.ItemInputDialog
+import layouts.ItemInputRowDialog
 import storage.Item
 import storage.StateBundle
 import javax.swing.JOptionPane
 
-class ItemCreationScreen: Screen {
+class ItemCreationScreen(startingItems: List<ItemInputRowDialog> = listOf()) : Screen {
     private var _showSnackbar: MutableState<Boolean> = mutableStateOf(false)
     private val snackbarVisibleTime: Long = 3000
 
-    private val itemInputDialog = ItemInputDialog(StateBundle.items) {
+    private val itemInputDialog = ItemInputDialog(StateBundle.items, {
         CoroutineScope(Dispatchers.Default).launch {
             _showSnackbar.value = true
             delay(snackbarVisibleTime)
             _showSnackbar.value = false
         }
-    }
+    }, startingItems)
 
     val isError: Boolean
         get() = itemInputDialog.isError
     val result: List<Item>
         get() = itemInputDialog.results
+
     @Composable
     override fun Content() {
-        var showSnackbar by remember { _showSnackbar }
+        val showSnackbar by remember { _showSnackbar }
         val navigator = LocalNavigator.currentOrThrow
 
         val backCustomButton = CustomButton({
@@ -65,7 +67,7 @@ class ItemCreationScreen: Screen {
                 return@CustomButton
             }
             StateBundle.items = result.toMutableList()
-            navigator += NoteCreationScreen() // TODO add items to state bundle
+            navigator += NoteCreationScreen()
         }, "Forward")
         Column(
             modifier = Modifier.fillMaxHeight()
