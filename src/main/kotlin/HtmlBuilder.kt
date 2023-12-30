@@ -17,7 +17,7 @@ class HtmlBuilder : InvoiceBuilder {
     override fun build(filePath: String, invoiceName: String) {
         CoroutineScope(Dispatchers.IO).launch {
             val fullPrice = StateBundle.items.fold(BigDecimal(0)) { running, item ->
-                running + item.price
+                running + item.total
             }.setScale(2, RoundingMode.HALF_EVEN)
             val htmlString = generateString(
                 StateBundle.user,

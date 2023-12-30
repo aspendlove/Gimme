@@ -17,7 +17,11 @@ data class Item(
     val price: BigDecimal
         get() = _price.setScale(2, RoundingMode.HALF_EVEN)
 
-    init {
+    private fun resetTotal() {
         total = (price * BigDecimal(quantity)).setScale(2, RoundingMode.HALF_EVEN)
+    }
+
+    init {
+        resetTotal()
     }
 }
