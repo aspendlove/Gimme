@@ -26,12 +26,13 @@ abstract class Entry<T>(
     private var _textField: MutableState<TextFieldValue> = mutableStateOf(TextFieldValue(initialText))
     private var _error: MutableState<Boolean> = mutableStateOf(required)
     private var _first: MutableState<Boolean> = mutableStateOf(true)
+    private var _visualError: MutableState<Boolean> = mutableStateOf(false)
 
-    var value: T
+    var value: T?
         get() {
             val change = handleValueChanges(_textField.value.text)
-            _textField.value = TextFieldValue(change.toString())
-            return change
+            _textField.value = TextFieldValue(change.second)
+            return change.first
         }
         set(new) {
             _textField.value = TextFieldValue(new.toString())
@@ -45,18 +46,22 @@ abstract class Entry<T>(
         }
     }
 
-    abstract fun handleValueChanges(textValue: String): T
+    abstract fun handleValueChanges(textValue: String): Pair<T?, String>
+
+    open fun isEntryEmpty(text: String): Boolean {
+        return text.isEmpty()
+    }
 
     open fun onValueChange(new: TextFieldValue, old: TextFieldValue): TextFieldValue {
         return new
     }
 
-    open fun checkErrorStatus(new: FocusState, first: Boolean): Boolean {
-        if (!required) return false
-        if (new.isFocused) {
-            return false
-        }
-        return _textField.value.text.isEmpty() && !first
+    open fun checkValueErrorStatus(new: TextFieldValue, old: TextFieldValue) : Boolean {
+        return false
+    }
+
+    open fun checkFocusErrorStatus(new: FocusState, first: Boolean, text: String): Boolean {
+        return false
     }
 
     open fun onFocusChange(new: FocusState): TextFieldValue? {
@@ -75,27 +80,54 @@ abstract class Entry<T>(
         var first by remember {
             _first
         }
+        var visualError by remember {
+            _visualError
+        }
+
+        fun changeErrorStatus(errorStatus: Boolean) {
+            error = errorStatus
+            _error.value = errorStatus
+        }
+
         TextField(
             value = textField,
             onValueChange = { new: TextFieldValue ->
                 val newValue = onValueChange(new, textField)
                 textField = newValue
                 _textField.value = newValue
+                changeErrorStatus(checkValueErrorStatus(new, textField))
+                val visualStatus = if(!required && isEntryEmpty(textField.text)) {
+                    false
+                } else {
+                    error || isEntryEmpty(textField.text)
+                }
+                visualError = visualStatus
+                _visualError.value = visualStatus
                 println(value)
             },
             label = { Text(title) },
             singleLine = singleLine,
-            isError = error,
+            isError = visualError,
+//            if(!required && isEntryEmpty(textField.text)) {
+//                false
+//            } else {
+//                error
+//            },
             trailingIcon = {
                 if (required) {
                     Icon(Icons.Outlined.Star, "Required")
                 }
             },
             modifier = modifier.then(Modifier.onFocusChanged { new: FocusState ->
-                val newErrorStatus = checkErrorStatus(new, first)
-                error = newErrorStatus
-                _error.value = newErrorStatus
-                if (!new.isFocused && first) {
+                changeErrorStatus(checkFocusErrorStatus(new, first, textField.text))
+                val visualStatus = if((!required && isEntryEmpty(textField.text)) || new.isFocused) {
+                    false
+                } else {
+                    error && !first
+                }
+                visualError = visualStatus
+                _visualError.value = visualStatus
+                if (new.isFocused) {
                     first = false
                     _first.value = false
                 }

@@ -1,132 +1,83 @@
 package components
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.darkColors
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import java.sql.Date
 import java.text.ParseException
 import java.text.SimpleDateFormat
 
-class DateFormatException(message: String) : Exception(message)
-
-class DateEntry(val title: String, private val required: Boolean = true, millisSinceEpoch: Long? = null) :
-    ComponentBase(Modifier) {
-    private var _text: String
-    private var _error: Boolean
-
-    init {
-        if (millisSinceEpoch != null) {
-            _text = SimpleDateFormat("MM/dd/yyyy").format(java.util.Date(millisSinceEpoch))
-            _error = false
+class DateEntry(title: String, required: Boolean, initialValue: Date?) :
+    Entry<Date>(
+        title, required, true,
+        if (initialValue != null) {
+            SimpleDateFormat("MM/dd/yyyy").format(initialValue)
         } else {
-            _text = "MM/DD/YYYY"
-            _error = required
+            "MM/DD/YYYY"
+        }
+    ) {
+    override fun handleValueChanges(textValue: String): Pair<Date?, String> {
+        return if(isError) {
+            Pair(
+                null,
+                textValue
+            )
+        } else {
+            Pair(
+                Date(SimpleDateFormat("MM/dd/yyyy").parse(textValue).time),
+                textValue
+            )
         }
     }
 
-
-    val isError: Boolean
-        get() = _error || _text.filter { toFilter ->
-            toFilter.isDigit()
-        }.length != 8
-
-
-    val result: Date?
-        get() {
-            return if (isError) {
-                null
-            } else {
-                try {
-                    Date(
-                        SimpleDateFormat("MM/dd/yyyy").parse(_text).time
-                    )
-                } catch(e: ParseException) {
-                    throw DateFormatException("Malformed date in input field")
-                }
-            }
-        }
-
-    @Composable
-    @Preview
-    override fun compose() {
-        val icon: @Composable (() -> Unit)? = if (required) {
-            @Composable { Icon(Icons.Default.Star, "Star") }
+    override fun onValueChange(new: TextFieldValue, old: TextFieldValue): TextFieldValue {
+        val returnText: TextFieldValue
+        var digits = new.text.filter { toFilter -> toFilter.isDigit() }
+        val cursorPlacement = if (digits.length > 4) {
+            digits.length + 2
+        } else if (digits.length > 2) {
+            digits.length + 1
         } else {
-            null
+            digits.length
         }
 
-        var text by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-            mutableStateOf(TextFieldValue(_text))
+        if (digits.isEmpty()) {
+            returnText = TextFieldValue(
+                "MM/DD/YYYY", TextRange(cursorPlacement), new.composition
+            )
+        } else {
+            while (digits.length < 8) {
+                digits += ' '
+            }
+
+            returnText = TextFieldValue(
+                digits.substring(0, 2) + "/" + digits.substring(2, 4) + "/" + digits.substring(4, 8),
+                TextRange(cursorPlacement),
+                new.composition
+            )
         }
 
-        var error by remember { mutableStateOf(false) }
-        var first by remember { mutableStateOf(true) }
-        var cursorPlacement by remember { mutableStateOf(0) }
+        return returnText
+    }
 
-        TextField(value = text,
-            textStyle = TextStyle(color = darkColors().onBackground),
-            onValueChange = { newValue ->
+    override fun isEntryEmpty(text: String): Boolean {
+        return text.isEmpty() || text == " /  /    " || text == "MM/DD/YYYY"
+    }
 
-                var digits = newValue.text.filter { toFilter -> toFilter.isDigit() }
+    override fun checkValueErrorStatus(new: TextFieldValue, old: TextFieldValue): Boolean {
+        return checkError(new.text)
+    }
 
-                cursorPlacement = if (digits.length > 4) {
-                    digits.length + 2
-                } else if (digits.length > 2) {
-                    digits.length + 1
-                } else {
-                    digits.length
-                }
+    override fun checkFocusErrorStatus(new: FocusState, first: Boolean, text: String): Boolean {
+        return checkError(text)
+    }
 
-                if (digits.isEmpty()) {
-                    text = TextFieldValue(
-                        "MM/DD/YYYY", TextRange(cursorPlacement)
-                    )
-                } else {
-                    while (digits.length < 8) {
-                        digits += ' '
-                    }
-
-                    text = TextFieldValue(
-                        digits.substring(0, 2) + "/" + digits.substring(2, 4) + "/" + digits.substring(4, 8),
-                        TextRange(cursorPlacement)
-                    )
-                }
-
-
-                _text = text.text
-            },
-            label = { Text(title) },
-            singleLine = true,
-            isError = error,
-            trailingIcon = icon,
-            modifier = modifier.fillMaxWidth().onFocusChanged {
-                if (!required) return@onFocusChanged
-                if (it.isFocused) {
-                    error = false
-                    _error = false
-                    return@onFocusChanged
-                }
-                if (!it.isFocused && first) {
-                    first = false
-                    return@onFocusChanged
-                }
-                error = _text.isEmpty() || _text.filter { toFilter ->
-                    toFilter.isDigit()
-                }.length != 8
-
-                _error = error
-            })
+    private fun checkError(text: String): Boolean {
+        return try {
+            SimpleDateFormat("MM/dd/yyyy").parse(text)
+            false
+        } catch (e: ParseException) {
+            true
+        }
     }
 }

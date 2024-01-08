@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import components.ComponentBase
-import components.DateEntry
+import components.DateEntryOld
 import components.RequiredText
 import components.RequiredTextMultiline
 import compose.icons.FeatherIcons
@@ -20,8 +20,8 @@ import storage.Item
 
 class ItemInputRowDialog(val id: Int, val onSave: () -> Unit, val item: Item? = null) : ComponentBase(_modifier = Modifier) {
     private val nameInput: RequiredText
-    private val startDateInput: DateEntry
-    private val endDateInput: DateEntry
+    private val startDateInput: DateEntryOld
+    private val endDateInput: DateEntryOld
     private val descriptionInput: RequiredTextMultiline
     private val quantityInput: RequiredText
     private val priceInput: RequiredText
@@ -29,16 +29,16 @@ class ItemInputRowDialog(val id: Int, val onSave: () -> Unit, val item: Item? = 
         if(item != null) {
             with(item) {
                 nameInput = RequiredText("Service",name)
-                startDateInput = DateEntry("Start Date", millisSinceEpoch = startDate.time)
-                endDateInput = DateEntry("End Date", required = false, millisSinceEpoch = endDate?.time)
+                startDateInput = DateEntryOld("Start Date", millisSinceEpoch = startDate.time)
+                endDateInput = DateEntryOld("End Date", required = false, millisSinceEpoch = endDate?.time)
                 descriptionInput = RequiredTextMultiline("Description", description)
                 quantityInput = RequiredText("Quantity", quantity.toString())
                 priceInput = RequiredText("Price", price.toString())
             }
         } else {
             nameInput = RequiredText("Service")
-            startDateInput = DateEntry("Start Date")
-            endDateInput = DateEntry("End Date", required = false)
+            startDateInput = DateEntryOld("Start Date")
+            endDateInput = DateEntryOld("End Date", required = false)
             descriptionInput = RequiredTextMultiline("Description")
             quantityInput = RequiredText("Quantity")
             priceInput = RequiredText("Price")

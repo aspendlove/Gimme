@@ -26,12 +26,14 @@ class GreetingScreen: Screen {
             "Welcome to Gimme!\nReady to make an invoice?"
         )
         val testEntryRequired = TextEntry("required text entry", true, "required")
-        val testEntry = TextEntry("text entry", false)
+//        val testEntry = TextEntry("text entry", false)
 //        val testNumEntryRequired = NumberEntryOld("num entry required", 0.1)
 //        val testNumEntry = NumberEntryOld("num entry")
-        val testNumEntry = NumberEntry("num entry", 0.1)
+        val testNumEntry = NumberEntry("num entry", true,0.1)
         val testOldNumEntry = NumberEntryOld("num entry old", 0.5)
         val testEntrySub = TestEntry(title = "ding", required = true, singleLine = false)
+
+        val testDateEntry = DateEntry("test date entry", required = true, initialValue = null)
         Column(modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -41,12 +43,13 @@ class GreetingScreen: Screen {
                 trackCustomButton.compose()
                 continueCustomButton.compose()
             }
-            testEntry.compose()
-            testEntryRequired.compose()
-            testNumEntry.compose()
-            testNumEntry.value = 0.87
-            testOldNumEntry.compose()
+            testDateEntry.compose()
             testEntrySub.compose()
+//            testEntryRequired.compose()
+            testNumEntry.compose()
+//            testNumEntry.value = 0.87
+//            testOldNumEntry.compose()
+//            testEntrySub.compose()
 //            CoroutineScope(Dispatchers.Default).launch {
 //                delay(3000)
 ////                println(testNumEntry.value)
