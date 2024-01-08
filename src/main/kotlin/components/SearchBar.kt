@@ -14,7 +14,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 
 class SearchBar(private var title: String, val searchUpdated: (String) -> Unit):
-    CustomComponentBase(Modifier.fillMaxWidth()){
+    ComponentBase(Modifier.fillMaxWidth()){
     private var _text = ""
     val result: String
         get() = _text

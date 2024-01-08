@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 class CustomButton(private val onClick:() -> Unit, private val text: String) :
-    CustomComponentBase(Modifier.height(40.dp).padding(3.dp)) {
+    ComponentBase(Modifier.height(40.dp).padding(3.dp)) {
     @Composable
     override fun compose() {
         Button(

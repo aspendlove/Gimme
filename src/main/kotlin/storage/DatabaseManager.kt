@@ -14,7 +14,6 @@ object DatabaseManager {
     private var InvoiceCache: HashMap<Int, Invoice> = hashMapOf()
 
     private var _databaseFilePath: String = "GimmeDatabase.db"
-//    private var _databaseFilePath: String = "${System.getProperty("user.home")}${File.separator}Desktop${File.separator}GimmeDatabase.db"
     var databaseFilePath: String
         get() {
             return _databaseFilePath

@@ -9,7 +9,7 @@ import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import components.CustomComponentBase
+import components.ComponentBase
 import components.DateEntry
 import components.RequiredText
 import components.RequiredTextMultiline
@@ -18,7 +18,7 @@ import compose.icons.feathericons.Save
 import storage.DatabaseManager
 import storage.Item
 
-class ItemInputRowDialog(val id: Int, val onSave: () -> Unit, val item: Item? = null) : CustomComponentBase(_modifier = Modifier) {
+class ItemInputRowDialog(val id: Int, val onSave: () -> Unit, val item: Item? = null) : ComponentBase(_modifier = Modifier) {
     private val nameInput: RequiredText
     private val startDateInput: DateEntry
     private val endDateInput: DateEntry

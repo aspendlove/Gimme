@@ -14,7 +14,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 
 class NonRequiredText(private var title: String, private var initialText: String = ""):
-    CustomComponentBase(Modifier.fillMaxWidth()){
+    ComponentBase(Modifier.fillMaxWidth()){
     private var _text = initialText
     val result: String
         get() = _text

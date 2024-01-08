@@ -15,12 +15,17 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 
-class TextEntry(private val title: String, private val required: Boolean, initialText: String = ""): CustomComponentBase(Modifier.fillMaxWidth()) {
+class TextEntry(
+    private val title: String,
+    private val required: Boolean,
+    initialText: String = "",
+    modifier: Modifier = Modifier.fillMaxWidth()
+) : ComponentBase(modifier) {
     private var _text = initialText
     private var _error = required
 
     init {
-        if(_text.isNotEmpty()) {
+        if (_text.isNotEmpty()) {
             _error = false
         }
     }
@@ -50,7 +55,7 @@ class TextEntry(private val title: String, private val required: Boolean, initia
             onValueChange = {
                 text = it
                 _text = text.text
-                if(required) {
+                if (required) {
                     error = it.text.isEmpty()
                     _error = error
                 }
@@ -62,7 +67,7 @@ class TextEntry(private val title: String, private val required: Boolean, initia
                 Icon(Icons.Default.Star, "Star")
             },
             modifier = modifier.fillMaxWidth().onFocusChanged {
-                if(!required) return@onFocusChanged
+                if (!required) return@onFocusChanged
                 if (it.isFocused) {
                     error = false
                     _error = false

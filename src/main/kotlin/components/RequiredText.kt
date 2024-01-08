@@ -15,7 +15,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 
-class RequiredText(private var title: String, private var initialText: String = "") : CustomComponentBase(Modifier.fillMaxWidth()) {
+class RequiredText(private var title: String, private var initialText: String = "") : ComponentBase(Modifier.fillMaxWidth()) {
     private var _text = initialText
     private var _error = true
 

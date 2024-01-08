@@ -3,7 +3,7 @@ package components
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
-abstract class CustomComponentBase(private var _modifier: Modifier) {
+abstract class ComponentBase(private var _modifier: Modifier) {
 
     fun addModifier(other: Modifier) {
         _modifier = _modifier.then(other)

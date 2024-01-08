@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 
-class NonRequiredTextMultiline(private var title: String, private var initialText: String = ""): CustomComponentBase(Modifier.fillMaxWidth()) {
+class NonRequiredTextMultiline(private var title: String, private var initialText: String = ""): ComponentBase(Modifier.fillMaxWidth()) {
     private var _text = initialText
     val result: String
         get() = _text

@@ -22,7 +22,7 @@ import java.text.SimpleDateFormat
 class DateFormatException(message: String) : Exception(message)
 
 class DateEntry(val title: String, private val required: Boolean = true, millisSinceEpoch: Long? = null) :
-    CustomComponentBase(Modifier) {
+    ComponentBase(Modifier) {
     private var _text: String
     private var _error: Boolean
 
