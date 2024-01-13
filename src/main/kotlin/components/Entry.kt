@@ -30,7 +30,7 @@ abstract class Entry<T>(
 
     var value: T?
         get() {
-            val change = handleValueChanges(_textField.value.text)
+            val change = interpretText(_textField.value.text)
             _textField.value = TextFieldValue(change.second)
             return change.first
         }
@@ -46,7 +46,7 @@ abstract class Entry<T>(
         }
     }
 
-    abstract fun handleValueChanges(textValue: String): Pair<T?, String>
+    abstract fun interpretText(textValue: String): Pair<T?, String>
 
     open fun isEntryEmpty(text: String): Boolean {
         return text.isEmpty()

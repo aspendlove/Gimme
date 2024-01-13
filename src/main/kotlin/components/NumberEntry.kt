@@ -9,7 +9,7 @@ class NumberEntry(title: String, required: Boolean, initialValue: Double? = null
     singleLine = true,
     initialValue?.toString() ?: "0.0"
 ) {
-    override fun handleValueChanges(textValue: String): Pair<Double?, String> {
+    override fun interpretText(textValue: String): Pair<Double?, String> {
         var text = textValue
         if(text.endsWith('.') || text == "-") {
             text += '0'

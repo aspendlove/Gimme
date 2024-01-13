@@ -13,6 +13,12 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import components.*
 
 class GreetingScreen: Screen {
+
+    val testEntryRequired = TextEntry("required text entry", true, "required")
+    val testNumEntry = NumberEntry("num entry", true,0.1)
+    val testOldNumEntry = NumberEntryOld("num entry old", 0.5)
+    val testEntrySub = TestEntry(title = "ding", required = true, singleLine = false)
+    val testDateEntry = DateEntry("test date entry", required = true, initialValue = null)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -25,15 +31,10 @@ class GreetingScreen: Screen {
         val greeting = Title(
             "Welcome to Gimme!\nReady to make an invoice?"
         )
-        val testEntryRequired = TextEntry("required text entry", true, "required")
 //        val testEntry = TextEntry("text entry", false)
 //        val testNumEntryRequired = NumberEntryOld("num entry required", 0.1)
 //        val testNumEntry = NumberEntryOld("num entry")
-        val testNumEntry = NumberEntry("num entry", true,0.1)
-        val testOldNumEntry = NumberEntryOld("num entry old", 0.5)
-        val testEntrySub = TestEntry(title = "ding", required = true, singleLine = false)
 
-        val testDateEntry = DateEntry("test date entry", required = true, initialValue = null)
         Column(modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center

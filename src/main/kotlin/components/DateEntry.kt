@@ -16,7 +16,7 @@ class DateEntry(title: String, required: Boolean, initialValue: Date?) :
             "MM/DD/YYYY"
         }
     ) {
-    override fun handleValueChanges(textValue: String): Pair<Date?, String> {
+    override fun interpretText(textValue: String): Pair<Date?, String> {
         return if(isError) {
             Pair(
                 null,
