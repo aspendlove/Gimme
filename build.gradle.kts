@@ -31,42 +31,26 @@ dependencies {
     implementation("br.com.devsrsouza.compose.icons:feather:1.1.0")
 }
 
-
-//kotlin {
-//    jvm {
-//        jvmToolchain(17)
-//        withJava()
-//    }
-//    sourceSets {
-//        val jvmMain by getting {
-//            dependencies {
-//                implementation(compose.desktop.currentOs)
-//            }
-//        }
-//        val jvmTest by getting {
-//            dependencies {
-//                implementation(kotlin("test-junit"))
-//            }
-//        }
-//    }
-//}
-
 val gimmeVersion: String by project
 
 compose.desktop {
     application {
         mainClass = "MainKt"
         nativeDistributions {
-            targetFormats(TargetFormat.Exe, TargetFormat.AppImage)
+            targetFormats(TargetFormat.Exe, TargetFormat.AppImage, TargetFormat.Msi)
             packageName = "Gimme"
             packageVersion = gimmeVersion
             version = gimmeVersion
             includeAllModules = true
+            windows {
+                shortcut = true
+                menu = true
+                this.perUserInstall = true
+            }
         }
 
         buildTypes.release.proguard {
             configurationFiles.from(project.file("compose-desktop.pro"))
-
         }
     }
 }
