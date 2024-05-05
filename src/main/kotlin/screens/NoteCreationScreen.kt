@@ -12,7 +12,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import components.CustomButton
 import components.ValueErrorPair
-import components.textEntryFun
+import components.textEntry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -53,7 +53,7 @@ class NoteCreationScreen : Screen {
             navigator += SummaryScreen()
         }, "Forward")
         Column(modifier = Modifier.fillMaxHeight()) {
-            textEntryFun(
+            textEntry(
                 "Notes to be placed in the footer of the invoice",
                 false,
                 singleLine = false,

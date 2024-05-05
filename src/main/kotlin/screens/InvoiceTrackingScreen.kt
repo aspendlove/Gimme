@@ -18,14 +18,14 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import components.textEntryFun
+import components.textEntry
 import layouts.InvoiceTrackingItem
 import storage.DatabaseManager
 import storage.InvoiceColumns
 
 // TODO allow marking as paid
 // TODO add recreating pdf
-class InvoiceTrackingScreen: Screen {
+class InvoiceTrackingScreen : Screen {
     var iteration: Int = 0
     var _rows: SnapshotStateList<InvoiceTrackingItem> = mutableListOf<InvoiceTrackingItem>().toMutableStateList()
     var modifier: Modifier = Modifier
@@ -48,7 +48,7 @@ class InvoiceTrackingScreen: Screen {
         val rows = remember { _rows }
 
         Column(modifier = modifier.padding(PaddingValues(10.dp))) {
-            textEntryFun("Search by Client", false, onTextChange = {
+            textEntry("Search by Client", false, onTextChange = {
                 loadRows(it)
             })
             val state = rememberLazyListState()

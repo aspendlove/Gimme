@@ -20,6 +20,7 @@ import storage.StateBundle
 import storage.User
 import javax.swing.JOptionPane
 
+// TODO add optional addresses and alternative payment methods
 class UserCreationScreen : Screen {
 
     private val businessNameResult = ValueErrorPair(StateBundle.user.businessName, true)
@@ -119,7 +120,7 @@ class UserCreationScreen : Screen {
                 presetButton.compose()
                 saveButton.compose()
             }
-            textEntryFun(
+            textEntry(
                 "Business Name",
                 true,
                 initialText = businessNameResult.value,
@@ -130,7 +131,7 @@ class UserCreationScreen : Screen {
                     businessNameResult.error = it
                 },
             )
-            textEntryFun(
+            textEntry(
                 "Contact Name",
                 true,
                 initialText = contactNameResult.value,
@@ -141,7 +142,7 @@ class UserCreationScreen : Screen {
                     contactNameResult.error = it
                 },
             )
-            textEntryFun(
+            textEntry(
                 "Subtitle",
                 true,
                 initialText = subtitleResult.value,
@@ -152,7 +153,7 @@ class UserCreationScreen : Screen {
                     subtitleResult.error = it
                 },
             )
-            textEntryFun(
+            textEntry(
                 "Street",
                 true,
                 initialText = streetResult.value,
@@ -163,7 +164,7 @@ class UserCreationScreen : Screen {
                     streetResult.error = it
                 },
             )
-            textEntryFun(
+            textEntry(
                 "City",
                 true,
                 initialText = cityResult.value,
@@ -174,7 +175,7 @@ class UserCreationScreen : Screen {
                     cityResult.error = it
                 },
             )
-            textEntryFun(
+            textEntry(
                 "State",
                 true,
                 initialText = stateResult.value,
@@ -185,13 +186,13 @@ class UserCreationScreen : Screen {
                     stateResult.error = it
                 },
             )
-            zipEntryFun(
+            zipEntry(
                 "Zip Code",
                 true,
                 initialVal = if (zipResult.value != -1) {
                     zipResult.value
                 } else {
-                    0
+                    null
                 },
                 onValueChange = {
                     zipResult.value = it
@@ -200,7 +201,7 @@ class UserCreationScreen : Screen {
                     zipResult.error = it
                 }
             )
-            textEntryFun(
+            textEntry(
                 "Email",
                 true,
                 initialText = emailResult.value,
@@ -211,7 +212,7 @@ class UserCreationScreen : Screen {
                     emailResult.error = it
                 },
             )
-            textEntryFun(
+            textEntry(
                 "Phone",
                 true,
                 initialText = phoneResult.value,

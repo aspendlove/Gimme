@@ -16,7 +16,7 @@ fun createIso8601String(
     utcOffset: Int = 0
 ): String {
     var utcOffsetString = "${"%02d".format(utcOffset)}:00"
-    if(utcOffset >= 0) {
+    if (utcOffset >= 0) {
         utcOffsetString = "+$utcOffsetString"
     }
 

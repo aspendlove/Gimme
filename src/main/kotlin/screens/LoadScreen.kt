@@ -19,7 +19,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import components.textEntryFun
+import components.textEntry
 import layouts.LoadScreenItem
 
 abstract class LoadScreen<T> : Screen {
@@ -39,7 +39,7 @@ abstract class LoadScreen<T> : Screen {
         println("hello")
         val rows = remember { _rows }
         Column(modifier = modifier.padding(PaddingValues(10.dp))) {
-            textEntryFun("Search", false, onTextChange = {
+            textEntry("Search", false, onTextChange = {
                 println("hello")
                 loadRows(navigator, it)
             })

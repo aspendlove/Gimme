@@ -117,7 +117,7 @@ class ClientCreationScreen : Screen {
                 saveButton.compose()
             }
 
-            textEntryFun(
+            textEntry(
                 "Business Name",
                 true,
                 initialText = businessNameResult.value,
@@ -129,7 +129,7 @@ class ClientCreationScreen : Screen {
                     businessNameResult.error = it
                 },
             )
-            textEntryFun(
+            textEntry(
                 "Contact Name",
                 true,
                 initialText = contactNameResult.value,
@@ -141,7 +141,7 @@ class ClientCreationScreen : Screen {
                     contactNameResult.error = it
                 },
             )
-            textEntryFun(
+            textEntry(
                 "Street",
                 true,
                 initialText = streetResult.value,
@@ -153,7 +153,7 @@ class ClientCreationScreen : Screen {
                     streetResult.error = it
                 },
             )
-            textEntryFun(
+            textEntry(
                 "City",
                 true,
                 initialText = cityResult.value,
@@ -165,7 +165,7 @@ class ClientCreationScreen : Screen {
                     cityResult.error = it
                 },
             )
-            textEntryFun(
+            textEntry(
                 "State",
                 true,
                 initialText = stateResult.value,
@@ -177,10 +177,14 @@ class ClientCreationScreen : Screen {
                     stateResult.error = it
                 },
             )
-            zipEntryFun(
+            zipEntry(
                 "Zip Code",
                 true,
-                initialVal = zipResult.value,
+                initialVal = if (zipResult.value != -1) {
+                    zipResult.value
+                } else {
+                    null
+                },
                 onValueChange = {
                     zipResult.value = it
                 },
@@ -188,7 +192,7 @@ class ClientCreationScreen : Screen {
                     zipResult.error = it
                 },
             )
-            textEntryFun(
+            textEntry(
                 "Email",
                 true,
                 initialText = emailResult.value,
@@ -200,7 +204,7 @@ class ClientCreationScreen : Screen {
                     emailResult.error = it
                 },
             )
-            textEntryFun(
+            textEntry(
                 "Phone",
                 true,
                 initialText = phoneResult.value,

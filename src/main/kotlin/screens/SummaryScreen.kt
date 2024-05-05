@@ -15,13 +15,11 @@ import components.Body
 import components.CustomButton
 import storage.DatabaseManager
 import storage.Invoice
-import storage.Item
 import storage.StateBundle
 import java.awt.FileDialog
 import java.awt.Frame
 import java.sql.Date
 import java.text.SimpleDateFormat
-import java.time.Instant
 
 class SummaryScreen : Screen {
     @Composable

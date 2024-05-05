@@ -2,9 +2,12 @@ package screens
 
 import cafe.adriel.voyager.navigator.Navigator
 import layouts.LoadScreenItem
-import storage.*
+import storage.DatabaseManager
+import storage.Note
+import storage.NoteColumns
+import storage.StateBundle
 
-class NoteLoadScreen: LoadScreen<Note>() {
+class NoteLoadScreen : LoadScreen<Note>() {
     override fun loadRows(navigator: Navigator, filter: String) {
         _rows.clear()
 
@@ -12,7 +15,7 @@ class NoteLoadScreen: LoadScreen<Note>() {
             NoteColumns.NOTE,
             filter
         )).map { note ->
-            val name = if(note.note.length > 10) {
+            val name = if (note.note.length > 10) {
                 note.note.substring(0, 10) + "..."
             } else {
                 note.note

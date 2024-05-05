@@ -6,7 +6,7 @@ import storage.DatabaseManager
 import storage.Item
 import storage.ItemColumns
 
-class ItemLoadScreen(val addRow: (Item) -> Unit): LoadScreen<Item>() {
+class ItemLoadScreen(val addRow: (Item) -> Unit) : LoadScreen<Item>() {
     override fun loadRows(navigator: Navigator, filter: String) {
         _rows.clear()
 

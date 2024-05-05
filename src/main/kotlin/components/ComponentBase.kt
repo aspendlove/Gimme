@@ -8,11 +8,12 @@ abstract class ComponentBase(private var _modifier: Modifier) {
     fun addModifier(other: Modifier) {
         _modifier = _modifier.then(other)
     }
+
     var modifier: Modifier
         get() {
             return _modifier
         }
-        set(value){
+        set(value) {
             _modifier = value
         }
 

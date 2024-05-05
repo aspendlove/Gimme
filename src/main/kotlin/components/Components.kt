@@ -31,7 +31,7 @@ private fun calculateErrorChange(
 }
 
 @Composable
-fun textEntryFun(
+fun textEntry(
     title: String,
     required: Boolean,
     onErrorChange: (Boolean) -> Unit = {},
@@ -70,7 +70,7 @@ fun textEntryFun(
             text = TextFieldValue(text.text, TextRange(text.text.length), text.composition)
             if (!required) return@onFocusChanged
             if (it.isFocused) {
-                if(first) first = false
+                if (first) first = false
                 error = calculateErrorChange(false, error, onErrorChange)
                 return@onFocusChanged
             }
@@ -81,7 +81,7 @@ fun textEntryFun(
 }
 
 @Composable
-fun numEntryFun(
+fun numEntry(
     title: String,
     required: Boolean,
     onErrorChange: (Boolean) -> Unit = {},
@@ -115,13 +115,13 @@ fun numEntryFun(
                 newText = newText.removeSuffix(".")
             }
             if (negativeAllowed) {
-                if(newText == "0-") newText = "-"
+                if (newText == "0-") newText = "-"
                 if (newText.startsWith("-.")) {
                     newText = "-0.${newText.removePrefix("-.")}"
                     newSelection = TextRange(newSelection.end + 1)
                 }
-                if(newText.length > 1) {
-                    newText = newText[0] + newText.substring(1,newText.length).filter { character ->
+                if (newText.length > 1) {
+                    newText = newText[0] + newText.substring(1, newText.length).filter { character ->
                         character != '-'
                     }
                 }
@@ -183,7 +183,7 @@ fun numEntryFun(
             }
         },
         modifier = modifier.fillMaxWidth().onFocusChanged {
-            val newText = if(!it.isFocused) {
+            val newText = if (!it.isFocused) {
                 correctText(text.text)
             } else {
                 text.text
@@ -191,7 +191,7 @@ fun numEntryFun(
             text = TextFieldValue(newText, TextRange(text.text.length), text.composition)
             if (!required) return@onFocusChanged
             if (it.isFocused) {
-                if(first) first = false
+                if (first) first = false
                 error = calculateErrorChange(false, error, onErrorChange)
                 return@onFocusChanged
             }
@@ -202,7 +202,7 @@ fun numEntryFun(
 }
 
 @Composable
-fun zipEntryFun(
+fun zipEntry(
     title: String,
     required: Boolean,
     onErrorChange: (Boolean) -> Unit = {},
@@ -262,7 +262,7 @@ fun zipEntryFun(
             text = TextFieldValue(text.text, TextRange(text.text.length), text.composition)
             if (!required) return@onFocusChanged
             if (it.isFocused) {
-                if(first) first = false
+                if (first) first = false
                 error = calculateErrorChange(false, error, onErrorChange)
                 return@onFocusChanged
             }
@@ -272,14 +272,12 @@ fun zipEntryFun(
     )
 }
 
-class DateFormatException(message: String) : Exception(message)
-
 @Composable
-fun dateEntryFun(
+fun dateEntry(
     title: String,
     required: Boolean,
     onErrorChange: (Boolean) -> Unit = {},
-    onValueChange: (java.sql.Date?) -> Unit = {},
+    onValueChange: (Date?) -> Unit = {},
     initialTime: Long? = null,
     singleLine: Boolean = true,
     modifier: Modifier = Modifier.fillMaxWidth(),
@@ -344,7 +342,7 @@ fun dateEntryFun(
                     }
                     null
                 }
-                if(date != null) {
+                if (date != null) {
                     onValueChange(
                         date
                     )
@@ -363,11 +361,10 @@ fun dateEntryFun(
         modifier = modifier.fillMaxWidth().onFocusChanged {
             if (!required) return@onFocusChanged
             if (it.isFocused) {
-                if(first) first = false
+                if (first) first = false
                 error = calculateErrorChange(false, error, onErrorChange)
                 return@onFocusChanged
             }
-//            error = calculateErrorChange(!it.isFocused && (error || !first), error, onErrorChange)
         },
         textStyle = TextStyle(color = darkColors().onBackground)
     )

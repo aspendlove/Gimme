@@ -12,4 +12,4 @@ data class User(
     val email: String,
     val phone: String,
     override val id: Int = -1
-): hasId
+) : hasId

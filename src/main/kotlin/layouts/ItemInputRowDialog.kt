@@ -15,7 +15,6 @@ import storage.DatabaseManager
 import storage.Item
 import java.math.BigDecimal
 
-// TODO change into a function that has callbacks on value change and error change. The value should be updated only when there is a full item
 class ItemInputRowDialog(val id: Int, val onSave: () -> Unit, val item: Item? = null) :
     ComponentBase(_modifier = Modifier) {
 
@@ -72,7 +71,7 @@ class ItemInputRowDialog(val id: Int, val onSave: () -> Unit, val item: Item? = 
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            textEntryFun(
+            textEntry(
                 "Service",
                 true,
                 initialText = nameResult.value,
@@ -85,7 +84,7 @@ class ItemInputRowDialog(val id: Int, val onSave: () -> Unit, val item: Item? = 
                 },
                 modifier = Modifier.weight(1f),
             )
-            dateEntryFun(
+            dateEntry(
                 "Start Date",
                 true,
                 initialTime = startDateResult.value?.time,
@@ -98,7 +97,7 @@ class ItemInputRowDialog(val id: Int, val onSave: () -> Unit, val item: Item? = 
                 },
                 modifier = Modifier.weight(1f),
             )
-            dateEntryFun(
+            dateEntry(
                 "End Date",
                 false,
                 initialTime = startDateResult.value?.time,
@@ -111,7 +110,7 @@ class ItemInputRowDialog(val id: Int, val onSave: () -> Unit, val item: Item? = 
                 },
                 modifier = Modifier.weight(1f)
             )
-            numEntryFun(
+            numEntry(
                 "Quantity",
                 true,
                 initialVal = quantityResult.value,
@@ -124,7 +123,7 @@ class ItemInputRowDialog(val id: Int, val onSave: () -> Unit, val item: Item? = 
                 },
                 modifier = Modifier.weight(1f)
             )
-            numEntryFun(
+            numEntry(
                 "Price",
                 true,
                 initialVal = priceResult.value.toDouble(),
@@ -137,7 +136,7 @@ class ItemInputRowDialog(val id: Int, val onSave: () -> Unit, val item: Item? = 
                 },
                 modifier = Modifier.weight(1f),
             )
-            textEntryFun(
+            textEntry(
                 "Description",
                 true,
                 initialText = descriptionResult.value,

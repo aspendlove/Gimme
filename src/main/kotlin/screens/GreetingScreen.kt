@@ -13,7 +13,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import components.CustomButton
 import components.Title
 
-class GreetingScreen: Screen {
+class GreetingScreen : Screen {
 
     @Composable
     override fun Content() {
@@ -25,10 +25,11 @@ class GreetingScreen: Screen {
             navigator += UserCreationScreen()
         }, "Create an Invoice")
         val greeting = Title(
-            "Welcome to Gimme!\nReady to make an invoice?"
+            "Welcome to Gimme!\n\nReady to make an invoice?"
         )
 
-        Column(modifier = Modifier.fillMaxSize(),
+        Column(
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {

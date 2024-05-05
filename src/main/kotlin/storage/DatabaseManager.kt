@@ -2,7 +2,6 @@ package storage
 
 import java.io.File
 import java.sql.*
-import kotlin.collections.HashMap
 
 // TODO add fully featured invoice tracking (enough info to recreate a full pdf from an entry in the invoice table)
 // TODO add apartment info to addresses

@@ -10,7 +10,7 @@ object StateBundle {
 
     fun clear() {
         user = User(
-                "", "", "", "", "", "", -1, "", ""
+            "", "", "", "", "", "", -1, "", ""
         )
         client = Client(
             "",

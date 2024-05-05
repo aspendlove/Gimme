@@ -9,9 +9,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-class Title(private val text: String): ComponentBase(Modifier.padding(10.dp)) {
+class Title(private val text: String) : ComponentBase(Modifier.padding(10.dp)) {
     @Composable
     override fun compose() {
-        Text(text,modifier, color = darkColors().onBackground, fontSize = 40.sp, textAlign = TextAlign.Center)
+        Text(text, modifier, color = darkColors().onBackground, fontSize = 40.sp, textAlign = TextAlign.Center)
     }
 }
