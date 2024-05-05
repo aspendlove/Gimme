@@ -9,7 +9,6 @@ import androidx.compose.material.darkColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.TextStyle
@@ -23,6 +22,7 @@ class TextEntry(
 ) : ComponentBase(modifier) {
     private var _text = initialText
     private var _error = required
+
 
     init {
         if (_text.isNotEmpty()) {
@@ -43,7 +43,7 @@ class TextEntry(
     @Composable
     @Preview
     override fun compose() {
-        var text by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        var text by remember {
             mutableStateOf(TextFieldValue(_text))
         }
 

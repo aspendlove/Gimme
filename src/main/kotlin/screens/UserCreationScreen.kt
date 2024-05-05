@@ -10,9 +10,7 @@ import androidx.compose.ui.zIndex
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import components.CustomButton
-import components.RequiredText
-import components.Title
+import components.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -23,39 +21,39 @@ import storage.User
 import javax.swing.JOptionPane
 
 class UserCreationScreen : Screen {
-    private val businessNameEntry = RequiredText("Business Name", StateBundle.user.businessName)
-    private val contactNameEntry = RequiredText("Contact Name", StateBundle.user.contactName)
-    private val subtitleEntry = RequiredText("Subtitle", StateBundle.user.subtitle)
-    private val streetEntry = RequiredText("Street", StateBundle.user.street)
-    private val cityEntry = RequiredText("City", StateBundle.user.city)
-    private val stateEntry = RequiredText("State", StateBundle.user.state)
-    private val zipEntry =
-        RequiredText("Zip Code", if (StateBundle.user.zip != -1) StateBundle.user.zip.toString() else "")
-    private val emailEntry = RequiredText("Email", StateBundle.user.email)
-    private val phoneEntry = RequiredText("Phone", StateBundle.user.phone)
+
+    private val businessNameResult = ValueErrorPair("", false)
+    private val contactNameResult = ValueErrorPair("", false)
+    private val subtitleResult = ValueErrorPair("", false)
+    private val streetResult = ValueErrorPair("", false)
+    private val cityResult = ValueErrorPair("", false)
+    private val stateResult = ValueErrorPair("", false)
+    private val zipResult = ValueErrorPair(0, false)
+    private val emailResult = ValueErrorPair("", false)
+    private val phoneResult = ValueErrorPair("", false)
 
     val isError: Boolean
-        get() = businessNameEntry.isError ||
-                contactNameEntry.isError ||
-                subtitleEntry.isError ||
-                streetEntry.isError ||
-                cityEntry.isError ||
-                stateEntry.isError ||
-                zipEntry.isError ||
-                emailEntry.isError ||
-                phoneEntry.isError
+        get() = businessNameResult.error ||
+                contactNameResult.error ||
+                subtitleResult.error ||
+                streetResult.error ||
+                cityResult.error ||
+                stateResult.error ||
+                zipResult.error ||
+                emailResult.error ||
+                phoneResult.error
 
     val result: User
         get() = User(
-            businessNameEntry.result,
-            contactNameEntry.result,
-            subtitleEntry.result,
-            streetEntry.result,
-            cityEntry.result,
-            stateEntry.result,
-            zipEntry.result.toInt(),
-            emailEntry.result,
-            phoneEntry.result
+            businessNameResult.value,
+            contactNameResult.value,
+            subtitleResult.value,
+            streetResult.value,
+            cityResult.value,
+            stateResult.value,
+            zipResult.value,
+            emailResult.value,
+            phoneResult.value
         )
 
     @Composable
@@ -121,15 +119,109 @@ class UserCreationScreen : Screen {
                 presetButton.compose()
                 saveButton.compose()
             }
-            businessNameEntry.compose()
-            contactNameEntry.compose()
-            subtitleEntry.compose()
-            streetEntry.compose()
-            cityEntry.compose()
-            stateEntry.compose()
-            zipEntry.compose()
-            emailEntry.compose()
-            phoneEntry.compose()
+            textEntryFun(
+                "Business Name",
+                true,
+                initialText = StateBundle.user.businessName,
+                onTextChange = {
+                    businessNameResult.value = it
+                },
+                onErrorChange = {
+                    businessNameResult.error = it
+                },
+            )
+            textEntryFun(
+                "Contact Name",
+                true,
+                initialText = StateBundle.user.contactName,
+                onTextChange = {
+                    contactNameResult.value = it
+                },
+                onErrorChange = {
+                    contactNameResult.error = it
+                },
+            )
+            textEntryFun(
+                "Subtitle",
+                true,
+                initialText = StateBundle.user.subtitle,
+                onTextChange = {
+                    subtitleResult.value = it
+                },
+                onErrorChange = {
+                    subtitleResult.error = it
+                },
+            )
+            textEntryFun(
+                "Street",
+                true,
+                initialText = StateBundle.user.street,
+                onTextChange = {
+                    streetResult.value = it
+                },
+                onErrorChange = {
+                    streetResult.error = it
+                },
+            )
+            textEntryFun(
+                "City",
+                true,
+                initialText = StateBundle.user.city,
+                onTextChange = {
+                    cityResult.value = it
+                },
+                onErrorChange = {
+                    cityResult.error = it
+                },
+            )
+            textEntryFun(
+                "State",
+                true,
+                initialText = StateBundle.user.state,
+                onTextChange = {
+                    stateResult.value = it
+                },
+                onErrorChange = {
+                    stateResult.error = it
+                },
+            )
+            zipEntryFun(
+                "Zip Code",
+                true,
+                initialVal = if (StateBundle.user.zip != -1) {
+                    StateBundle.user.zip
+                } else {
+                    0
+                },
+                onValueChange = {
+                    zipResult.value = it
+                },
+                onErrorChange = {
+                    zipResult.error = it
+                }
+            )
+            textEntryFun(
+                "Email",
+                true,
+                initialText = StateBundle.user.email,
+                onTextChange = {
+                    emailResult.value = it
+                },
+                onErrorChange = {
+                    emailResult.error = it
+                },
+            )
+            textEntryFun(
+                "Phone",
+                true,
+                initialText = StateBundle.user.phone,
+                onTextChange = {
+                    phoneResult.value = it
+                },
+                onErrorChange = {
+                    phoneResult.error = it
+                },
+            )
             Row(modifier = Modifier.fillMaxWidth().weight(1f).padding(0.dp, 10.dp, 0.dp, 0.dp)) {
                 val commonModifier = Modifier.fillMaxWidth().weight(1f)
                 backCustomButton.addModifier(commonModifier)

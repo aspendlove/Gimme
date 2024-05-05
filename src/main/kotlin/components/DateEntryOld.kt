@@ -19,7 +19,7 @@ import java.sql.Date
 import java.text.ParseException
 import java.text.SimpleDateFormat
 
-class DateFormatException(message: String) : Exception(message)
+//class DateFormatException(message: String) : Exception(message)
 
 class DateEntryOld(val title: String, private val required: Boolean = true, millisSinceEpoch: Long? = null) :
     ComponentBase(Modifier) {

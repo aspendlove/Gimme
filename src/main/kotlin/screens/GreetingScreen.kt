@@ -10,15 +10,11 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import components.*
+import components.CustomButton
+import components.Title
 
 class GreetingScreen: Screen {
 
-    val testEntryRequired = TextEntry("required text entry", true, "required")
-    val testNumEntry = NumberEntry("num entry", true,0.1)
-    val testOldNumEntry = NumberEntryOld("num entry old", 0.5)
-    val testEntrySub = TestEntry(title = "ding", required = true, singleLine = false)
-    val testDateEntry = DateEntry("test date entry", required = true, initialValue = null)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -31,9 +27,6 @@ class GreetingScreen: Screen {
         val greeting = Title(
             "Welcome to Gimme!\nReady to make an invoice?"
         )
-//        val testEntry = TextEntry("text entry", false)
-//        val testNumEntryRequired = NumberEntryOld("num entry required", 0.1)
-//        val testNumEntry = NumberEntryOld("num entry")
 
         Column(modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -44,18 +37,6 @@ class GreetingScreen: Screen {
                 trackCustomButton.compose()
                 continueCustomButton.compose()
             }
-            testDateEntry.compose()
-            testEntrySub.compose()
-//            testEntryRequired.compose()
-            testNumEntry.compose()
-//            testNumEntry.value = 0.87
-//            testOldNumEntry.compose()
-//            testEntrySub.compose()
-//            CoroutineScope(Dispatchers.Default).launch {
-//                delay(3000)
-////                println(testNumEntry.value)
-//                println(testNumEntry.value)
-//            }
             Text("© Aidan Spendlove 2023", color = Color.White, modifier = Modifier.padding(0.dp, 40.dp, 0.dp, 0.dp))
         }
     }
