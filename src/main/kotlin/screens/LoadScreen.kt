@@ -36,11 +36,9 @@ abstract class LoadScreen<T> : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         loadRows(navigator, "")
-        println("hello")
         val rows = remember { _rows }
         Column(modifier = modifier.padding(PaddingValues(10.dp))) {
             textEntry("Search", false, onTextChange = {
-                println("hello")
                 loadRows(navigator, it)
             })
             val state = rememberLazyListState()

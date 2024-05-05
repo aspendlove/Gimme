@@ -14,6 +14,7 @@ import compose.icons.feathericons.Save
 import storage.DatabaseManager
 import storage.Item
 import java.math.BigDecimal
+import javax.swing.JOptionPane
 
 class ItemInputRowDialog(val id: Int, val onSave: () -> Unit, val item: Item? = null) :
     ComponentBase(_modifier = Modifier) {
@@ -151,6 +152,15 @@ class ItemInputRowDialog(val id: Int, val onSave: () -> Unit, val item: Item? = 
             )
             Button(
                 onClick = {
+                    if (isError) {
+                        JOptionPane.showMessageDialog(
+                            null,
+                            "Please fill out all required fields",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                        )
+                        return@Button
+                    }
                     DatabaseManager.insertItem(result)
                     onSave()
                 },

@@ -219,7 +219,6 @@ fun zipEntry(
     TextField(
         value = text,
         onValueChange = {
-            println(it.text)
             var newText = it.text
             var newSelection = it.selection
             if (newText.isEmpty()) {
