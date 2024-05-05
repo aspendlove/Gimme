@@ -41,7 +41,8 @@ fun textEntryFun(
     modifier: Modifier = Modifier.fillMaxWidth(),
 ) {
 
-    var error by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf(initialText.isEmpty() && required) }
+    onErrorChange(error)
     var text by remember {
         mutableStateOf(TextFieldValue(initialText))
     }
@@ -59,20 +60,18 @@ fun textEntryFun(
         },
         label = { Text(title) },
         singleLine = singleLine,
-        isError = error,
+        isError = error && !first,
         trailingIcon = {
             if (required) {
                 Icon(Icons.Default.Star, "Star")
             }
         },
         modifier = modifier.fillMaxWidth().onFocusChanged {
+            text = TextFieldValue(text.text, TextRange(text.text.length), text.composition)
             if (!required) return@onFocusChanged
             if (it.isFocused) {
+                if(first) first = false
                 error = calculateErrorChange(false, error, onErrorChange)
-                return@onFocusChanged
-            }
-            if (!it.isFocused && first) {
-                first = false
                 return@onFocusChanged
             }
             error = calculateErrorChange(text.text.isEmpty(), error, onErrorChange)
@@ -101,9 +100,10 @@ fun numEntryFun(
         return parsedText
     }
 
-    var error by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf(initialVal == null && required) }
+    onErrorChange(error)
     var text by remember {
-        mutableStateOf(TextFieldValue(initialVal?.toString() ?: ""))
+        mutableStateOf(TextFieldValue(initialVal?.toString()?.removeSuffix(".0") ?: ""))
     }
     var first by remember { mutableStateOf(true) }
     TextField(
@@ -115,9 +115,19 @@ fun numEntryFun(
                 newText = newText.removeSuffix(".")
             }
             if (negativeAllowed) {
+                if(newText == "0-") newText = "-"
                 if (newText.startsWith("-.")) {
                     newText = "-0.${newText.removePrefix("-.")}"
                     newSelection = TextRange(newSelection.end + 1)
+                }
+                if(newText.length > 1) {
+                    newText = newText[0] + newText.substring(1,newText.length).filter { character ->
+                        character != '-'
+                    }
+                }
+            } else {
+                newText = newText.filter { character ->
+                    character != '-'
                 }
             }
             if (newText.startsWith('.')) {
@@ -166,21 +176,23 @@ fun numEntryFun(
         },
         label = { Text(title) },
         singleLine = singleLine,
-        isError = error,
+        isError = error && !first,
         trailingIcon = {
             if (required) {
                 Icon(Icons.Default.Star, "Star")
             }
         },
         modifier = modifier.fillMaxWidth().onFocusChanged {
-            if (!it.isFocused) text = TextFieldValue(correctText(text.text), text.selection, text.composition)
+            val newText = if(!it.isFocused) {
+                correctText(text.text)
+            } else {
+                text.text
+            }
+            text = TextFieldValue(newText, TextRange(text.text.length), text.composition)
             if (!required) return@onFocusChanged
             if (it.isFocused) {
+                if(first) first = false
                 error = calculateErrorChange(false, error, onErrorChange)
-                return@onFocusChanged
-            }
-            if (!it.isFocused && first) {
-                first = false
                 return@onFocusChanged
             }
             error = calculateErrorChange(text.text.isEmpty(), error, onErrorChange)
@@ -198,7 +210,8 @@ fun zipEntryFun(
     initialVal: Int? = null,
     modifier: Modifier = Modifier.fillMaxWidth(),
 ) {
-    var error by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf(initialVal == null && required) }
+    onErrorChange(error)
     var text by remember {
         mutableStateOf(TextFieldValue(initialVal?.toString() ?: ""))
     }
@@ -206,6 +219,7 @@ fun zipEntryFun(
     TextField(
         value = text,
         onValueChange = {
+            println(it.text)
             var newText = it.text
             var newSelection = it.selection
             if (newText.isEmpty()) {
@@ -238,20 +252,18 @@ fun zipEntryFun(
         },
         label = { Text(title) },
         singleLine = true,
-        isError = error,
+        isError = error && !first,
         trailingIcon = {
             if (required) {
                 Icon(Icons.Default.Star, "Star")
             }
         },
         modifier = modifier.fillMaxWidth().onFocusChanged {
+            text = TextFieldValue(text.text, TextRange(text.text.length), text.composition)
             if (!required) return@onFocusChanged
             if (it.isFocused) {
+                if(first) first = false
                 error = calculateErrorChange(false, error, onErrorChange)
-                return@onFocusChanged
-            }
-            if (!it.isFocused && first) {
-                first = false
                 return@onFocusChanged
             }
             error = calculateErrorChange(text.text.isEmpty(), error, onErrorChange)
@@ -277,7 +289,8 @@ fun dateEntryFun(
         return SimpleDateFormat("MM/dd/yyyy").format(java.util.Date(millisSinceEpoch))
     }
 
-    var error by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf(initialTime == null && required) }
+    onErrorChange(error)
     var text by remember {
         mutableStateOf(
             TextFieldValue(
@@ -341,7 +354,7 @@ fun dateEntryFun(
         },
         label = { Text(title) },
         singleLine = singleLine,
-        isError = error,
+        isError = error && !first,
         trailingIcon = {
             if (required) {
                 Icon(Icons.Default.Star, "Star")
@@ -350,16 +363,11 @@ fun dateEntryFun(
         modifier = modifier.fillMaxWidth().onFocusChanged {
             if (!required) return@onFocusChanged
             if (it.isFocused) {
+                if(first) first = false
                 error = calculateErrorChange(false, error, onErrorChange)
                 return@onFocusChanged
             }
-            if (!it.isFocused && first) {
-                first = false
-                return@onFocusChanged
-            }
-            println(error)
-            println(!it.isFocused && error)
-            error = calculateErrorChange(!it.isFocused && (error || !first), error, onErrorChange)
+//            error = calculateErrorChange(!it.isFocused && (error || !first), error, onErrorChange)
         },
         textStyle = TextStyle(color = darkColors().onBackground)
     )

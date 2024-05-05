@@ -20,15 +20,16 @@ import compose.icons.FeatherIcons
 import compose.icons.feathericons.XCircle
 import screens.ItemLoadScreen
 import storage.Item
-import storage.StateBundle
 
-class ItemInputDialog(startingItems: MutableList<Item>, private val onSave: () -> Unit, unfinishedRows: List<ItemInputRowDialog> = listOf()) {
+class ItemInputDialog(private val onSave: () -> Unit) {
 
     private var iteration: Int = 0
 
-    private val _rows: MutableList<ItemInputRowDialog> = (unfinishedRows + startingItems.map { item ->
-        ItemInputRowDialog(unfinishedRows.size + iteration++, onSave, item)
-    }).toMutableList()
+    private val _rows: MutableList<ItemInputRowDialog> = mutableListOf()
+
+    private fun addItem(item: Item) {
+        _rows.add(ItemInputRowDialog(iteration++, onSave, item))
+    }
 
     init {
         if(_rows.isEmpty()) {
@@ -61,11 +62,7 @@ class ItemInputDialog(startingItems: MutableList<Item>, private val onSave: () -
             _rows.add(newRow)
         }, "New Service")
         val loadButton = CustomButton({
-            StateBundle.clear()
-            _rows.map {row ->
-                StateBundle.items.add(row.result)
-            }
-            navigator.replace(ItemLoadScreen())
+            navigator += ItemLoadScreen(::addItem)
         }, "Load Service")
         Column(modifier = modifier.padding(PaddingValues(10.dp))) {
             val state = rememberLazyListState()
@@ -90,7 +87,6 @@ class ItemInputDialog(startingItems: MutableList<Item>, private val onSave: () -
                                     }
                                     rows.remove(row)
                                     _rows.remove(row)
-                                    StateBundle.items.remove(row.item)
                                 },
                                 modifier = Modifier.fillMaxHeight()
                             ) {
@@ -110,24 +106,6 @@ class ItemInputDialog(startingItems: MutableList<Item>, private val onSave: () -
                 loadButton.addModifier(Modifier.weight(1f))
                 newButton.compose()
                 loadButton.compose()
-//                Button(
-//                    onClick = {
-//                        val newRow = ItemInputRowDialog(iteration++, onSave)
-//                        rows.add(newRow)
-//                        _rows.add(newRow)
-//                    },
-//                    modifier = Modifier.height(40.dp).weight(1f)
-//                ) {
-//                    Text("New Service")
-//                }
-//                Button(
-//                    onClick = {
-//                        navigator.replace(ItemLoadScreen())
-//                    },
-//                    modifier = Modifier.height(40.dp).weight(1f)
-//                ) {
-//                    Text("Load Service")
-//                }
             }
         }
     }

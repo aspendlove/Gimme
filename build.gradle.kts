@@ -1,9 +1,8 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
-val kotlinVersion: String by project
 plugins {
     java
-    kotlin("jvm") version "1.8.20"
+    kotlin("jvm") version "1.9.23"
     id("org.jetbrains.compose")
     kotlin("plugin.serialization") version "1.5.0"
 }

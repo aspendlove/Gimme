@@ -1,7 +1,6 @@
 package layouts
 
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.material.Button
@@ -9,60 +8,62 @@ import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import components.ComponentBase
-import components.DateEntryOld
-import components.RequiredText
-import components.RequiredTextMultiline
+import components.*
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Save
 import storage.DatabaseManager
 import storage.Item
+import java.math.BigDecimal
 
-class ItemInputRowDialog(val id: Int, val onSave: () -> Unit, val item: Item? = null) : ComponentBase(_modifier = Modifier) {
-    private val nameInput: RequiredText
-    private val startDateInput: DateEntryOld
-    private val endDateInput: DateEntryOld
-    private val descriptionInput: RequiredTextMultiline
-    private val quantityInput: RequiredText
-    private val priceInput: RequiredText
+// TODO change into a function that has callbacks on value change and error change. The value should be updated only when there is a full item
+class ItemInputRowDialog(val id: Int, val onSave: () -> Unit, val item: Item? = null) :
+    ComponentBase(_modifier = Modifier) {
+
+    private val nameResult: ValueErrorPair<String>
+    private val startDateResult: ValueErrorPair<java.sql.Date?>
+    private val endDateResult: ValueErrorPair<java.sql.Date?>
+    private val descriptionResult: ValueErrorPair<String>
+    private val quantityResult: ValueErrorPair<Double>
+    private val priceResult: ValueErrorPair<BigDecimal>
+
     init {
-        if(item != null) {
+        if (item != null) {
             with(item) {
-                nameInput = RequiredText("Service",name)
-                startDateInput = DateEntryOld("Start Date", millisSinceEpoch = startDate.time)
-                endDateInput = DateEntryOld("End Date", required = false, millisSinceEpoch = endDate?.time)
-                descriptionInput = RequiredTextMultiline("Description", description)
-                quantityInput = RequiredText("Quantity", quantity.toString())
-                priceInput = RequiredText("Price", price.toString())
+                nameResult = ValueErrorPair(name, true)
+                startDateResult = ValueErrorPair(startDate, true)
+                endDateResult = ValueErrorPair(endDate, true)
+                quantityResult = ValueErrorPair(quantity, true)
+                priceResult = ValueErrorPair(price, true)
+                descriptionResult = ValueErrorPair(description, true)
             }
         } else {
-            nameInput = RequiredText("Service")
-            startDateInput = DateEntryOld("Start Date")
-            endDateInput = DateEntryOld("End Date", required = false)
-            descriptionInput = RequiredTextMultiline("Description")
-            quantityInput = RequiredText("Quantity")
-            priceInput = RequiredText("Price")
+            nameResult = ValueErrorPair("", true)
+            startDateResult = ValueErrorPair(null, true)
+            endDateResult = ValueErrorPair(null, true)
+            descriptionResult = ValueErrorPair("", true)
+            quantityResult = ValueErrorPair(0.0, true)
+            priceResult = ValueErrorPair(0.0.toBigDecimal(), true)
         }
     }
 
     val isError: Boolean
         get() {
-            return nameInput.isError ||
-                    startDateInput.isError ||
-                    descriptionInput.isError ||
-                    quantityInput.isError ||
-                    priceInput.isError
+            return nameResult.error ||
+                    startDateResult.error ||
+                    descriptionResult.error ||
+                    quantityResult.error ||
+                    priceResult.error
         }
 
     val result: Item
         get() {
             return Item(
-                nameInput.result,
-                startDateInput.result!!,
-                endDateInput.result,
-                if(quantityInput.result.isEmpty()) 0.0 else quantityInput.result.toDouble(),
-                priceInput.result.toBigDecimal(),
-                descriptionInput.result
+                nameResult.value,
+                startDateResult.value!!,
+                endDateResult.value,
+                quantityResult.value,
+                priceResult.value,
+                descriptionResult.value
             )
         }
 
@@ -71,24 +72,84 @@ class ItemInputRowDialog(val id: Int, val onSave: () -> Unit, val item: Item? = 
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(modifier = Modifier.weight(1f)) {
-                nameInput.compose()
-            }
-            Box(modifier = Modifier.weight(1f)) {
-                startDateInput.compose()
-            }
-            Box(modifier = Modifier.weight(1f)) {
-                endDateInput.compose()
-            }
-            Box(modifier = Modifier.weight(1f)) {
-                quantityInput.compose()
-            }
-            Box(modifier = Modifier.weight(1f)) {
-                priceInput.compose()
-            }
-            Box(modifier = Modifier.weight(2f)) {
-                descriptionInput.compose()
-            }
+            textEntryFun(
+                "Service",
+                true,
+                initialText = nameResult.value,
+                singleLine = true,
+                onTextChange = {
+                    nameResult.value = it
+                },
+                onErrorChange = {
+                    nameResult.error = it
+                },
+                modifier = Modifier.weight(1f),
+            )
+            dateEntryFun(
+                "Start Date",
+                true,
+                initialTime = startDateResult.value?.time,
+                singleLine = true,
+                onValueChange = {
+                    startDateResult.value = it
+                },
+                onErrorChange = {
+                    startDateResult.error = it
+                },
+                modifier = Modifier.weight(1f),
+            )
+            dateEntryFun(
+                "End Date",
+                false,
+                initialTime = startDateResult.value?.time,
+                singleLine = true,
+                onValueChange = {
+                    endDateResult.value = it
+                },
+                onErrorChange = {
+                    endDateResult.error = it
+                },
+                modifier = Modifier.weight(1f)
+            )
+            numEntryFun(
+                "Quantity",
+                true,
+                initialVal = quantityResult.value,
+                singleLine = true,
+                onValueChange = {
+                    quantityResult.value = it
+                },
+                onErrorChange = {
+                    quantityResult.error = it
+                },
+                modifier = Modifier.weight(1f)
+            )
+            numEntryFun(
+                "Price",
+                true,
+                initialVal = priceResult.value.toDouble(),
+                singleLine = true,
+                onValueChange = {
+                    priceResult.value = it.toBigDecimal()
+                },
+                onErrorChange = {
+                    priceResult.error = it
+                },
+                modifier = Modifier.weight(1f),
+            )
+            textEntryFun(
+                "Description",
+                true,
+                initialText = descriptionResult.value,
+                onTextChange = {
+                    descriptionResult.value = it
+                },
+                onErrorChange = {
+                    descriptionResult.error = it
+                },
+                singleLine = true,
+                modifier = Modifier.weight(2f),
+            )
             Button(
                 onClick = {
                     DatabaseManager.insertItem(result)

@@ -22,15 +22,15 @@ import javax.swing.JOptionPane
 
 class UserCreationScreen : Screen {
 
-    private val businessNameResult = ValueErrorPair("", false)
-    private val contactNameResult = ValueErrorPair("", false)
-    private val subtitleResult = ValueErrorPair("", false)
-    private val streetResult = ValueErrorPair("", false)
-    private val cityResult = ValueErrorPair("", false)
-    private val stateResult = ValueErrorPair("", false)
-    private val zipResult = ValueErrorPair(0, false)
-    private val emailResult = ValueErrorPair("", false)
-    private val phoneResult = ValueErrorPair("", false)
+    private val businessNameResult = ValueErrorPair(StateBundle.user.businessName, true)
+    private val contactNameResult = ValueErrorPair(StateBundle.user.contactName, true)
+    private val subtitleResult = ValueErrorPair(StateBundle.user.subtitle, true)
+    private val streetResult = ValueErrorPair(StateBundle.user.street, true)
+    private val cityResult = ValueErrorPair(StateBundle.user.city, true)
+    private val stateResult = ValueErrorPair(StateBundle.user.state, true)
+    private val zipResult = ValueErrorPair(StateBundle.user.zip, true)
+    private val emailResult = ValueErrorPair(StateBundle.user.email, true)
+    private val phoneResult = ValueErrorPair(StateBundle.user.phone, true)
 
     val isError: Boolean
         get() = businessNameResult.error ||
@@ -122,7 +122,7 @@ class UserCreationScreen : Screen {
             textEntryFun(
                 "Business Name",
                 true,
-                initialText = StateBundle.user.businessName,
+                initialText = businessNameResult.value,
                 onTextChange = {
                     businessNameResult.value = it
                 },
@@ -133,7 +133,7 @@ class UserCreationScreen : Screen {
             textEntryFun(
                 "Contact Name",
                 true,
-                initialText = StateBundle.user.contactName,
+                initialText = contactNameResult.value,
                 onTextChange = {
                     contactNameResult.value = it
                 },
@@ -144,7 +144,7 @@ class UserCreationScreen : Screen {
             textEntryFun(
                 "Subtitle",
                 true,
-                initialText = StateBundle.user.subtitle,
+                initialText = subtitleResult.value,
                 onTextChange = {
                     subtitleResult.value = it
                 },
@@ -155,7 +155,7 @@ class UserCreationScreen : Screen {
             textEntryFun(
                 "Street",
                 true,
-                initialText = StateBundle.user.street,
+                initialText = streetResult.value,
                 onTextChange = {
                     streetResult.value = it
                 },
@@ -166,7 +166,7 @@ class UserCreationScreen : Screen {
             textEntryFun(
                 "City",
                 true,
-                initialText = StateBundle.user.city,
+                initialText = cityResult.value,
                 onTextChange = {
                     cityResult.value = it
                 },
@@ -177,7 +177,7 @@ class UserCreationScreen : Screen {
             textEntryFun(
                 "State",
                 true,
-                initialText = StateBundle.user.state,
+                initialText = stateResult.value,
                 onTextChange = {
                     stateResult.value = it
                 },
@@ -188,8 +188,8 @@ class UserCreationScreen : Screen {
             zipEntryFun(
                 "Zip Code",
                 true,
-                initialVal = if (StateBundle.user.zip != -1) {
-                    StateBundle.user.zip
+                initialVal = if (zipResult.value != -1) {
+                    zipResult.value
                 } else {
                     0
                 },
@@ -203,7 +203,7 @@ class UserCreationScreen : Screen {
             textEntryFun(
                 "Email",
                 true,
-                initialText = StateBundle.user.email,
+                initialText = emailResult.value,
                 onTextChange = {
                     emailResult.value = it
                 },
@@ -214,7 +214,7 @@ class UserCreationScreen : Screen {
             textEntryFun(
                 "Phone",
                 true,
-                initialText = StateBundle.user.phone,
+                initialText = phoneResult.value,
                 onTextChange = {
                     phoneResult.value = it
                 },

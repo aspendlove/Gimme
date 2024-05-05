@@ -1,14 +1,12 @@
 package screens
 
 import cafe.adriel.voyager.navigator.Navigator
-import layouts.ItemInputRowDialog
 import layouts.LoadScreenItem
 import storage.DatabaseManager
 import storage.Item
 import storage.ItemColumns
-import storage.StateBundle
 
-class ItemLoadScreen(private val inProgressItems: List<ItemInputRowDialog> = listOf()): LoadScreen<Item>() {
+class ItemLoadScreen(val addRow: (Item) -> Unit): LoadScreen<Item>() {
     override fun loadRows(navigator: Navigator, filter: String) {
         _rows.clear()
 
@@ -17,7 +15,7 @@ class ItemLoadScreen(private val inProgressItems: List<ItemInputRowDialog> = lis
             filter
         )).map { item ->
             _rows.add(LoadScreenItem(iteration++, item.name, item, {
-                StateBundle.items.add(item)
+                addRow(item)
                 goToPreviousScreen(navigator)
             }, {
                 DatabaseManager.deleteItem(item.id)
@@ -27,6 +25,6 @@ class ItemLoadScreen(private val inProgressItems: List<ItemInputRowDialog> = lis
     }
 
     override fun goToPreviousScreen(navigator: Navigator) {
-        navigator.replace(ItemCreationScreen(inProgressItems))
+        navigator.pop()
     }
 }

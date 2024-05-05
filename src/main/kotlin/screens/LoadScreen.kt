@@ -19,8 +19,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import components.SearchBar
-import layouts.ItemInputRowDialog
+import components.textEntryFun
 import layouts.LoadScreenItem
 
 abstract class LoadScreen<T> : Screen {
@@ -37,12 +36,13 @@ abstract class LoadScreen<T> : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         loadRows(navigator, "")
+        println("hello")
         val rows = remember { _rows }
-        val searchBar = SearchBar("Search") { query ->
-            loadRows(navigator, query)
-        }
         Column(modifier = modifier.padding(PaddingValues(10.dp))) {
-            searchBar.compose()
+            textEntryFun("Search", false, onTextChange = {
+                println("hello")
+                loadRows(navigator, it)
+            })
             val state = rememberLazyListState()
 
             Box(modifier = Modifier.weight(5f)) {

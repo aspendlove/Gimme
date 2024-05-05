@@ -12,13 +12,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import cafe.adriel.voyager.navigator.Navigator
-import screens.GreetingScreen
 import screens.ItemCreationScreen
-import screens.LoadScreen
-import screens.NoteCreationScreen
-import storage.Client
-import storage.DatabaseManager
-import storage.User
 
 fun main() = application {
     val windowState = rememberWindowState(size = DpSize(1200.dp, 800.dp))
@@ -32,7 +26,7 @@ fun App() {
     MaterialTheme(colors = darkColors()) {
         Box(Modifier.fillMaxSize().background(MaterialTheme.colors.background)) {
             Navigator(
-                screen = GreetingScreen()
+                screen = ItemCreationScreen()
             )
         }
     }

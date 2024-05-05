@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import components.SearchBar
+import components.textEntryFun
 import layouts.InvoiceTrackingItem
 import storage.DatabaseManager
 import storage.InvoiceColumns
@@ -46,11 +46,11 @@ class InvoiceTrackingScreen: Screen {
         val navigator = LocalNavigator.currentOrThrow
         loadRows("")
         val rows = remember { _rows }
-        val searchBar = SearchBar("Search by Client") { query ->
-            loadRows(query)
-        }
+
         Column(modifier = modifier.padding(PaddingValues(10.dp))) {
-            searchBar.compose()
+            textEntryFun("Search by Client", false, onTextChange = {
+                loadRows(it)
+            })
             val state = rememberLazyListState()
 
             Box(modifier = Modifier.weight(5f)) {

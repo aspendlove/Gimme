@@ -11,7 +11,8 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import components.CustomButton
-import components.NonRequiredTextMultiline
+import components.ValueErrorPair
+import components.textEntryFun
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -21,11 +22,11 @@ import storage.Note
 import storage.StateBundle
 
 class NoteCreationScreen : Screen {
-    private val notesEntry =
-        NonRequiredTextMultiline("Notes to be placed in the footer of the invoice", StateBundle.notes.note)
+
+    private val notesResult: ValueErrorPair<String> = ValueErrorPair("", false)
 
     val result: String
-        get() = notesEntry.result
+        get() = notesResult.value
 
     @Composable
     override fun Content() {
@@ -52,8 +53,16 @@ class NoteCreationScreen : Screen {
             navigator += SummaryScreen()
         }, "Forward")
         Column(modifier = Modifier.fillMaxHeight()) {
-            notesEntry.addModifier(Modifier.fillMaxWidth().fillMaxHeight(0.75F))
-            notesEntry.compose()
+            textEntryFun(
+                "Notes to be placed in the footer of the invoice",
+                false,
+                singleLine = false,
+                onTextChange = {
+                    notesResult.value = it
+                },
+                modifier = Modifier.fillMaxWidth().fillMaxHeight(0.75F),
+                initialText = StateBundle.notes.note
+            )
             Row(modifier = Modifier.fillMaxWidth().weight(1f).padding(0.dp, 10.dp, 0.dp, 0.dp)) {
                 loadCustomButton.addModifier(Modifier.weight(1f))
                 saveCustomButton.addModifier(Modifier.weight(1f))

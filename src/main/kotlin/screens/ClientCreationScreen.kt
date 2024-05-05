@@ -10,9 +10,7 @@ import androidx.compose.ui.zIndex
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import components.CustomButton
-import components.RequiredText
-import components.Title
+import components.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -23,38 +21,36 @@ import storage.StateBundle
 import javax.swing.JOptionPane
 
 class ClientCreationScreen : Screen {
-
-    private val businessNameEntry = RequiredText("Business Name", StateBundle.client.businessName)
-    private val contactNameEntry = RequiredText("Contact Name", StateBundle.client.contactName)
-    private val streetEntry = RequiredText("Street", StateBundle.client.street)
-    private val cityEntry = RequiredText("City", StateBundle.client.city)
-    private val stateEntry = RequiredText("State", StateBundle.client.state)
-    private val zipEntry =
-        RequiredText("Zip Code", if (StateBundle.client.zip != -1) StateBundle.client.zip.toString() else "")
-    private val emailEntry = RequiredText("Email", StateBundle.client.email)
-    private val phoneEntry = RequiredText("Phone", StateBundle.client.phone)
+    private val businessNameResult = ValueErrorPair(StateBundle.client.businessName, true)
+    private val contactNameResult = ValueErrorPair(StateBundle.client.contactName, true)
+    private val streetResult = ValueErrorPair(StateBundle.client.street, true)
+    private val cityResult = ValueErrorPair(StateBundle.client.city, true)
+    private val stateResult = ValueErrorPair(StateBundle.client.state, true)
+    private val zipResult = ValueErrorPair(StateBundle.client.zip, true)
+    private val emailResult = ValueErrorPair(StateBundle.client.email, true)
+    private val phoneResult = ValueErrorPair(StateBundle.client.phone, true)
 
 
     val isError: Boolean
-        get() = businessNameEntry.isError ||
-                contactNameEntry.isError ||
-                streetEntry.isError ||
-                cityEntry.isError ||
-                stateEntry.isError ||
-                zipEntry.isError ||
-                emailEntry.isError ||
-                phoneEntry.isError
+        get() = businessNameResult.error ||
+                contactNameResult.error ||
+                streetResult.error ||
+                cityResult.error ||
+                stateResult.error ||
+                zipResult.error ||
+                emailResult.error ||
+                phoneResult.error
 
     val result: Client
         get() = Client(
-            businessNameEntry.result,
-            contactNameEntry.result,
-            streetEntry.result,
-            cityEntry.result,
-            stateEntry.result,
-            zipEntry.result.toInt(),
-            emailEntry.result,
-            phoneEntry.result
+            businessNameResult.value,
+            contactNameResult.value,
+            streetResult.value,
+            cityResult.value,
+            stateResult.value,
+            zipResult.value,
+            emailResult.value,
+            phoneResult.value
         )
 
     @Composable
@@ -120,14 +116,102 @@ class ClientCreationScreen : Screen {
                 presetButton.compose()
                 saveButton.compose()
             }
-            businessNameEntry.compose()
-            contactNameEntry.compose()
-            streetEntry.compose()
-            cityEntry.compose()
-            stateEntry.compose()
-            zipEntry.compose()
-            emailEntry.compose()
-            phoneEntry.compose()
+
+            textEntryFun(
+                "Business Name",
+                true,
+                initialText = businessNameResult.value,
+                singleLine = true,
+                onTextChange = {
+                    businessNameResult.value = it
+                },
+                onErrorChange = {
+                    businessNameResult.error = it
+                },
+            )
+            textEntryFun(
+                "Contact Name",
+                true,
+                initialText = contactNameResult.value,
+                singleLine = true,
+                onTextChange = {
+                    contactNameResult.value = it
+                },
+                onErrorChange = {
+                    contactNameResult.error = it
+                },
+            )
+            textEntryFun(
+                "Street",
+                true,
+                initialText = streetResult.value,
+                singleLine = true,
+                onTextChange = {
+                    streetResult.value = it
+                },
+                onErrorChange = {
+                    streetResult.error = it
+                },
+            )
+            textEntryFun(
+                "City",
+                true,
+                initialText = cityResult.value,
+                singleLine = true,
+                onTextChange = {
+                    cityResult.value = it
+                },
+                onErrorChange = {
+                    cityResult.error = it
+                },
+            )
+            textEntryFun(
+                "State",
+                true,
+                initialText = stateResult.value,
+                singleLine = true,
+                onTextChange = {
+                    stateResult.value = it
+                },
+                onErrorChange = {
+                    stateResult.error = it
+                },
+            )
+            zipEntryFun(
+                "Zip Code",
+                true,
+                initialVal = zipResult.value,
+                onValueChange = {
+                    zipResult.value = it
+                },
+                onErrorChange = {
+                    zipResult.error = it
+                },
+            )
+            textEntryFun(
+                "Email",
+                true,
+                initialText = emailResult.value,
+                singleLine = true,
+                onTextChange = {
+                    emailResult.value = it
+                },
+                onErrorChange = {
+                    emailResult.error = it
+                },
+            )
+            textEntryFun(
+                "Phone",
+                true,
+                initialText = phoneResult.value,
+                singleLine = true,
+                onTextChange = {
+                    phoneResult.value = it
+                },
+                onErrorChange = {
+                    phoneResult.error = it
+                },
+            )
             Row(modifier = Modifier.fillMaxWidth().weight(1f).padding(0.dp, 10.dp, 0.dp, 0.dp)) {
                 val commonModifier = Modifier.fillMaxWidth().weight(1f)
                 backCustomButton.addModifier(commonModifier)
