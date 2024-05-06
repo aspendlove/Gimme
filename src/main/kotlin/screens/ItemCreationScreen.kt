@@ -30,6 +30,8 @@ import storage.Item
 import storage.StateBundle
 import javax.swing.JOptionPane
 
+
+// TODO load from statebundle on initialization
 class ItemCreationScreen : Screen {
     private var _showSnackbar: MutableState<Boolean> = mutableStateOf(false)
     private val snackbarVisibleTime: Long = 3000
