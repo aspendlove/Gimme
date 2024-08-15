@@ -38,7 +38,7 @@ class GreetingScreen : Screen {
                 trackCustomButton.compose()
                 continueCustomButton.compose()
             }
-            Text("© Aidan Spendlove 2023", color = Color.White, modifier = Modifier.padding(0.dp, 40.dp, 0.dp, 0.dp))
+            Text("© Aidan Spendlove 2024", color = Color.White, modifier = Modifier.padding(0.dp, 40.dp, 0.dp, 0.dp))
         }
     }
 }
