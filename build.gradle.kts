@@ -37,7 +37,7 @@ compose.desktop {
     application {
         mainClass = "MainKt"
         nativeDistributions {
-            targetFormats(TargetFormat.Exe, TargetFormat.AppImage, TargetFormat.Msi)
+            targetFormats(TargetFormat.AppImage, TargetFormat.Msi)
             packageName = "Gimme"
             packageVersion = gimmeVersion
             version = gimmeVersion
