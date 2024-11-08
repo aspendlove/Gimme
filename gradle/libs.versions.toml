@@ -7,6 +7,7 @@ serializationPlugin = "2.0.20"
 voyager = "1.0.0"
 kotlinx-datetime = "0.6.1"
 featherVersion = "1.1.1"
+playwright = "1.48.0"
 
 [libraries]
 sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "jdbc" }
@@ -16,6 +17,7 @@ voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", vers
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 feather = { module = "br.com.devsrsouza.compose.icons:feather", version.ref = "featherVersion" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
+playwright = {module = "com.microsoft.playwright:playwright", version.ref = "playwright"}
 
 [plugins]
 jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose" }

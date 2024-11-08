@@ -1,10 +1,11 @@
+
 import com.aspendlove.gimme.generated.resources.Res
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import storage.Item
 import storage.StateBundle
 import java.awt.Desktop
 import java.io.File
-import java.io.FileWriter
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
@@ -101,8 +102,8 @@ class RegexBuilder : InvoiceBuilder {
                 file.delete()
                 file.createNewFile()
             }
-            val fileWriter = FileWriter(filePath)
-            fileWriter.write(result)
+            val fileWriter = FileOutputStream(file)
+            fileWriter.write(htmlToPdf(result))
             fileWriter.close()
             val desktop = Desktop.getDesktop()
             desktop.open(file)

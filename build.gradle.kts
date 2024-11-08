@@ -33,6 +33,7 @@ dependencies {
     implementation(libs.kotlinx.datetime)
     implementation(libs.feather)
     implementation(compose.components.resources)
+    implementation(libs.playwright)
     testImplementation(libs.kotlin.test)
 }
 

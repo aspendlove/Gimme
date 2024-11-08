@@ -89,7 +89,7 @@ class SummaryScreen : Screen {
 
             val dialog = FileDialog(null as Frame?, "Save File")
             dialog.mode = FileDialog.SAVE
-            dialog.file = "$invoiceName.html"
+            dialog.file = "$invoiceName.pdf"
 
             dialog.isVisible = true
             if (dialog.directory == null || dialog.file == null) {
