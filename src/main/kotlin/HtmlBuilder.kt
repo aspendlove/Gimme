@@ -1,3 +1,4 @@
+
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -8,17 +9,13 @@ import storage.User
 import java.awt.Desktop
 import java.io.File
 import java.io.FileWriter
-import java.math.BigDecimal
-import java.math.RoundingMode
 import java.text.SimpleDateFormat
 import java.util.*
 
 class HtmlBuilder : InvoiceBuilder {
-    override fun build(filePath: String, invoiceName: String) {
+    override suspend fun build(filePath: String, invoiceName: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            val fullPrice = StateBundle.items.fold(BigDecimal(0)) { running, item ->
-                running + item.total
-            }.setScale(2, RoundingMode.HALF_EVEN)
+            val fullPrice = StateBundle.total
             val htmlString = generateString(
                 StateBundle.user,
                 StateBundle.client,
@@ -248,10 +245,6 @@ class HtmlBuilder : InvoiceBuilder {
             workingOutput.append(phone)
         }
         return newlineToBreak(workingOutput.toString())
-    }
-
-    fun newlineToBreak(input: String): String {
-        return input.replace("\n", "<br/>")
     }
 
 }

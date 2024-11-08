@@ -1,0 +1,24 @@
+[versions]
+jdbc = "3.47.0.0"
+kotlin = "2.0.0"
+compose ="1.6.11"
+serialization = "1.7.3"
+serializationPlugin = "2.0.20"
+voyager = "1.0.0"
+kotlinx-datetime = "0.6.1"
+featherVersion = "1.1.1"
+
+[libraries]
+sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "jdbc" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
+voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
+feather = { module = "br.com.devsrsouza.compose.icons:feather", version.ref = "featherVersion" }
+kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
+
+[plugins]
+jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+jetbrains-kotlin-plugin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+serialization = {id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "serializationPlugin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

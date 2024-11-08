@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice</title>
+    <style>
+        #root {
+            margin: 0;
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        #logo {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        #notes {
+            max-width: 60%;
+        }
+
+        #total {
+            margin-right: 1.5em;
+        }
+
+        #info ul {
+            text-align: right;
+            list-style: none;
+        }
+
+        #name {
+            font-size:1.5em;
+        }
+
+        #items {
+            margin-top: 3em;
+        }
+
+        #items table {
+            min-width: 100%;
+            text-align: left;
+        }
+
+        #items table tr th {
+            margin-left: 1em;
+        }
+
+        #bottom-box {
+            margin-top: 2em;
+        }
+
+        .double-box {
+            display:flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items:center;
+            padding: 1em;
+            justify-content: space-between;
+        }
+
+        a {
+            color: black;
+            text-decoration-line: none;
+        }
+
+        .accent {
+            color: #066093;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&family=Roboto+Slab&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="root">
+    <div class="double-box" id="top-box">
+        <div id="logo" class="accent">{{User.businessName}}</div>
+        <div id="info">
+            <ul>
+                <li id="name">{{User.contactName}}</li>
+                <p>{{User.subtitle}}</p>
+                <li><br/></li>
+                <li>{{User.street}}</li>
+                <li>{{User.city}}, {{User.state}} {{User.zip}}</li>
+                <li>{{User.optionals}}</li>
+            </ul>
+        </div>
+    </div>
+    <div class="double-box" id="mid-box">
+        <div id="client">
+            <p style="font-size: 1.5em" class="accent">Bill to:</p>
+            <p style="font-size: 1.2em">{{Client.businessName}}</p>
+            {{Client.contactName}} <br/>
+            {{Client.street}} <br/>
+            {{Client.city}}, {{Client.state}} {{Client.zip}} <br/>
+            {{Client.optionals}}
+        </div>
+        <div id="invoice">
+            <p> <span style="font-weight: bold">Invoice Number:</span> {{Invoice.name}}<br/>
+                <span style="font-weight: bold">Invoice Date:</span> {{Invoice.invoiceDate}}<br/>
+                <span style="font-weight: bold">Due date:</span> {{Invoice.dueDate}}</p>
+        </div>
+    </div>
+    <div id="items">
+        <table>
+            <tr>
+                <th style="width: 2em" class="accent">#</th>
+                <th style="width: 8em" class="accent">Date(s)</th>
+                <th class="accent">Description</th>
+                <th style="width: 6em" class="accent">Quantity</th>
+                <th style="width: 6em" class="accent">Price</th>
+                <th style="width: 6em" class="accent">Item Total</th>
+            </tr>
+            {{Invoice.items}}
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><span style="font-weight: bolder;  font-size: larger;" class="accent">Total</span><br/></td>
+                <td>${{Invoice.total}}</td>
+            </tr>
+        </table>
+    </div>
+    <div class="double-box" id="bottom-box">
+        <div id="notes">
+            <p>
+                <span style="font-weight: bold;" class="accent">Notes</span><br/>
+                {{Invoice.notes}}
+            </p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,3 +1,3 @@
 interface InvoiceBuilder {
-    fun build(filePath: String, invoiceName: String)
+    suspend fun build(filePath: String, invoiceName: String)
 }

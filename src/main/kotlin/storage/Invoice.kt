@@ -11,10 +11,13 @@ data class Invoice(
     val clientPhone: String,
     override val id: Int = -1
 ) : hasId {
-    val name: String
-
-    init {
-        val iteration = id.toString()
-        name = "INV-" + iteration.padStart(8 - iteration.length, '0')
+    companion object {
+        fun formatInvoiceName(id: Int): String {
+            val iteration = id.toString()
+            return "INV-${iteration.padStart(8 - iteration.length, '0')}"
+        }
     }
+
+    val name: String
+        get() = formatInvoiceName(id)
 }

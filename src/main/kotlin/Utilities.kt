@@ -24,3 +24,7 @@ fun createIso8601String(
             "T${"%02d".format(hour)}:${"%02d".format(minute)}:${"%02d".format(second)}.${"%03d".format(millisecond)}" +
             utcOffsetString
 }
+
+fun newlineToBreak(input: String): String {
+    return input.replace("\n", "<br/>")
+}

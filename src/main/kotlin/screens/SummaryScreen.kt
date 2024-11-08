@@ -1,7 +1,7 @@
 package screens
 
-import HtmlBuilder
 import InvoiceBuilder
+import RegexBuilder
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Card
 import androidx.compose.runtime.Composable
@@ -13,6 +13,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import components.Body
 import components.CustomButton
+import kotlinx.coroutines.runBlocking
 import storage.DatabaseManager
 import storage.Invoice
 import storage.StateBundle
@@ -84,16 +85,7 @@ class SummaryScreen : Screen {
 
             val invoiceId = DatabaseManager.insertInvoice(completedInvoice)
 
-            // TODO fix this stupid way of getting the invoice name
-            val invoiceName = Invoice(
-                completedInvoice.sendDate,
-                completedInvoice.status,
-                completedInvoice.sender,
-                completedInvoice.clientBusinessName,
-                completedInvoice.clientEmail,
-                completedInvoice.clientPhone,
-                id = invoiceId
-            ).name
+            val invoiceName = Invoice.formatInvoiceName(invoiceId)
 
             val dialog = FileDialog(null as Frame?, "Save File")
             dialog.mode = FileDialog.SAVE
@@ -105,9 +97,10 @@ class SummaryScreen : Screen {
                 return@CustomButton
             }
             val fullPath: String = dialog.directory + dialog.file
-            val invoiceBuilder: InvoiceBuilder = HtmlBuilder()
-            invoiceBuilder.build(fullPath, invoiceName)
-
+            val invoiceBuilder: InvoiceBuilder = RegexBuilder()
+            runBlocking {
+                invoiceBuilder.build(fullPath, invoiceName)
+            }
             navigator += ConclusionScreen()
         }, "Create Invoice")
         val backButton = CustomButton({
